@@ -1,4 +1,5 @@
 from fastapi import APIRouter, status
+from pydantic import BaseModel
 from sqlalchemy import text
 
 from app.core.logging import get_logger
@@ -9,8 +10,14 @@ logger = get_logger(__name__)
 router = APIRouter(tags=["health"])
 
 
-@router.get("/health", status_code=status.HTTP_200_OK)
-def health_check() -> dict[str, str]:
+class HealthResponse(BaseModel):
+    status: str
+    api: str
+    database: str
+
+
+@router.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
+def health_check() -> HealthResponse:
     database = "disconnected"
     try:
         with engine.connect() as connection:
@@ -19,8 +26,8 @@ def health_check() -> dict[str, str]:
     except Exception:
         logger.exception("Database health check failed")
 
-    return {
-        "status": "ok" if database == "connected" else "degraded",
-        "api": "ok",
-        "database": database,
-    }
+    return HealthResponse(
+        status="ok" if database == "connected" else "degraded",
+        api="ok",
+        database=database,
+    )

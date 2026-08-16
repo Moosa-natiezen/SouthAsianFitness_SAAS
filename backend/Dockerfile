@@ -12,9 +12,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir uv
 
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 RUN uv sync --no-dev
 
+COPY alembic.ini ./
+COPY alembic ./alembic
 COPY app ./app
 
 EXPOSE 8000
