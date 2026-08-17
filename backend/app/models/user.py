@@ -1,17 +1,20 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import (
     CheckConstraint,
+    DateTime,
     ForeignKey,
     Numeric,
     String,
     Text,
     UniqueConstraint,
     Uuid,
+    func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -55,10 +58,10 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     email: Mapped[str] = mapped_column(String(320), nullable=False)
     display_name: Mapped[str] = mapped_column(String(150), nullable=False)
-    country_id: Mapped[UUID] = mapped_column(
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    country_id: Mapped[UUID | None] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey("countries.id", ondelete="RESTRICT"),
-        nullable=False,
         index=True,
     )
     region_id: Mapped[UUID | None] = mapped_column(
@@ -67,20 +70,32 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         index=True,
     )
     preferred_language: Mapped[str] = mapped_column(String(16), nullable=False, default="en")
-    preferred_unit_system: Mapped[UnitSystem] = mapped_column(
+    preferred_unit_system: Mapped[UnitSystem | None] = mapped_column(
         UNIT_SYSTEM_ENUM,
-        nullable=False,
     )
-    preferred_currency_code: Mapped[str] = mapped_column(
+    preferred_currency_code: Mapped[str | None] = mapped_column(
         ForeignKey("currencies.code", ondelete="RESTRICT"),
-        nullable=False,
         index=True,
     )
+    password_changed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        default=lambda: datetime.now(),
+    )
+    failed_login_attempts: Mapped[int] = mapped_column(nullable=False, default=0)
+    locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_onboarded: Mapped[bool] = mapped_column(nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
-    country: Mapped[Country] = relationship(back_populates="users")
+    country: Mapped[Country | None] = relationship(back_populates="users")
     region: Mapped[Region | None] = relationship(back_populates="users")
-    preferred_currency: Mapped[Currency] = relationship()
+    preferred_currency: Mapped[Currency | None] = relationship()
+    sessions: Mapped[list[UserSession]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
     profile: Mapped[UserProfile | None] = relationship(
         back_populates="user",
         uselist=False,
@@ -103,6 +118,25 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+
+class UserSession(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "user_sessions"
+
+    user_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    token_hash: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    user_agent: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
+    password_version: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    user: Mapped[User] = relationship(back_populates="sessions")
 
 
 class UserProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):

@@ -15,7 +15,7 @@ from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
 from app.models.progress import ProgressEntry
 from app.models.tags import CuisineTag, DietaryTag, FoodCategory
 from app.models.unit import Unit
-from app.models.user import User, UserFoodPreference, UserPreferences, UserProfile
+from app.models.user import User, UserFoodPreference, UserPreferences, UserProfile, UserSession
 
 __all__ = [
     "Country",
@@ -38,6 +38,7 @@ __all__ = [
     "UserFoodPreference",
     "UserPreferences",
     "UserProfile",
+    "UserSession",
     "food_cuisine_tags",
     "food_dietary_tags",
     "food_regions",

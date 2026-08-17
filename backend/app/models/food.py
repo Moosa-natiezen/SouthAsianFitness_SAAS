@@ -10,13 +10,13 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    JSON,
     Numeric,
     String,
     Text,
     UniqueConstraint,
     Uuid,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -44,7 +44,7 @@ class Food(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     slug: Mapped[str] = mapped_column(String(150), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
-    translations: Mapped[dict | None] = mapped_column(JSONB)
+    translations: Mapped[dict | None] = mapped_column(JSON)
     category_id: Mapped[UUID | None] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey("food_categories.id", ondelete="SET NULL"),

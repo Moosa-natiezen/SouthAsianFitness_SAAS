@@ -7,13 +7,13 @@ from uuid import UUID
 from sqlalchemy import (
     CheckConstraint,
     ForeignKey,
+    JSON,
     Numeric,
     String,
     Text,
     UniqueConstraint,
     Uuid,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -32,7 +32,7 @@ class Meal(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text)
-    translations: Mapped[dict | None] = mapped_column(JSONB)
+    translations: Mapped[dict | None] = mapped_column(JSON)
     meal_type: Mapped[MealType] = mapped_column(
         MEAL_TYPE_ENUM,
         nullable=False,

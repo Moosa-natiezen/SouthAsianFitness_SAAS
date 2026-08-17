@@ -24,6 +24,25 @@ class Settings(BaseSettings):
         ...,
         description="SQLAlchemy database URL, e.g. postgresql+psycopg://user:pass@host:5432/db",
     )
+    secret_key: str = Field(
+        ...,
+        min_length=32,
+        description="Secret key used for secure cookie and session signing",
+    )
+    csrf_secret_key: str = Field(
+        ...,
+        min_length=32,
+        description="Secret key used for CSRF token generation",
+    )
+    session_cookie_name: str = "saf_session"
+    csrf_cookie_name: str = "saf_csrf"
+    session_lifetime_seconds: int = 60 * 60 * 24 * 7
+    secure_cookies: bool = False
+    csrf_cookie_samesite: str = "lax"
+    login_max_attempts: int = 5
+    login_lockout_minutes: int = 15
+    login_rate_limit_window_seconds: int = 300
+    login_rate_limit_max_requests: int = 10
 
     cors_origins: str = "http://localhost:3000"
 
