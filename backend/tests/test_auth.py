@@ -33,7 +33,9 @@ def reset_db() -> None:
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db_session.engine = engine
-    db_session.SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, class_=Session)
+    db_session.SessionLocal = sessionmaker(
+        bind=engine, autocommit=False, autoflush=False, class_=Session
+    )
     settings.database_url = str(engine.url)
 
 
@@ -69,7 +71,9 @@ def seed_country_and_currency() -> str:
     return country_id
 
 
-def register_user(client: TestClient, email: str = "user@example.com") -> tuple[TestClient, dict[str, str]]:
+def register_user(
+    client: TestClient, email: str = "user@example.com"
+) -> tuple[TestClient, dict[str, str]]:
     response = client.post(
         "/api/auth/register",
         json={
@@ -85,7 +89,9 @@ def register_user(client: TestClient, email: str = "user@example.com") -> tuple[
     return client, payload
 
 
-def login_user(client: TestClient, email: str = "user@example.com") -> tuple[TestClient, dict[str, str]]:
+def login_user(
+    client: TestClient, email: str = "user@example.com"
+) -> tuple[TestClient, dict[str, str]]:
     response = client.post(
         "/api/auth/login",
         json={

@@ -99,7 +99,9 @@ class Food(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class FoodIngredient(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "food_ingredients"
     __table_args__ = (
-        UniqueConstraint("parent_food_id", "ingredient_food_id", name="uq_food_ingredients_parent_ingredient"),
+        UniqueConstraint(
+            "parent_food_id", "ingredient_food_id", name="uq_food_ingredients_parent_ingredient"
+        ),
         CheckConstraint("quantity > 0", name="positive_ingredient_quantity"),
     )
 

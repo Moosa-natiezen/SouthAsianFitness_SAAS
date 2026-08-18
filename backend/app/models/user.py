@@ -216,7 +216,9 @@ class UserPreferences(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
 class UserFoodPreference(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "user_food_preferences"
-    __table_args__ = (UniqueConstraint("user_id", "food_id", name="uq_user_food_preferences_user_food"),)
+    __table_args__ = (
+        UniqueConstraint("user_id", "food_id", name="uq_user_food_preferences_user_food"),
+    )
 
     user_id: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),

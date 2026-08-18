@@ -23,7 +23,9 @@ def get_current_user(
 ) -> User:
     token = request.cookies.get(settings.session_cookie_name)
     if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
+        )
 
     session = (
         db.query(UserSession)
@@ -34,19 +36,27 @@ def get_current_user(
     )
 
     if session is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
+        )
 
     user = db.query(User).filter(User.id == session.user_id).first()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
+        )
 
     if session.password_version != password_version(user.password_changed_at):
         session.revoked_at = datetime.now(UTC)
         db.commit()
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
+        )
 
     if user.locked_until and user.locked_until > datetime.now(UTC):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account temporarily locked")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Account temporarily locked"
+        )
 
     return user
 
@@ -63,7 +73,9 @@ def require_csrf(
         expected = request.cookies.get(settings.csrf_cookie_name)
         header_value = request.headers.get("X-CSRF-Token")
         if not expected or not header_value or not constant_time_equals(expected, header_value):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="CSRF validation failed")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="CSRF validation failed"
+            )
     return user
 
 

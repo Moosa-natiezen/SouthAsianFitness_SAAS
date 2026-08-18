@@ -79,7 +79,9 @@ class MealPlan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
 class MealPlanDay(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "meal_plan_days"
-    __table_args__ = (UniqueConstraint("meal_plan_id", "plan_date", name="uq_meal_plan_days_plan_date"),)
+    __table_args__ = (
+        UniqueConstraint("meal_plan_id", "plan_date", name="uq_meal_plan_days_plan_date"),
+    )
 
     meal_plan_id: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),

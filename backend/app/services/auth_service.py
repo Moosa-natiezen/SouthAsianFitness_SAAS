@@ -40,7 +40,9 @@ def ensure_dietary_tag(db: Session, slug: str, name: str, kind: DietaryTagKind) 
     normalized_slug = slug.strip().lower().replace(" ", "-")
     tag = db.query(DietaryTag).filter(DietaryTag.slug == normalized_slug).first()
     if tag is None:
-        tag = DietaryTag(slug=normalized_slug, name=name or normalized_slug.replace("-", " ").title(), kind=kind)
+        tag = DietaryTag(
+            slug=normalized_slug, name=name or normalized_slug.replace("-", " ").title(), kind=kind
+        )
         db.add(tag)
         db.flush()
     return tag
@@ -113,22 +115,35 @@ def login_user(db: Session, email: str, password: str, request: Request) -> tupl
     normalized_email = normalize_email(email)
     rate_key = f"login:{normalized_email}:{request.client.host if request.client else 'unknown'}"
     if not login_rate_limiter.allow(rate_key):
-        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many login attempts. Please try again later.")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many login attempts. Please try again later.",
+        )
 
     user = db.query(User).filter(User.email == normalized_email).first()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password."
+        )
 
     if user.locked_until and user.locked_until > datetime.now(UTC):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account temporarily locked.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Account temporarily locked."
+        )
 
     if not verify_password(password, user.password_hash):
         user.failed_login_attempts += 1
         if user.failed_login_attempts >= settings.login_max_attempts:
-            user.locked_until = datetime.now(UTC) + timedelta(minutes=settings.login_lockout_minutes)
-            logger.warning("User account locked for email %s due to repeated failed logins", normalized_email)
+            user.locked_until = datetime.now(UTC) + timedelta(
+                minutes=settings.login_lockout_minutes
+            )
+            logger.warning(
+                "User account locked for email %s due to repeated failed logins", normalized_email
+            )
         db.commit()
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password."
+        )
 
     user.failed_login_attempts = 0
     user.locked_until = None
@@ -153,7 +168,9 @@ def logout_user(db: Session, request: Request, response: Response) -> None:
 
 def change_password(db: Session, user: User, current_password: str, new_password: str) -> None:
     if not verify_password(current_password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is invalid.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is invalid."
+        )
 
     try:
         validate_password(new_password)
@@ -161,7 +178,10 @@ def change_password(db: Session, user: User, current_password: str, new_password
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
     if verify_password(new_password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New password must differ from the current password.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must differ from the current password.",
+        )
 
     user.password_hash = hash_password(new_password)
     user.password_changed_at = datetime.now(UTC)
@@ -182,16 +202,29 @@ def submit_onboarding(db: Session, user: User, payload: dict) -> User:
 
     region = None
     if region_id:
-        region = db.query(Region).filter(Region.id == region_id, Region.country_id == country.id).first()
+        region = (
+            db.query(Region).filter(Region.id == region_id, Region.country_id == country.id).first()
+        )
         if region is None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Selected region is invalid for the chosen country.")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Selected region is invalid for the chosen country.",
+            )
 
-    currency = db.query(Currency).filter(Currency.code == payload.get("preferred_currency_code", "").upper()).first()
+    currency = (
+        db.query(Currency)
+        .filter(Currency.code == payload.get("preferred_currency_code", "").upper())
+        .first()
+    )
     if currency is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preferred currency is invalid.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Preferred currency is invalid."
+        )
 
     if not payload.get("preferred_language"):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preferred language is required.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Preferred language is required."
+        )
 
     user.country_id = country.id
     user.region_id = region.id if region else None
@@ -212,11 +245,17 @@ def submit_onboarding(db: Session, user: User, payload: dict) -> User:
     db.add(profile)
     db.flush()
 
-    dietary_tag_slugs = list(payload.get("dietary_tag_slugs", [])) + list(payload.get("allergen_tag_slugs", []))
+    dietary_tag_slugs = list(payload.get("dietary_tag_slugs", [])) + list(
+        payload.get("allergen_tag_slugs", [])
+    )
     for slug in dietary_tag_slugs:
         if not slug:
             continue
-        tag_kind = DietaryTagKind.ALLERGEN if slug in payload.get("allergen_tag_slugs", []) else DietaryTagKind.DIET_PATTERN
+        tag_kind = (
+            DietaryTagKind.ALLERGEN
+            if slug in payload.get("allergen_tag_slugs", [])
+            else DietaryTagKind.DIET_PATTERN
+        )
         tag = ensure_dietary_tag(db, slug, slug, tag_kind)
         profile.dietary_tags.append(tag)
 

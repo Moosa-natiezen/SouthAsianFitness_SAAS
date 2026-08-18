@@ -11,9 +11,7 @@ logger = get_logger(__name__)
 
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(
-        request: Request, exc: StarletteHTTPException
-    ) -> JSONResponse:
+    async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
         logger.warning(
             "HTTP %s on %s %s: %s",
             exc.status_code,
@@ -39,5 +37,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
-        detail = str(exc) if settings.debug and not settings.is_production else "Internal server error"
+        detail = (
+            str(exc) if settings.debug and not settings.is_production else "Internal server error"
+        )
         return JSONResponse(status_code=500, content={"detail": detail})

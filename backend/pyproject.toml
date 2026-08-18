@@ -30,3 +30,6 @@ link-mode = "copy"
 target-version = "py312"
 line-length = 100
 src = ["app"]
+
+[tool.ruff.lint]
+ignore = ["B008"]
