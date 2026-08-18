@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -18,7 +19,7 @@ security = HTTPBearer(auto_error=False)
 
 def get_current_user(
     request: Request,
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ) -> User:
     token = request.cookies.get(settings.session_cookie_name)
     if not token:
@@ -28,7 +29,7 @@ def get_current_user(
         db.query(UserSession)
         .filter(UserSession.token_hash == hash_token(token))
         .filter(UserSession.revoked_at.is_(None))
-        .filter(UserSession.expires_at > datetime.now(timezone.utc))
+        .filter(UserSession.expires_at > datetime.now(UTC))
         .first()
     )
 
@@ -40,21 +41,24 @@ def get_current_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
 
     if session.password_version != password_version(user.password_changed_at):
-        session.revoked_at = datetime.now(timezone.utc)
+        session.revoked_at = datetime.now(UTC)
         db.commit()
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
 
-    if user.locked_until and user.locked_until > datetime.now(timezone.utc):
+    if user.locked_until and user.locked_until > datetime.now(UTC):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account temporarily locked")
 
     return user
 
 
-def require_auth(user: User = Depends(get_current_user)) -> User:
+def require_auth(user: Annotated[User, Depends(get_current_user)]) -> User:
     return user
 
 
-def require_csrf(request: Request, user: User = Depends(get_current_user)) -> User:
+def require_csrf(
+    request: Request,
+    user: Annotated[User, Depends(get_current_user)],
+) -> User:
     if request.method.upper() in {"POST", "PUT", "PATCH", "DELETE"}:
         expected = request.cookies.get(settings.csrf_cookie_name)
         header_value = request.headers.get("X-CSRF-Token")
@@ -63,7 +67,9 @@ def require_csrf(request: Request, user: User = Depends(get_current_user)) -> Us
     return user
 
 
-def get_auth_bearer(credentials: HTTPAuthorizationCredentials | None = Depends(security)) -> str | None:
+def get_auth_bearer(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
+) -> str | None:
     if credentials is None:
         return None
     return credentials.credentials

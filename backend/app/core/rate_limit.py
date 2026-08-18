@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import time
 from collections import defaultdict, deque
 from threading import Lock
-import time
 
 
 class InMemoryRateLimiter:

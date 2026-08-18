@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
@@ -19,7 +19,7 @@ from app.core.security import (
     verify_password,
 )
 from app.models.currency import Currency
-from app.models.enums import DietaryTagKind, DietPattern, UnitSystem
+from app.models.enums import DietaryTagKind, DietPattern
 from app.models.geography import Country, Region
 from app.models.tags import DietaryTag
 from app.models.user import User, UserPreferences, UserProfile, UserSession
@@ -65,7 +65,7 @@ def register_user(db: Session, email: str, password: str, display_name: str) -> 
         preferred_unit_system=None,
         preferred_currency_code=None,
         country_id=None,
-        password_changed_at=datetime.now(timezone.utc),
+        password_changed_at=datetime.now(UTC),
         is_onboarded=False,
         is_active=True,
     )
@@ -78,7 +78,7 @@ def register_user(db: Session, email: str, password: str, display_name: str) -> 
 def create_session_for_user(db: Session, user: User, request: Request) -> str:
     token = generate_token()
     token_hash = hash_token(token)
-    expires_at = datetime.now(timezone.utc) + timedelta(seconds=settings.session_lifetime_seconds)
+    expires_at = datetime.now(UTC) + timedelta(seconds=settings.session_lifetime_seconds)
     session = UserSession(
         user_id=user.id,
         token_hash=token_hash,
@@ -119,20 +119,20 @@ def login_user(db: Session, email: str, password: str, request: Request) -> tupl
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
 
-    if user.locked_until and user.locked_until > datetime.now(timezone.utc):
+    if user.locked_until and user.locked_until > datetime.now(UTC):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account temporarily locked.")
 
     if not verify_password(password, user.password_hash):
         user.failed_login_attempts += 1
         if user.failed_login_attempts >= settings.login_max_attempts:
-            user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=settings.login_lockout_minutes)
+            user.locked_until = datetime.now(UTC) + timedelta(minutes=settings.login_lockout_minutes)
             logger.warning("User account locked for email %s due to repeated failed logins", normalized_email)
         db.commit()
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
 
     user.failed_login_attempts = 0
     user.locked_until = None
-    user.last_login_at = datetime.now(timezone.utc)
+    user.last_login_at = datetime.now(UTC)
     db.flush()
     token = create_session_for_user(db, user, request)
     db.commit()
@@ -145,7 +145,7 @@ def logout_user(db: Session, request: Request, response: Response) -> None:
     if token:
         session = db.query(UserSession).filter(UserSession.token_hash == hash_token(token)).first()
         if session is not None:
-            session.revoked_at = datetime.now(timezone.utc)
+            session.revoked_at = datetime.now(UTC)
             db.commit()
     clear_session_cookie(response)
     logger.info("User logged out")
@@ -164,11 +164,11 @@ def change_password(db: Session, user: User, current_password: str, new_password
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New password must differ from the current password.")
 
     user.password_hash = hash_password(new_password)
-    user.password_changed_at = datetime.now(timezone.utc)
+    user.password_changed_at = datetime.now(UTC)
     user.failed_login_attempts = 0
     user.locked_until = None
     for session in user.sessions:
-        session.revoked_at = datetime.now(timezone.utc)
+        session.revoked_at = datetime.now(UTC)
     db.commit()
     logger.info("Password changed for user %s", user.id)
 

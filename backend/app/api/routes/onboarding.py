@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -15,8 +17,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/onboarding", response_model=OnboardingResponse)
 def save_onboarding(
     payload: OnboardingRequest,
-    user: User = Depends(require_csrf),
-    db: Session = Depends(get_db),
+    user: Annotated[User, Depends(require_csrf)],
+    db: Annotated[Session, Depends(get_db)],
 ):
     submit_onboarding(db, user, payload.model_dump())
     return OnboardingResponse(status="ok", is_onboarded=True)

@@ -1,14 +1,23 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, require_auth, require_csrf
+from app.api.deps import require_auth, require_csrf
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.security import generate_token
 from app.db.session import get_db
-from app.schemas.auth import AuthSession, AuthUser, ChangePasswordRequest, LoginRequest, RegisterRequest
+from app.models.user import User
+from app.schemas.auth import (
+    AuthSession,
+    AuthUser,
+    ChangePasswordRequest,
+    LoginRequest,
+    RegisterRequest,
+)
 from app.services.auth_service import (
     _user_response,
     change_password,
@@ -17,7 +26,6 @@ from app.services.auth_service import (
     logout_user,
     register_user,
 )
-from app.models.user import User
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -42,7 +50,7 @@ def register(
     payload: RegisterRequest,
     request: Request,
     response: Response,
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ):
     user = register_user(db, payload.email, payload.password, payload.display_name)
     token = create_session_for_user(db, user, request)
@@ -73,7 +81,7 @@ def login(
     payload: LoginRequest,
     request: Request,
     response: Response,
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ):
     user, token = login_user(db, payload.email, payload.password, request)
     response.set_cookie(
@@ -101,23 +109,23 @@ def login(
 def logout(
     request: Request,
     response: Response,
-    user: User = Depends(require_csrf),
-    db: Session = Depends(get_db),
+    user: Annotated[User, Depends(require_csrf)],
+    db: Annotated[Session, Depends(get_db)],
 ):
     logout_user(db, request, response)
     return {"status": "ok"}
 
 
 @router.get("/me")
-def get_current_user_data(user: User = Depends(require_auth)):
+def get_current_user_data(user: Annotated[User, Depends(require_auth)]):
     return AuthUser(**_user_response(user))
 
 
 @router.post("/change-password")
 def change_password_route(
     payload: ChangePasswordRequest,
-    user: User = Depends(require_csrf),
-    db: Session = Depends(get_db),
+    user: Annotated[User, Depends(require_csrf)],
+    db: Annotated[Session, Depends(get_db)],
 ):
     change_password(db, user, payload.current_password, payload.new_password)
     return {"status": "ok"}

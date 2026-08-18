@@ -8,11 +8,6 @@ os.environ.setdefault("CSRF_SECRET_KEY", "test-csrf-secret-key-1234567890abcdef"
 os.environ.setdefault("ENVIRONMENT", "testing")
 os.environ.setdefault("DEBUG", "false")
 
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
-
 from app import models as app_models  # noqa: F401
 from app.core.config import settings
 from app.core.rate_limit import login_rate_limiter
@@ -23,6 +18,10 @@ from app.main import app
 from app.models.currency import Currency
 from app.models.enums import UnitSystem
 from app.models.geography import Country
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 
 def reset_db() -> None:

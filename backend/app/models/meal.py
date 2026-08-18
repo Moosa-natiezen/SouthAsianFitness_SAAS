@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     ForeignKey,
-    JSON,
     Numeric,
     String,
     Text,

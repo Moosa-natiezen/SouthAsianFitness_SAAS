@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import secrets
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import bcrypt
 
@@ -50,5 +50,5 @@ def constant_time_equals(a: str, b: str) -> bool:
 
 def password_version(value: datetime | None) -> str:
     if value is None:
-        value = datetime.now(timezone.utc)
-    return value.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S%fZ")
+        value = datetime.now(UTC)
+    return value.astimezone(UTC).strftime("%Y%m%d%H%M%S%fZ")

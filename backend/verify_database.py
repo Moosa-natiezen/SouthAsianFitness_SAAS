@@ -20,15 +20,9 @@ Verifications performed:
    - Foreign key CASCADE enforcement (deleting user cascades to profile, preferences, meal plans, progress)
 """
 
-from datetime import date, datetime, timezone
-from decimal import Decimal
 import sys
-from copy import deepcopy
-
-from sqlalchemy import JSON, create_engine, inspect, select
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, sessionmaker
+from datetime import UTC, date, datetime
+from decimal import Decimal
 
 from app.core.config import settings
 from app.db.base import Base
@@ -45,7 +39,7 @@ from app.models.enums import (
     UnitDimension,
     UnitSystem,
 )
-from app.models.food import Food, FoodIngredient, FoodPrice
+from app.models.food import Food, FoodPrice
 from app.models.geography import Country, Region
 from app.models.meal import Meal, MealFood
 from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
@@ -53,6 +47,10 @@ from app.models.progress import ProgressEntry
 from app.models.tags import CuisineTag, DietaryTag, FoodCategory
 from app.models.unit import Unit
 from app.models.user import User, UserFoodPreference, UserPreferences, UserProfile
+from sqlalchemy import JSON, create_engine, inspect, select
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import Session, sessionmaker
 
 
 def _patch_jsonb_for_sqlite(metadata) -> None:
@@ -75,7 +73,7 @@ def get_test_engine():
             conn.execute(select(1))
         print("Connected successfully to PostgreSQL database:", settings.database_url.split("@")[-1])
         return pg_engine, "postgresql"
-    except Exception as err:
+    except SQLAlchemyError as err:
         print(
             f"Notice: Live PostgreSQL connection not available ({err.__class__.__name__}). "
             "Using test engine with SQLite + foreign keys enabled."
@@ -151,6 +149,7 @@ def verify_alembic_ddl() -> None:
         capture_output=True,
         text=True,
         cwd=".",
+        check=False,
     )
     if result.returncode != 0:
         print("ERROR: Alembic DDL generation failed:")
@@ -323,7 +322,7 @@ def test_crud_and_relationships(TestSession: sessionmaker) -> None:
             quantity=Decimal("1.000"),
             unit_id=unit_kg.id,
             source="Local Market Survey",
-            observed_at=datetime.now(timezone.utc),
+            observed_at=datetime.now(UTC),
         )
         db.add(daal_price)
 
@@ -424,7 +423,7 @@ def test_constraints_and_cascades(TestSession: sessionmaker) -> None:
             invalid_food = Food(
                 slug="invalid-negative-food",
                 name="Negative Calorie Food",
-                serving_size=Decimal("100"),
+                serving_size=Decimal(100),
                 serving_unit_id=unit_id,
                 calories=Decimal("-50.00"),  # Fails ck_foods_non_negative_calories
             )
