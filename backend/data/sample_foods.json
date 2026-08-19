@@ -1,0 +1,118 @@
+{
+  "foods": [
+    {
+      "name": "Basmati rice",
+      "slug": "basmati-rice",
+      "description": "Sample long-grain rice suitable for South Asian meals.",
+      "food_type": "ingredient",
+      "category": "grains",
+      "country": "PK",
+      "countries": ["PK", "IN"],
+      "region": "Punjab",
+      "regions": ["Punjab"],
+      "nutrition": {
+        "calories": 130,
+        "protein_g": 2.5,
+        "carbs_g": 28,
+        "fat_g": 0.4,
+        "fiber_g": 0.7
+      },
+      "serving": {
+        "amount": 100,
+        "unit": "g",
+        "grams_equivalent": 100
+      },
+      "ingredients": [],
+      "prices": [
+        {
+          "country": "PK",
+          "region": "Punjab",
+          "currency": "PKR",
+          "amount": 180,
+          "quantity": 1,
+          "unit": "kg",
+          "observed_at": "2026-08-01T00:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Daal",
+      "slug": "daal",
+      "description": "Sample lentil preparation common across South Asian households.",
+      "food_type": "composite",
+      "category": "prepared-meals",
+      "country": "PK",
+      "countries": ["PK", "IN"],
+      "region": "Sindh",
+      "regions": ["Sindh"],
+      "nutrition": {
+        "calories": 240,
+        "protein_g": 18,
+        "carbs_g": 30,
+        "fat_g": 5,
+        "fiber_g": 10
+      },
+      "serving": {
+        "amount": 1,
+        "unit": "serving",
+        "grams_equivalent": 250
+      },
+      "ingredients": [
+        {"name": "lentils", "quantity": 100, "unit": "g"},
+        {"name": "onion", "quantity": 30, "unit": "g"},
+        {"name": "tomato", "quantity": 25, "unit": "g"}
+      ],
+      "prices": [
+        {
+          "country": "PK",
+          "region": "Sindh",
+          "currency": "PKR",
+          "amount": 220,
+          "quantity": 1,
+          "unit": "serving",
+          "observed_at": "2026-08-01T00:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Chicken salan",
+      "slug": "chicken-salan",
+      "description": "Sample chicken curry dish to demonstrate composite foods.",
+      "food_type": "composite",
+      "category": "prepared-meals",
+      "country": "PK",
+      "countries": ["PK"],
+      "region": "Balochistan",
+      "regions": ["Balochistan"],
+      "nutrition": {
+        "calories": 420,
+        "protein_g": 32,
+        "carbs_g": 18,
+        "fat_g": 23,
+        "fiber_g": 3
+      },
+      "serving": {
+        "amount": 1,
+        "unit": "serving",
+        "grams_equivalent": 350
+      },
+      "ingredients": [
+        {"name": "chicken", "quantity": 180, "unit": "g"},
+        {"name": "onion", "quantity": 40, "unit": "g"},
+        {"name": "tomato", "quantity": 50, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"}
+      ],
+      "prices": [
+        {
+          "country": "PK",
+          "region": "Balochistan",
+          "currency": "PKR",
+          "amount": 540,
+          "quantity": 1,
+          "unit": "serving",
+          "observed_at": "2026-08-01T00:00:00+00:00"
+        }
+      ]
+    }
+  ]
+}
