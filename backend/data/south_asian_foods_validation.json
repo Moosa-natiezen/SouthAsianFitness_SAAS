@@ -1,7 +1,15 @@
 {
-  "total": 198,
-  "complete": 172,
-  "by_cat": {
+  "total_foods": 198,
+  "verified": 133,
+  "verified_with_notes": 2,
+  "pending_review": 63,
+  "rejected": 0,
+  "incomplete": 0,
+  "duplicate_candidates": 24,
+  "atwater_issues": 3,
+  "source_unverified": 0,
+  "country_issues": 0,
+  "by_category": {
     "grains": 18,
     "legumes": 16,
     "poultry": 2,
@@ -32,9 +40,37 @@
     "composite": 29
   },
   "by_verification": {
-    "pending_review": 198
+    "verified": 133,
+    "pending_review": 63,
+    "verified_with_notes": 2
   },
   "issues": [
-    "Coffee (brewed): Atwater 152%"
+    "lemon: deviation 34.7% (warning)",
+    "coriander-ground: deviation 30.6% (warning)",
+    "nimbu-pani: deviation 34.7% (warning)",
+    "{'type': 'same_fdc_id', 'fdc_id': 168944, 'slugs': ['whole-wheat-flour', 'chapati', 'poori', 'aloo-paratha']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168872, 'slugs': ['all-purpose-flour', 'naan', 'plain-paratha']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168870, 'slugs': ['semolina', 'upma']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168890, 'slugs': ['rice-flour', 'dosa', 'idli']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168553, 'slugs': ['puffed-rice', 'poha']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 173756, 'slugs': ['chickpeas', 'black-chickpeas']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 174288, 'slugs': ['chickpea-flour', 'papadum']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 171290, 'slugs': ['egg-boiled', 'egg-curry']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 171265, 'slugs': ['whole-milk', 'masala-chai']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 171271, 'slugs': ['plain-yogurt', 'sweet-lassi', 'raita']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 170875, 'slugs': ['paneer', 'palak-paneer']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 170457, 'slugs': ['tomato', 'rasam']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 170026, 'slugs': ['potato', 'aloo-gobi']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168427, 'slugs': ['fenugreek-leaves', 'fenugreek-seeds']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 173944, 'slugs': ['banana', 'mashed-banana']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 170076, 'slugs': ['lemon', 'nimbu-pani']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 12179, 'slugs': ['desiccated-coconut', 'coconut-milk']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 4513, 'slugs': ['mustard-oil', 'vegetable-oil']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168436, 'slugs': ['bay-leaf', 'garam-masala']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168438, 'slugs': ['mustard-seeds', 'nigella-seeds']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168451, 'slugs': ['tamarind', 'tamarind-chutney']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 172421, 'slugs': ['dal-boiled', 'khichdi', 'sambar']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 170031, 'slugs': ['mashed-potato', 'cucumber']}",
+    "{'type': 'same_fdc_id', 'fdc_id': 168425, 'slugs': ['carom-seeds', 'fennel-seeds']}"
   ]
 }
