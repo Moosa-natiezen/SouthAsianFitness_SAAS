@@ -84,5 +84,7 @@ class VerificationStatus(str, enum.Enum):
     UNVERIFIED = "unverified"
     PENDING_REVIEW = "pending_review"
     VERIFIED = "verified"
+    VERIFIED_WITH_NOTES = "verified_with_notes"
     CONFLICT = "conflict"
     RETRACTED = "retracted"
+    REJECTED = "rejected"

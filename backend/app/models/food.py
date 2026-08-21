@@ -204,4 +204,4 @@ class FoodPrice(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     country: Mapped[Country] = relationship()
     region: Mapped[Region | None] = relationship()
     currency: Mapped[Currency] = relationship()
-    unit: Mapped[Unit] = relationship()
+    unit: Mapped[Unit | None] = relationship()
