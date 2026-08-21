@@ -145,9 +145,11 @@ export function LandingPage() {
 
         <footer id="about" className="flex flex-col gap-4 border-t border-slate-200 py-6 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
           <p>© 2026 South Asian Fitness</p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link href="/auth/login">Login</Link>
             <Link href="/auth/signup">Sign up</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
           </div>
         </footer>
       </main>

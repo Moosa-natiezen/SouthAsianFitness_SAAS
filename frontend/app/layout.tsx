@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
@@ -13,9 +13,46 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#059669",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
-  title: "South Asian Fitness",
-  description: "Personalized, budget-friendly South Asian diet and fitness planning.",
+  title: {
+    default: "South Asian Fitness — Personalized Meal Planning",
+    template: "%s — South Asian Fitness",
+  },
+  description:
+    "Personalized, budget-friendly South Asian diet and fitness planning. " +
+    "Get meal plans built around the foods, meals, and budgets that fit your life.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "South Asian Fitness",
+    title: "South Asian Fitness — Personalized Meal Planning",
+    description:
+      "Personalized, budget-friendly South Asian diet and fitness planning. " +
+      "Get meal plans built around the foods, meals, and budgets that fit your life.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "South Asian Fitness — Personalized Meal Planning",
+    description:
+      "Personalized, budget-friendly South Asian diet and fitness planning.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({

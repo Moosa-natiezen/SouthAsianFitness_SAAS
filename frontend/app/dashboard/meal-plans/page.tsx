@@ -140,6 +140,17 @@ export default function MealPlansPage() {
         </div>
       )}
 
+      {/* Idle state - helpful guidance */}
+      {state.status === "idle" && (
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+          <p className="text-lg font-medium text-slate-700">No meal plan yet</p>
+          <p className="mt-2 text-slate-500">
+            Select your preferences above and click &quot;Generate Plan&quot; to create
+            a personalized meal plan based on your nutrition targets.
+          </p>
+        </div>
+      )}
+
       {/* Plan display */}
       {state.status === "ready" && (
         <MealPlanView plan={state.plan} />

@@ -3,7 +3,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.config import settings
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -37,7 +36,9 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
-        detail = (
-            str(exc) if settings.debug and not settings.is_production else "Internal server error"
+        # Never expose exception details to clients — even in debug mode.
+        # Debug details are available in server logs.
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal server error"},
         )
-        return JSONResponse(status_code=500, content={"detail": detail})

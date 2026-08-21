@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /auth/login
+Allow: /auth/signup
+
+Disallow: /dashboard/
+Disallow: /onboarding
+Disallow: /api/
+
+Sitemap: https://southasianfitness.com/sitemap.xml
