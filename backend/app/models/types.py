@@ -6,11 +6,13 @@ from app.models.enums import (
     DietPattern,
     FitnessGoal,
     FoodPreferenceType,
+    FoodSourceLicense,
     MealPlanStatus,
     MealType,
     Sex,
     UnitDimension,
     UnitSystem,
+    VerificationStatus,
 )
 
 
@@ -33,3 +35,5 @@ MEAL_TYPE_ENUM = _sa_enum(MealType, "meal_type")
 MEAL_PLAN_STATUS_ENUM = _sa_enum(MealPlanStatus, "meal_plan_status")
 FOOD_PREFERENCE_TYPE_ENUM = _sa_enum(FoodPreferenceType, "food_preference_type")
 DIETARY_TAG_KIND_ENUM = _sa_enum(DietaryTagKind, "dietary_tag_kind")
+FOOD_SOURCE_LICENSE_ENUM = _sa_enum(FoodSourceLicense, "food_source_license")
+VERIFICATION_STATUS_ENUM = _sa_enum(VerificationStatus, "verification_status")

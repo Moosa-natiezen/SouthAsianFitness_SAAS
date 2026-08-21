@@ -9,6 +9,7 @@ from app.models.associations import (
 )
 from app.models.currency import Currency
 from app.models.food import Food, FoodIngredient, FoodPrice
+from app.models.food_source import FoodSource
 from app.models.geography import Country, Region
 from app.models.meal import Meal, MealFood
 from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
@@ -26,6 +27,7 @@ __all__ = [
     "FoodCategory",
     "FoodIngredient",
     "FoodPrice",
+    "FoodSource",
     "Meal",
     "MealFood",
     "MealPlan",

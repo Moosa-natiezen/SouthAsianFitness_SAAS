@@ -179,3 +179,192 @@ def test_reimport_is_idempotent_for_duplicate_slug() -> None:
     assert db.query(Food).count() == 2
     assert db.query(Food).filter(Food.slug == "lentils").count() == 1
     db.close()
+
+
+def test_import_with_per_record_source() -> None:
+    """Verify per-record source provenance fields are persisted."""
+    db = reset_db()
+    payload = {
+        "foods": [
+            {
+                "name": "Basmati Rice",
+                "slug": "basmati-rice-provenance",
+                "category": "grains",
+                "food_type": "ingredient",
+                "country": "IN",
+                "nutrition": {
+                    "calories": 130,
+                    "protein_g": 2.7,
+                    "carbs_g": 28.2,
+                    "fat_g": 0.3,
+                },
+                "serving": {"amount": 100, "unit": "g", "grams_equivalent": 100},
+                "ingredients": [],
+                "prices": [],
+                "source": {
+                    "source_name": "USDA FoodData Central",
+                    "source_identifier": "FDC-169705",
+                    "source_version": "SR Legacy",
+                    "source_date": "2024-06-01T00:00:00+00:00",
+                    "verification_status": "pending_review",
+                    "notes": "Imported from USDA",
+                },
+            }
+        ]
+    }
+
+    summary = import_food_dataset(db, payload)
+    assert summary.imported == 1
+    assert summary.failed == 0
+
+    food = db.query(Food).filter(Food.slug == "basmati-rice-provenance").one()
+    assert food.source_identifier == "FDC-169705"
+    assert food.source_version == "SR Legacy"
+    assert food.verification_status.value == "pending_review"
+    assert food.imported_at is not None
+    assert food.source is not None
+    assert food.source.name == "USDA FoodData Central"
+    assert food.source.version == "SR Legacy"
+    db.close()
+
+
+def test_import_with_dataset_level_source() -> None:
+    """Verify dataset-level source metadata applies to all foods."""
+    db = reset_db()
+    payload = {
+        "dataset_source": {
+            "name": "ICMR-NIN IFCT",
+            "version": "2017",
+            "license_category": "open_data",
+            "can_store_raw_data": False,
+            "can_store_derived_values": True,
+            "source_date": "2017-01-01T00:00:00+00:00",
+        },
+        "foods": [
+            {
+                "name": "Chickpeas",
+                "slug": "chickpeas-ifct",
+                "category": "legumes",
+                "food_type": "ingredient",
+                "country": "IN",
+                "nutrition": {
+                    "calories": 164,
+                    "protein_g": 8.9,
+                    "carbs_g": 27.4,
+                    "fat_g": 2.6,
+                },
+                "serving": {"amount": 100, "unit": "g", "grams_equivalent": 100},
+                "ingredients": [],
+                "prices": [],
+            }
+        ],
+    }
+
+    summary = import_food_dataset(db, payload)
+    assert summary.imported == 1
+
+    food = db.query(Food).filter(Food.slug == "chickpeas-ifct").one()
+    assert food.source is not None
+    assert food.source.name == "ICMR-NIN IFCT"
+    assert food.source.version == "2017"
+    assert food.source.license_category.value == "open_data"
+    assert food.source.can_store_raw_data is False
+    assert food.source.can_store_derived_values is True
+    assert food.verification_status.value == "unverified"
+    db.close()
+
+
+def test_per_record_source_overrides_dataset_source() -> None:
+    """Per-record source should take precedence over dataset-level source."""
+    db = reset_db()
+    payload = {
+        "dataset_source": {
+            "name": "USDA FoodData Central",
+            "version": "2024",
+            "license_category": "public_domain",
+        },
+        "foods": [
+            {
+                "name": "Special Rice",
+                "slug": "special-rice-overrides",
+                "category": "grains",
+                "food_type": "ingredient",
+                "country": "IN",
+                "nutrition": {
+                    "calories": 130,
+                    "protein_g": 2.7,
+                    "carbs_g": 28.2,
+                    "fat_g": 0.3,
+                },
+                "serving": {"amount": 100, "unit": "g", "grams_equivalent": 100},
+                "ingredients": [],
+                "prices": [],
+                "source": {
+                    "source_name": "ICMR-NIN IFCT",
+                    "source_identifier": "IFCT-CUSTOM-001",
+                    "source_version": "2017",
+                    "verification_status": "verified",
+                },
+            }
+        ],
+    }
+
+    summary = import_food_dataset(db, payload)
+    assert summary.imported == 1
+
+    food = db.query(Food).filter(Food.slug == "special-rice-overrides").one()
+    assert food.source.name == "ICMR-NIN IFCT"
+    assert food.source_identifier == "IFCT-CUSTOM-001"
+    assert food.verification_status.value == "verified"
+    db.close()
+
+
+def test_food_source_created_once_per_name_version() -> None:
+    """Multiple foods from the same source should share one FoodSource record."""
+    from app.models.food_source import FoodSource
+
+    db = reset_db()
+    payload = {
+        "dataset_source": {
+            "name": "Shared Source",
+            "version": "1.0",
+        },
+        "foods": [
+            {
+                "name": "Food A",
+                "slug": "food-a-shared",
+                "category": "grains",
+                "food_type": "ingredient",
+                "country": "PK",
+                "nutrition": {"calories": 100, "protein_g": 5, "carbs_g": 20, "fat_g": 1},
+                "serving": {"amount": 100, "unit": "g", "grams_equivalent": 100},
+                "ingredients": [],
+                "prices": [],
+            },
+            {
+                "name": "Food B",
+                "slug": "food-b-shared",
+                "category": "legumes",
+                "food_type": "ingredient",
+                "country": "PK",
+                "nutrition": {"calories": 120, "protein_g": 8, "carbs_g": 18, "fat_g": 2},
+                "serving": {"amount": 100, "unit": "g", "grams_equivalent": 100},
+                "ingredients": [],
+                "prices": [],
+            },
+        ],
+    }
+
+    summary = import_food_dataset(db, payload)
+    assert summary.imported == 2
+
+    # Both foods should share the same FoodSource
+    sources = db.query(FoodSource).all()
+    assert len(sources) == 1
+    assert sources[0].name == "Shared Source"
+    assert sources[0].version == "1.0"
+
+    food_a = db.query(Food).filter(Food.slug == "food-a-shared").one()
+    food_b = db.query(Food).filter(Food.slug == "food-b-shared").one()
+    assert food_a.food_source_id == food_b.food_source_id
+    db.close()

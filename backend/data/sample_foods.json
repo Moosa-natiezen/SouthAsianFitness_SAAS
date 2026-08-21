@@ -1,4 +1,12 @@
 {
+  "dataset_source": {
+    "name": "Freebuff Internal - Sample Dataset",
+    "version": "1.0",
+    "license_category": "unknown",
+    "can_store_raw_data": false,
+    "can_store_derived_values": true,
+    "description": "Initial sample foods for development and testing. Not sourced from an authoritative database."
+  },
   "foods": [
     {
       "name": "Basmati rice",
@@ -33,7 +41,14 @@
           "unit": "kg",
           "observed_at": "2026-08-01T00:00:00+00:00"
         }
-      ]
+      ],
+      "source": {
+        "source_name": "Freebuff Internal - Sample Dataset",
+        "source_identifier": "sample-basmati-rice-001",
+        "source_version": "1.0",
+        "verification_status": "unverified",
+        "notes": "Placeholder values for development"
+      }
     },
     {
       "name": "Daal",
@@ -72,7 +87,14 @@
           "unit": "serving",
           "observed_at": "2026-08-01T00:00:00+00:00"
         }
-      ]
+      ],
+      "source": {
+        "source_name": "Freebuff Internal - Sample Dataset",
+        "source_identifier": "sample-daal-001",
+        "source_version": "1.0",
+        "verification_status": "unverified",
+        "notes": "Placeholder values for development"
+      }
     },
     {
       "name": "Chicken salan",
@@ -112,7 +134,14 @@
           "unit": "serving",
           "observed_at": "2026-08-01T00:00:00+00:00"
         }
-      ]
+      ],
+      "source": {
+        "source_name": "Freebuff Internal - Sample Dataset",
+        "source_identifier": "sample-chicken-salan-001",
+        "source_version": "1.0",
+        "verification_status": "unverified",
+        "notes": "Placeholder values for development"
+      }
     }
   ]
 }

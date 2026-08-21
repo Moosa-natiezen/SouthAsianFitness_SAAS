@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -14,12 +14,18 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.currency import Currency
-from app.models.enums import UnitDimension, UnitSystem
+from app.models.enums import FoodSourceLicense, UnitDimension, UnitSystem, VerificationStatus
 from app.models.food import Food, FoodIngredient, FoodPrice
+from app.models.food_source import FoodSource
 from app.models.geography import Country, Region
 from app.models.tags import FoodCategory
 from app.models.unit import Unit
-from app.schemas.food_import import FoodImportRecord, PriceImport
+from app.schemas.food_import import (
+    DatasetSourceMeta,
+    FoodImportRecord,
+    PriceImport,
+    SourceProvenanceImport,
+)
 
 DEFAULT_CURRENCY_MAP = {
     "PKR": ("Pakistani Rupee", "Rs"),
@@ -192,11 +198,101 @@ def _dataset_to_records(raw_items: list[dict[str, Any]]) -> list[FoodImportRecor
     return records
 
 
-def _upsert_food(db: Session, record: FoodImportRecord) -> tuple[Food, str]:
+def _ensure_food_source(
+    db: Session,
+    source_meta: SourceProvenanceImport | DatasetSourceMeta,
+) -> FoodSource:
+    """Get or create a FoodSource record from import metadata."""
+    # SourceProvenanceImport uses 'source_name', DatasetSourceMeta uses 'name'
+    name = getattr(source_meta, "source_name", None) or getattr(source_meta, "name", "unknown")
+    name = name.strip()
+    # SourceProvenanceImport uses 'source_version', DatasetSourceMeta uses 'version'
+    raw_version = getattr(source_meta, "source_version", None) or getattr(source_meta, "version", None)
+    version = raw_version.strip() if raw_version else "1.0"
+
+    existing = (
+        db.execute(
+            select(FoodSource).where(FoodSource.name == name, FoodSource.version == version)
+        )
+        .scalars()
+        .first()
+    )
+    if existing is not None:
+        return existing
+
+    license_cat = FoodSourceLicense.UNKNOWN
+    if hasattr(source_meta, "license_category"):
+        try:
+            license_cat = FoodSourceLicense(source_meta.license_category)
+        except ValueError:
+            license_cat = FoodSourceLicense.UNKNOWN
+
+    can_raw = getattr(source_meta, "can_store_raw_data", False)
+    can_derived = getattr(source_meta, "can_store_derived_values", True)
+    ref_url = getattr(source_meta, "reference_url", None)
+    attr_text = getattr(source_meta, "attribution_text", None)
+    desc = getattr(source_meta, "description", None)
+    src_date = None
+    raw_date = getattr(source_meta, "source_date", None)
+    if raw_date:
+        try:
+            src_date = datetime.fromisoformat(str(raw_date))
+        except (ValueError, TypeError):
+            src_date = None
+
+    source = FoodSource(
+        name=name,
+        version=version,
+        reference_url=ref_url,
+        license_category=license_cat,
+        attribution_text=attr_text,
+        can_store_raw_data=can_raw,
+        can_store_derived_values=can_derived,
+        description=desc,
+        source_date=src_date,
+        imported_at=datetime.now(tz=UTC),
+    )
+    db.add(source)
+    db.flush()
+    return source
+
+
+def _upsert_food(
+    db: Session,
+    record: FoodImportRecord,
+    source: FoodSource | None = None,
+) -> tuple[Food, str]:
     normalized_slug = _normalize_slug(record.slug)
     food = db.execute(select(Food).where(Food.slug == normalized_slug)).scalars().first()
     category = _ensure_category(db, record.category)
     serving_unit = _ensure_unit(db, record.serving.unit)
+
+    # Determine source and verification from per-record or dataset-level metadata
+    food_source_id = None
+    source_identifier = None
+    source_version = None
+    source_date = None
+    verification = VerificationStatus.UNVERIFIED
+    now = datetime.now(tz=UTC)
+
+    if record.source is not None:
+        per_source = _ensure_food_source(db, record.source)
+        food_source_id = per_source.id
+        source_identifier = record.source.source_identifier
+        source_version = record.source.source_version
+        try:
+            verification = VerificationStatus(record.source.verification_status)
+        except ValueError:
+            verification = VerificationStatus.UNVERIFIED
+        if record.source.source_date:
+            try:
+                source_date = datetime.fromisoformat(record.source.source_date)
+            except (ValueError, TypeError):
+                source_date = None
+    elif source is not None:
+        food_source_id = source.id
+        source_version = source.version
+        source_date = source.source_date
 
     if food is None:
         food = Food(
@@ -216,6 +312,12 @@ def _upsert_food(db: Session, record: FoodImportRecord) -> tuple[Food, str]:
             sodium_mg=record.nutrition.sodium_mg,
             is_active=True,
             translations=None,
+            food_source_id=food_source_id,
+            source_identifier=source_identifier,
+            source_version=source_version,
+            source_date=source_date,
+            imported_at=now,
+            verification_status=verification,
         )
         db.add(food)
         db.flush()
@@ -234,6 +336,11 @@ def _upsert_food(db: Session, record: FoodImportRecord) -> tuple[Food, str]:
     food.fiber_g = record.nutrition.fiber_g
     food.sugar_g = record.nutrition.sugar_g
     food.sodium_mg = record.nutrition.sodium_mg
+    if food_source_id is not None:
+        food.food_source_id = food_source_id
+        food.source_identifier = source_identifier
+        food.source_version = source_version
+        food.source_date = source_date
     return food, "updated"
 
 
@@ -335,11 +442,24 @@ def _upsert_ingredients(db: Session, record: FoodImportRecord, parent_food: Food
 
 
 def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, Any], *, dry_run: bool = False) -> ImportSummary:
-    payload = dataset if isinstance(dataset, list) else dataset.get("foods", [])
+    # Support both raw list and envelope with dataset_source metadata
+    if isinstance(dataset, list):
+        payload = dataset
+        dataset_source: DatasetSourceMeta | None = None
+    else:
+        payload = dataset.get("foods", [])
+        raw_meta = dataset.get("dataset_source")
+        dataset_source = DatasetSourceMeta.model_validate(raw_meta) if raw_meta else None
+
     try:
         records = _dataset_to_records(payload)
     except ImportValidationError as exc:
         raise ImportValidationError(str(exc)) from exc
+
+    # Resolve dataset-level source if present
+    dataset_source_obj: FoodSource | None = None
+    if dataset_source is not None:
+        dataset_source_obj = _ensure_food_source(db, dataset_source)
 
     summary = ImportSummary()
     failed_records: list[str] = []
@@ -360,7 +480,7 @@ def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, A
                 summary.skipped += 1
                 continue
 
-            food, action = _upsert_food(db, record)
+            food, action = _upsert_food(db, record, source=dataset_source_obj)
             if action == "updated":
                 summary.updated += 1
             else:

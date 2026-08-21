@@ -67,3 +67,22 @@ class UnitDimension(str, enum.Enum):
     COUNT = "count"
     ENERGY = "energy"
     LENGTH = "length"
+
+
+class FoodSourceLicense(str, enum.Enum):
+    PUBLIC_DOMAIN = "public_domain"
+    CC0 = "cc0"
+    CC_BY = "cc_by"
+    CC_BY_SA = "cc_by_sa"
+    OPEN_DATA = "open_data"
+    PROPRIETARY_ALLOW_REDIST = "proprietary_allow_redist"
+    PROPRIETARY_NO_REDIST = "proprietary_no_redist"
+    UNKNOWN = "unknown"
+
+
+class VerificationStatus(str, enum.Enum):
+    UNVERIFIED = "unverified"
+    PENDING_REVIEW = "pending_review"
+    VERIFIED = "verified"
+    CONFLICT = "conflict"
+    RETRACTED = "retracted"

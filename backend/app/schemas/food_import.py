@@ -50,6 +50,20 @@ class PriceImport(BaseModel):
         return value.strip().upper()
 
 
+class SourceProvenanceImport(BaseModel):
+    """Provenance metadata linking a food record to its data source."""
+
+    source_name: str = Field(..., min_length=1, max_length=150)
+    source_identifier: str | None = Field(default=None, max_length=255)
+    source_version: str | None = Field(default=None, max_length=64)
+    source_date: str | None = Field(default=None, max_length=32)
+    verification_status: str = Field(
+        default="unverified",
+        pattern=r"^(unverified|pending_review|verified|conflict|retracted)$",
+    )
+    notes: str | None = Field(default=None, max_length=1000)
+
+
 class FoodImportRecord(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     slug: str = Field(..., min_length=1, max_length=150)
@@ -64,6 +78,7 @@ class FoodImportRecord(BaseModel):
     serving: ServingImport
     ingredients: list[IngredientImport] = Field(default_factory=list)
     prices: list[PriceImport] = Field(default_factory=list)
+    source: SourceProvenanceImport | None = Field(default=None)
 
     @field_validator("country", "region")
     @classmethod
@@ -101,8 +116,26 @@ class FoodImportRecord(BaseModel):
         return list(dict.fromkeys(values))
 
 
+class DatasetSourceMeta(BaseModel):
+    """Top-level source metadata for an entire dataset file."""
+
+    name: str = Field(..., min_length=1, max_length=150)
+    version: str | None = Field(default=None, max_length=64)
+    reference_url: str | None = Field(default=None, max_length=2000)
+    license_category: str = Field(
+        default="unknown",
+        pattern=r"^(public_domain|cc0|cc_by|cc_by_sa|open_data|proprietary_allow_redist|proprietary_no_redist|unknown)$",
+    )
+    attribution_text: str | None = Field(default=None, max_length=2000)
+    can_store_raw_data: bool = Field(default=False)
+    can_store_derived_values: bool = Field(default=True)
+    source_date: str | None = Field(default=None, max_length=32)
+    description: str | None = Field(default=None, max_length=2000)
+
+
 class DatasetEnvelope(BaseModel):
     foods: list[FoodImportRecord]
+    dataset_source: DatasetSourceMeta | None = Field(default=None)
 
     @field_validator("foods")
     @classmethod

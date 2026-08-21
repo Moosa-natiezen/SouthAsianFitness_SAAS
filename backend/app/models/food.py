@@ -21,10 +21,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.associations import food_cuisine_tags, food_dietary_tags, food_regions
+from app.models.enums import VerificationStatus
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.types import VERIFICATION_STATUS_ENUM
 
 if TYPE_CHECKING:
     from app.models.currency import Currency
+    from app.models.food_source import FoodSource
     from app.models.geography import Country, Region
     from app.models.meal import MealFood
     from app.models.tags import CuisineTag, DietaryTag, FoodCategory
@@ -67,7 +70,25 @@ class Food(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sodium_mg: Mapped[Decimal | None] = mapped_column(Numeric(10, 3))
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
+    # Provenance / source tracking
+    food_source_id: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("food_sources.id", ondelete="SET NULL"),
+        index=True,
+    )
+    source_identifier: Mapped[str | None] = mapped_column(String(255))
+    source_version: Mapped[str | None] = mapped_column(String(64))
+    source_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    imported_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    verification_status: Mapped[VerificationStatus] = mapped_column(
+        VERIFICATION_STATUS_ENUM,
+        nullable=False,
+        default=VerificationStatus.UNVERIFIED,
+        index=True,
+    )
+
     category: Mapped[FoodCategory | None] = relationship(back_populates="foods")
+    source: Mapped[FoodSource | None] = relationship(back_populates="foods")
     serving_unit: Mapped[Unit] = relationship()
     regions: Mapped[list[Region]] = relationship(
         secondary=food_regions,

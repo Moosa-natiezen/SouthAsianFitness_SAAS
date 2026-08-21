@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, Field
@@ -19,6 +20,17 @@ class Serving(BaseModel):
     grams_equivalent: Decimal | None = None
 
 
+class ProvenanceOut(BaseModel):
+    source_name: str | None = None
+    source_identifier: str | None = None
+    source_version: str | None = None
+    source_date: datetime | None = None
+    verification_status: str = "unverified"
+    imported_at: datetime | None = None
+
+    model_config = {"from_attributes": True}
+
+
 class FoodOut(BaseModel):
     id: str
     slug: str
@@ -30,6 +42,7 @@ class FoodOut(BaseModel):
     serving_unit: str
     grams_per_serving: Decimal | None
     nutrition: Nutrition
+    provenance: ProvenanceOut | None = None
 
     model_config = {"from_attributes": True}
 
