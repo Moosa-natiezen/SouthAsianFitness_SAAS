@@ -31,3 +31,9 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Freebuff local config
+.freebuff/
+
+# USDA FDC API cache
+*.fdc_cache.json
