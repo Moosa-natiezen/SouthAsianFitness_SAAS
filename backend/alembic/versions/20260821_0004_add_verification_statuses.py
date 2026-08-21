@@ -1,15 +1,15 @@
 """Add VERIFIED_WITH_NOTES and REJECTED to verification_status enum.
 
-Revision ID: 0004
-Revises: 0003
+Revision ID: 20260821_0004
+Revises: 20260818_0003
 Create Date: 2026-08-21
 """
 
 from alembic import op
 import sqlalchemy as sa
 
-revision = "0004"
-down_revision = "0003"
+revision = "20260821_0004"
+down_revision = "20260818_0003"
 branch_labels = None
 depends_on = None
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_db, require_csrf
 from app.models.user import User
 from app.schemas.meal_plan import (
     MealPlanFailureResponse,
@@ -118,13 +118,14 @@ def _build_plan_response(result) -> MealPlanResponse | MealPlanFailureResponse:
 )
 def generate(
     body: MealPlanGenerateRequest | None = None,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_csrf),
     db: Session = Depends(get_db),
 ):
     """Generate a meal plan for the authenticated user.
 
     Uses server-side nutrition targets (not client-provided).
     All foods are verified-only. Respects diet pattern, allergies, and dislikes.
+    Requires CSRF token for this mutating POST endpoint.
     """
     plan_days = body.plan_days if body else None
     meal_count = body.meal_count if body else None
