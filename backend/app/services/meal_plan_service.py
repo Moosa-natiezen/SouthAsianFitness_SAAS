@@ -132,7 +132,10 @@ def generate_meal_plan(
     all_warnings: list[str] = []
 
     # Validate plan_days
-    days = plan_days or OPTIMIZER_PARAMS.default_plan_days
+    if plan_days is not None:
+        days = plan_days
+    else:
+        days = OPTIMIZER_PARAMS.default_plan_days
     if days > OPTIMIZER_PARAMS.max_plan_days:
         return GenerationResult(
             success=False,
@@ -255,6 +258,7 @@ def generate_meal_plan(
             price_per_gram=price_per_gram,
             candidates=candidates,
             meal_slots=structure.slots,
+            day_index=day_offset,
         )
 
         day_result = optimize_day(opt_ctx)

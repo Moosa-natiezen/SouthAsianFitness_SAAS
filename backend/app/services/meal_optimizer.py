@@ -98,6 +98,9 @@ class OptimizationContext:
     # Structure
     meal_slots: tuple[MealSlot, ...]
 
+    # Day index for cross-day variety (0-based, deterministic)
+    day_index: int = 0
+
 
 def optimize_day(ctx: OptimizationContext) -> DayResult:
     """Optimize a full day of meals.
@@ -135,6 +138,7 @@ def optimize_day(ctx: OptimizationContext) -> DayResult:
             categories_used=categories_used,
             daily_budget=ctx.daily_budget,
             budget_currency=ctx.budget_currency,
+            day_index=ctx.day_index,
         )
 
         all_meals.append(meal)
@@ -180,8 +184,11 @@ def optimize_day(ctx: OptimizationContext) -> DayResult:
             f"from target ({ctx.calorie_target:.0f})"
         )
 
-    if not cost_complete and ctx.daily_budget is not None:
-        all_warnings.append("Some foods lack price data; budget estimate is incomplete")
+    if not cost_complete:
+        if ctx.daily_budget is not None:
+            all_warnings.append("Some foods lack price data; budget estimate is incomplete")
+        else:
+            all_warnings.append("No price data available for selected foods")
 
     return DayResult(
         meals=all_meals,
@@ -208,6 +215,7 @@ def _optimize_meal(
     categories_used: list[str],
     daily_budget: Decimal | None,
     budget_currency: str | None,
+    day_index: int = 0,
 ) -> MealResult:
     """Optimize a single meal slot using greedy scoring."""
     warnings: list[str] = []
@@ -227,6 +235,7 @@ def _optimize_meal(
         foods_used_today=foods_used_today,
         categories_used=categories_used,
         price_per_gram=price_per_gram,
+        day_index=day_index,
     )
 
     # Greedy selection: pick top foods until we fill the slot
@@ -456,10 +465,13 @@ def _score_candidates(
     foods_used_today: dict[str, int],
     categories_used: list[str],
     price_per_gram: dict[str, Decimal],
+    day_index: int = 0,
 ) -> list[tuple[float, object]]:
     """Score all candidates and return sorted (score, candidate) pairs.
 
     Lower score = better candidate.
+    day_index introduces a small deterministic offset per food so that
+    multi-day plans do not produce identical daily plans.
     """
     scored = []
     w = SCORING_WEIGHTS
@@ -491,10 +503,20 @@ def _score_candidates(
         if c.category_slug and c.category_slug in categories_used:
             variety += 0.02
 
+        # Cross-day variety: deterministic per-food offset based on day_index
+        # Uses a simple hash of the slug + day_index to create a small
+        # deterministic perturbation that varies across days.
+        day_offset = 0.0
+        if day_index > 0:
+            # Simple deterministic hash: sum of ord values modulo small prime
+            slug_hash = sum(ord(ch) for ch in c.slug) % 7
+            day_offset = 0.03 * ((day_index * 3 + slug_hash) % 5) * 0.1
+
         total = (
             nutrition_score
             + w.preference_penalty * pref_penalty
             + variety
+            + day_offset
         )
 
         scored.append((total, c))
