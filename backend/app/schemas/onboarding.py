@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.models.enums import ActivityLevel, FitnessGoal, Sex, UnitSystem
+from app.models.enums import ActivityLevel, DietPattern, FitnessGoal, Sex, UnitSystem
 
 
 class OnboardingRequest(BaseModel):
@@ -20,6 +20,7 @@ class OnboardingRequest(BaseModel):
     weight_kg: Decimal = Field(..., gt=0)
     activity_level: ActivityLevel
     fitness_goal: FitnessGoal
+    diet_pattern: DietPattern = Field(default=DietPattern.OMNIVORE)
     dietary_tag_slugs: list[str] = Field(default_factory=list)
     allergen_tag_slugs: list[str] = Field(default_factory=list)
     food_dislikes: list[str] = Field(default_factory=list)
