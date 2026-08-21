@@ -1,0 +1,40 @@
+{
+  "total": 198,
+  "complete": 172,
+  "by_cat": {
+    "grains": 18,
+    "legumes": 16,
+    "poultry": 2,
+    "eggs": 3,
+    "meats": 5,
+    "fish": 6,
+    "dairy": 13,
+    "vegetables": 33,
+    "fruits": 21,
+    "nuts-seeds": 13,
+    "oils-fats": 8,
+    "spices": 24,
+    "beverages": 8,
+    "sweeteners": 3,
+    "breads": 8,
+    "prepared-dishes": 15,
+    "snacks": 2
+  },
+  "by_country": {
+    "PK": 145,
+    "IN": 196,
+    "BD": 138,
+    "LK": 63,
+    "NP": 94
+  },
+  "by_type": {
+    "ingredient": 169,
+    "composite": 29
+  },
+  "by_verification": {
+    "pending_review": 198
+  },
+  "issues": [
+    "Coffee (brewed): Atwater 152%"
+  ]
+}
