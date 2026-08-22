@@ -19,20 +19,15 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    # 1. Create food_source_license enum type
-    op.execute(
-        "CREATE TYPE food_source_license AS ENUM ("
-        "'public_domain', 'cc0', 'cc_by', 'cc_by_sa', 'open_data', "
-        "'proprietary_allow_redist', 'proprietary_no_redist', 'unknown')"
-    )
+    # 1. Create verification_status enum type (used later in add_column,
+    #    so we must create it before the column that references it).
+    sa.Enum(
+        "unverified", "pending_review", "verified", "conflict", "retracted",
+        name="verification_status",
+    ).create(op.get_bind(), checkfirst=True)
 
-    # 2. Create verification_status enum type
-    op.execute(
-        "CREATE TYPE verification_status AS ENUM ("
-        "'unverified', 'pending_review', 'verified', 'conflict', 'retracted')"
-    )
-
-    # 3. Create food_sources table
+    # 2. Create food_sources table (food_source_license enum is auto-created
+    #    by SQLAlchemy when the table is created).
     op.create_table(
         "food_sources",
         sa.Column("name", sa.String(length=150), nullable=False),
@@ -126,6 +121,7 @@ def upgrade() -> None:
                 "conflict",
                 "retracted",
                 name="verification_status",
+                create_type=False,
             ),
             nullable=False,
             server_default="unverified",
