@@ -226,6 +226,7 @@ def test_crud_and_relationships(TestSession: sessionmaker) -> None:
         user = User(
             email="ahmed.khan@example.com",
             display_name="Ahmed Khan",
+            password_hash="$2b$12$fakehashforverificationonly000000000000000000000",
             country_id=pk.id,
             region_id=punjab_pk.id,
             preferred_language="ur",
@@ -442,6 +443,7 @@ def test_constraints_and_cascades(TestSession: sessionmaker) -> None:
             dup_user = User(
                 email="ahmed.khan@example.com",  # Already exists
                 display_name="Ahmed Duplicate",
+                password_hash="$2b$12$fakehashforverificationonly000000000000000000000",
                 country_id=country_id,
                 preferred_language="en",
                 preferred_unit_system=UnitSystem.METRIC,
