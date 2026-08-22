@@ -15,7 +15,7 @@ else:
     engine_kwargs["pool_size"] = 5
     engine_kwargs["max_overflow"] = 10
 
-engine = create_engine(settings.database_url, **engine_kwargs)
+engine = create_engine(settings.sqlalchemy_database_url, **engine_kwargs)
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, class_=Session)
 

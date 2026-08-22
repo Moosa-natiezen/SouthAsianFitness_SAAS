@@ -24,6 +24,20 @@ class Settings(BaseSettings):
         ...,
         description="SQLAlchemy database URL, e.g. postgresql+psycopg://user:pass@host:5432/db",
     )
+
+    @property
+    def sqlalchemy_database_url(self) -> str:
+        """Return the database URL with the correct psycopg v3 driver prefix.
+
+        Neon and many providers issue plain ``postgresql://`` URLs.  SQLAlchemy
+        interprets that as the psycopg2 dialect which this project does not
+        install.  Normalise to ``postgresql+psycopg://`` so the psycopg v3 driver
+        (specified in pyproject.toml) is always used.
+        """
+        url = self.database_url
+        if url.startswith("postgresql://"):
+            url = "postgresql+psycopg://" + url[len("postgresql://") :]
+        return url
     secret_key: str = Field(
         ...,
         min_length=32,
