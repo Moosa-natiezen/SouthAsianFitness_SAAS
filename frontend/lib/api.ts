@@ -237,21 +237,21 @@ export async function fetchHealth(): Promise<HealthResponse> {
 }
 
 export async function getCsrfToken(): Promise<string> {
-  const response = await apiFetch<{ csrf_token: string }>("/auth/csrf", {
+  const response = await apiFetch<{ csrf_token: string }>("/api/auth/csrf", {
     method: "GET",
   });
   return response.csrf_token;
 }
 
 export async function registerUser(payload: RegisterRequest): Promise<AuthSession> {
-  return apiFetch<AuthSession>("/auth/register", {
+  return apiFetch<AuthSession>("/api/auth/register", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
 export async function loginUser(payload: LoginRequest): Promise<AuthSession> {
-  return apiFetch<AuthSession>("/auth/login", {
+  return apiFetch<AuthSession>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -259,19 +259,19 @@ export async function loginUser(payload: LoginRequest): Promise<AuthSession> {
 
 export async function logoutUser(): Promise<void> {
   const csrfToken = await getCsrfToken();
-  await apiFetch<unknown>("/auth/logout", {
+  await apiFetch<unknown>("/api/auth/logout", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
   });
 }
 
 export async function getCurrentUser(): Promise<AuthUser> {
-  return apiFetch<AuthUser>("/auth/me");
+  return apiFetch<AuthUser>("/api/auth/me");
 }
 
 export async function submitOnboarding(payload: OnboardingRequest): Promise<void> {
   const csrfToken = await getCsrfToken();
-  await apiFetch<unknown>("/auth/onboarding", {
+  await apiFetch<unknown>("/api/auth/onboarding", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
     body: JSON.stringify(payload),
