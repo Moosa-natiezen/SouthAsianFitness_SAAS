@@ -39,7 +39,7 @@ def get_csrf_token(response: Response):
         value=token,
         httponly=False,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
         path="/",
     )
     return {"csrf_token": token}
@@ -59,7 +59,7 @@ def register(
         value=token,
         httponly=True,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
         max_age=settings.session_lifetime_seconds,
         path="/",
     )
@@ -69,7 +69,7 @@ def register(
         value=csrf_token,
         httponly=False,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
         path="/",
     )
     db.commit()
@@ -89,7 +89,7 @@ def login(
         value=token,
         httponly=True,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
         max_age=settings.session_lifetime_seconds,
         path="/",
     )
@@ -99,7 +99,7 @@ def login(
         value=csrf_token,
         httponly=False,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
         path="/",
     )
     return AuthSession(user=AuthUser(**_user_response(user)), csrf_token=csrf_token)

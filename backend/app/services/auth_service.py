@@ -100,14 +100,14 @@ def clear_session_cookie(response: Response) -> None:
         path="/",
         httponly=True,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
     )
     response.delete_cookie(
         key=settings.csrf_cookie_name,
         path="/",
         httponly=False,
         secure=settings.is_production or settings.secure_cookies,
-        samesite="lax",
+        samesite=settings.cookie_samesite,
     )
 
 

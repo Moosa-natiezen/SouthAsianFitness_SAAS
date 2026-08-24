@@ -68,6 +68,15 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
 
+    @property
+    def cookie_samesite(self) -> str:
+        """SameSite attribute for authentication cookies.
+
+        Production uses None (cross-site) because the Vercel frontend and
+        Render backend live on different origins.  Development keeps Lax.
+        """
+        return "none" if self.is_production else "lax"
+
 
 @lru_cache
 def get_settings() -> Settings:

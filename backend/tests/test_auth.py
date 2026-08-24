@@ -273,3 +273,61 @@ def test_basic_rate_limit_behavior() -> None:
         )
     assert response.status_code == 429
     assert response.json()["detail"] == "Too many login attempts. Please try again later."
+
+
+def test_cookie_samesite_development() -> None:
+    """In development, cookies should use SameSite=Lax."""
+    settings.environment = "development"
+    assert settings.cookie_samesite == "lax"
+
+
+def test_cookie_samesite_production() -> None:
+    """In production, cookies should use SameSite=None for cross-site auth."""
+    settings.environment = "production"
+    assert settings.cookie_samesite == "none"
+    settings.environment = "testing"
+
+
+def test_production_login_cookie_attributes() -> None:
+    """Production login should set SameSite=None and Secure=True cookies."""
+    settings.environment = "production"
+    login_rate_limiter.clear()
+    client = make_client()
+    register_user(client)
+    client = TestClient(app)
+    response = client.post(
+        "/api/auth/login",
+        json={"email": "user@example.com", "password": "StrongPass!123"},
+    )
+    assert response.status_code == 200
+    # Check session cookie
+    session_cookie = response.headers.get_list("set-cookie")
+    session_header = next(h for h in session_cookie if "saf_session" in h)
+    assert "samesite=none" in session_header.lower()
+    assert "httponly" in session_header.lower()
+    assert "secure" in session_header.lower()
+    assert "path=/" in session_header.lower()
+    # Check CSRF cookie
+    csrf_header = next(h for h in session_cookie if "saf_csrf" in h)
+    assert "samesite=none" in csrf_header.lower()
+    assert "secure" in csrf_header.lower()
+    assert "path=/" in csrf_header.lower()
+    settings.environment = "testing"
+
+
+def test_development_login_cookie_attributes() -> None:
+    """Development login should set SameSite=Lax cookies."""
+    settings.environment = "development"
+    login_rate_limiter.clear()
+    client = make_client()
+    register_user(client)
+    client = TestClient(app)
+    response = client.post(
+        "/api/auth/login",
+        json={"email": "user@example.com", "password": "StrongPass!123"},
+    )
+    assert response.status_code == 200
+    session_cookie = response.headers.get_list("set-cookie")
+    session_header = next(h for h in session_cookie if "saf_session" in h)
+    assert "samesite=lax" in session_header.lower()
+    settings.environment = "testing"
