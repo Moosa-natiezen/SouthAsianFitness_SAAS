@@ -1,31 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { submitOnboarding } from "@/lib/api";
+import { fetchLocations, submitOnboarding, type CountryData } from "@/lib/api";
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
-
-const countryOptions = [
-  { value: "11111111-1111-4111-8111-111111111111", label: "Pakistan" },
-  { value: "22222222-2222-4222-8222-222222222222", label: "India" },
-  { value: "33333333-3333-4333-8333-333333333333", label: "Bangladesh" },
-  { value: "44444444-4444-4444-8444-444444444444", label: "Sri Lanka" },
-  { value: "55555555-5555-4555-8555-555555555555", label: "Nepal" },
-  { value: "66666666-6666-4666-8666-666666666666", label: "United Arab Emirates" },
-];
-
-const regionOptions: Record<string, string[]> = {
-  "11111111-1111-4111-8111-111111111111": ["Punjab", "Sindh", "Khyber Pakhtunkhwa", "Balochistan"],
-  "22222222-2222-4222-8222-222222222222": ["Punjab", "Maharashtra", "Karnataka", "West Bengal"],
-  "33333333-3333-4333-8333-333333333333": ["Dhaka", "Chittagong", "Khulna", "Sylhet"],
-  "44444444-4444-4444-8444-444444444444": ["Western", "Central", "Southern", "Northern"],
-  "55555555-5555-4555-8555-555555555555": ["Bagmati", "Lumbini", "Koshi", "Gandaki"],
-  "66666666-6666-4666-8666-666666666666": ["Dubai", "Abu Dhabi", "Sharjah", "Ajman"],
-};
 
 /** Backend ActivityLevel enum — these exact values are sent to the API. */
 const activityLevels = [
@@ -77,7 +59,7 @@ type FormState = {
 };
 
 const initialForm: FormState = {
-  country_id: "11111111-1111-4111-8111-111111111111",
+  country_id: "",
   region_id: "",
   preferred_currency_code: "PKR",
   preferred_language: "en",
@@ -115,7 +97,42 @@ export function OnboardingWizard() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const currentRegions = regionOptions[form.country_id] ?? [];
+  /* ── Locations data from API ───────────────────────────────────────── */
+  const [countries, setCountries] = useState<CountryData[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [locationsError, setLocationsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const data = await fetchLocations();
+        if (cancelled) return;
+        setCountries(data);
+        // Auto-select first country and set its currency
+        if (data.length > 0 && !form.country_id) {
+          setForm((c) => ({
+            ...c,
+            country_id: data[0].id,
+            preferred_currency_code: data[0].currency_code,
+          }));
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setLocationsError(
+            err instanceof Error ? err.message : "Unable to load countries.",
+          );
+        }
+      } finally {
+        if (!cancelled) setLocationsLoading(false);
+      }
+    }
+    void load();
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const selectedCountry = countries.find((c) => c.id === form.country_id);
+  const currentRegions = selectedCountry?.regions ?? [];
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setForm((c) => ({ ...c, [field]: value }));
@@ -124,7 +141,14 @@ export function OnboardingWizard() {
   const handleSelect = (event: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
     if (name === "country_id") {
-      setForm((c) => ({ ...c, country_id: value, region_id: "" }));
+      // When country changes, update currency to match and reset region
+      const newCountry = countries.find((c) => c.id === value);
+      setForm((c) => ({
+        ...c,
+        country_id: value,
+        region_id: "",
+        preferred_currency_code: newCountry?.currency_code ?? c.preferred_currency_code,
+      }));
       return;
     }
     updateField(name as keyof FormState, value as never);
@@ -173,7 +197,7 @@ export function OnboardingWizard() {
 
   const handleBack = () => {
     setError(null);
-    setStepIndex((c) => Math.max(0, c + 1));
+    setStepIndex((c) => Math.max(0, c - 1));
   };
 
   /* ── Submit ─────────────────────────────────────────────────────────── */
@@ -221,19 +245,33 @@ export function OnboardingWizard() {
     const inputClass = selectClass;
 
     if (stepIndex === 0) {
+      if (locationsLoading) {
+        return (
+          <div className="flex items-center justify-center py-8" aria-live="polite">
+            <p className="text-sm text-slate-500">Loading countries...</p>
+          </div>
+        );
+      }
+      if (locationsError) {
+        return (
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {locationsError}
+          </div>
+        );
+      }
       return (
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
             <label htmlFor="country" className="text-sm font-medium text-slate-700">Country</label>
             <select id="country" name="country_id" value={form.country_id} onChange={handleSelect} className={selectClass}>
-              {countryOptions.map((c) => (<option key={c.value} value={c.value}>{c.label}</option>))}
+              {countries.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
             </select>
           </div>
           <div className="space-y-2 md:col-span-2">
             <label htmlFor="region" className="text-sm font-medium text-slate-700">Region / state / province</label>
             <select id="region" name="region_id" value={form.region_id} onChange={(e) => updateField("region_id", e.target.value)} className={selectClass}>
               <option value="">Select region</option>
-              {currentRegions.map((r) => (<option key={r} value={r}>{r}</option>))}
+              {currentRegions.map((r) => (<option key={r.id} value={r.id}>{r.name}</option>))}
             </select>
           </div>
           <div className="space-y-2">

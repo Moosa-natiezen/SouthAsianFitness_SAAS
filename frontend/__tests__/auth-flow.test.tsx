@@ -16,6 +16,7 @@ jest.mock("@/lib/api", () => ({
   generateMealPlan: jest.fn(),
   getEligibleFoods: jest.fn(),
   getCsrfToken: jest.fn(),
+  fetchLocations: jest.fn(),
 }));
 
 const mockPush = jest.fn();
@@ -37,6 +38,7 @@ const {
   submitOnboarding,
   getNutritionAndBudget,
   generateMealPlan,
+  fetchLocations,
 } = jest.requireMock("@/lib/api");
 
 /* ── Auth flow ────────────────────────────────────────────────────────── */
@@ -102,6 +104,19 @@ describe("auth UI flow", () => {
 describe("onboarding wizard", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock fetchLocations to return valid country/region data with real UUIDs
+    fetchLocations.mockResolvedValue([
+      {
+        id: "00000000-0000-4000-a000-000000000001",
+        name: "Pakistan",
+        iso_code: "PK",
+        currency_code: "PKR",
+        regions: [
+          { id: "00000000-0000-4000-a000-000000000010", name: "Punjab", code: "PK-PB" },
+          { id: "00000000-0000-4000-a000-000000000011", name: "Sindh", code: "PK-SD" },
+        ],
+      },
+    ]);
   });
 
   const VALID_BACKEND_ACTIVITY_LEVELS = [
@@ -127,7 +142,10 @@ describe("onboarding wizard", () => {
     const { OnboardingWizard } = require("@/components/onboarding/onboarding-wizard");
     render(<OnboardingWizard />);
 
-    // Step 1 (Location) - defaults are fine, click Next
+    // Step 1 (Location) - wait for countries to load, then click Next
+    await waitFor(() => {
+      expect(screen.getByLabelText(/country/i)).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /next/i }));
 
     // Step 2 (Body info) - defaults are fine, click Next
@@ -159,7 +177,10 @@ describe("onboarding wizard", () => {
     const { OnboardingWizard } = require("@/components/onboarding/onboarding-wizard");
     render(<OnboardingWizard />);
 
-    // Step 1
+    // Step 1 - wait for countries to load
+    await waitFor(() => {
+      expect(screen.getByLabelText(/country/i)).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /next/i }));
     // Step 2
     await userEvent.click(screen.getByRole("button", { name: /next/i }));
@@ -187,7 +208,10 @@ describe("onboarding wizard", () => {
     const { OnboardingWizard } = require("@/components/onboarding/onboarding-wizard");
     render(<OnboardingWizard />);
 
-    // Step 1
+    // Step 1 - wait for countries to load
+    await waitFor(() => {
+      expect(screen.getByLabelText(/country/i)).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /next/i }));
     // Step 2
     await userEvent.click(screen.getByRole("button", { name: /next/i }));

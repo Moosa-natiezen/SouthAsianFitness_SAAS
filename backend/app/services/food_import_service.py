@@ -106,14 +106,40 @@ def _ensure_currency(db: Session, code: str) -> Currency:
     return currency
 
 
+# Canonical country name lookup — prevents ISO codes from being used as names.
+_COUNTRY_NAMES: dict[str, str] = {
+    "PK": "Pakistan",
+    "IN": "India",
+    "BD": "Bangladesh",
+    "NP": "Nepal",
+    "LK": "Sri Lanka",
+    "AE": "United Arab Emirates",
+}
+
+# Canonical currency per country — prevents defaulting everything to PKR.
+_COUNTRY_CURRENCIES: dict[str, str] = {
+    "PK": "PKR",
+    "IN": "INR",
+    "BD": "BDT",
+    "NP": "NPR",
+    "LK": "LKR",
+    "AE": "AED",
+}
+
+
 def _ensure_country(db: Session, country_code: str, country_name: str | None = None) -> Country:
     normalized = country_code.strip().upper()
+    # Always look up by natural key first (idempotent).
     country = db.execute(select(Country).where(Country.iso_code == normalized)).scalars().first()
     if country is not None:
         return country
-    currency = _ensure_currency(db, "PKR")
+    # Resolve currency from canonical mapping, fall back to PKR.
+    currency_code = _COUNTRY_CURRENCIES.get(normalized, "PKR")
+    currency = _ensure_currency(db, currency_code)
+    # Use provided name, canonical lookup, or fall back to ISO code.
+    name = country_name or _COUNTRY_NAMES.get(normalized, normalized)
     country = Country(
-        name=country_name or normalized,
+        name=name,
         iso_code=normalized,
         currency_code=currency.code,
         default_unit_system=UnitSystem.METRIC,
@@ -127,6 +153,7 @@ def _ensure_region(db: Session, country: Country, region_name: str | None) -> Re
     if region_name is None or not region_name.strip():
         return None
     cleaned = region_name.strip()
+    # Always look up by natural key first (idempotent).
     existing = (
         db.execute(
             select(Region).where(Region.country_id == country.id, Region.name == cleaned)
@@ -136,6 +163,8 @@ def _ensure_region(db: Session, country: Country, region_name: str | None) -> Re
     )
     if existing is not None:
         return existing
+    # Only create a region if it doesn't already exist — prefer seeded data.
+    # Use a stable slug-based code for food-imported regions.
     region = Region(name=cleaned, code=_normalize_slug(cleaned), country_id=country.id)
     db.add(region)
     db.flush()

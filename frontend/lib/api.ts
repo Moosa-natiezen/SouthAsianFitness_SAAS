@@ -230,6 +230,26 @@ export type MealPlanGenerateRequest = {
   meal_count?: number | null;
 };
 
+/* ── Locations API ─────────────────────────────────────────────────────── */
+
+export type RegionData = {
+  id: string;
+  name: string;
+  code: string | null;
+};
+
+export type CountryData = {
+  id: string;
+  name: string;
+  iso_code: string;
+  currency_code: string;
+  regions: RegionData[];
+};
+
+export async function fetchLocations(): Promise<CountryData[]> {
+  return apiFetch<CountryData[]>("/api/locations/");
+}
+
 /* ── Auth API ──────────────────────────────────────────────────────────── */
 
 export async function fetchHealth(): Promise<HealthResponse> {
