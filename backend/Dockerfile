@@ -19,6 +19,10 @@ COPY alembic.ini ./
 COPY alembic ./alembic
 COPY app ./app
 
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE ${PORT:-8000}
 
-CMD sh -c "uv run alembic upgrade head && uv run python -m app.scripts.seed_reference_data && uv run uvicorn app.main:app --host 0.0.0.0 --port $${PORT:-8000}"
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
