@@ -1,6 +1,7 @@
 """Tests for the reference data seed script.
 
-Verifies idempotent creation of currencies, countries, and regions.
+Verifies idempotent creation of currencies, countries, and regions
+from worldwide ISO 3166 / ISO 4217 data via pycountry.
 """
 
 from __future__ import annotations
@@ -9,13 +10,11 @@ from decimal import Decimal
 
 import pytest
 from app.db.base import Base
-from app.models.currency import Currency
 from app.models.food import Food
 from app.models.geography import Country, Region
 from app.models.unit import Unit
 from app.scripts.seed_reference_data import (
-    COUNTRIES,
-    CURRENCIES,
+    COUNTRY_CURRENCY_MAP,
     seed_all,
     seed_countries,
     seed_currencies,
@@ -63,25 +62,21 @@ def db_session():
 
 class TestCurrencySeed:
     def test_creates_all_currencies(self, db_session: Session):
+        expected_count = len(set(COUNTRY_CURRENCY_MAP.values()))
         result = seed_currencies(db_session)
-        assert result.currencies_created == len(CURRENCIES)
+        assert result.currencies_created == expected_count
         assert result.currencies_skipped == 0
 
-        for seed in CURRENCIES:
-            currency = db_session.get(Currency, seed.code)
-            assert currency is not None
-            assert currency.name == seed.name
-            assert currency.symbol == seed.symbol
-
-    def test_idempotent第二次_does_not_duplicate(self, db_session: Session):
+    def test_idempotent_does_not_duplicate(self, db_session: Session):
+        expected_count = len(set(COUNTRY_CURRENCY_MAP.values()))
         first = seed_currencies(db_session)
         db_session.commit()
         second = seed_currencies(db_session)
         db_session.commit()
 
-        assert first.currencies_created == len(CURRENCIES)
+        assert first.currencies_created == expected_count
         assert second.currencies_created == 0
-        assert second.currencies_skipped == len(CURRENCIES)
+        assert second.currencies_skipped == expected_count
 
 
 # ── Country seeding ──────────────────────────────────────────────────────
@@ -90,35 +85,35 @@ class TestCurrencySeed:
 class TestCountrySeed:
     def test_creates_all_countries(self, db_session: Session):
         seed_currencies(db_session)
+        db_session.commit()
         result = seed_countries(db_session)
         db_session.commit()
 
-        assert result.countries_created == len(COUNTRIES)
+        assert result.countries_created == len(COUNTRY_CURRENCY_MAP)
         assert result.countries_skipped == 0
 
-        for seed in COUNTRIES:
+        for iso_code, currency_code in COUNTRY_CURRENCY_MAP.items():
             country = db_session.execute(
-                select(Country).where(Country.iso_code == seed.iso_code)
+                select(Country).where(Country.iso_code == iso_code)
             ).scalars().first()
-            assert country is not None, f"Country {seed.iso_code} not found"
-            assert country.name == seed.name
-            assert country.currency_code == seed.currency_code
+            assert country is not None, f"Country {iso_code} not found"
+            assert country.currency_code == currency_code
 
     def test_uses_correct_names_not_iso_codes(self, db_session: Session):
         seed_currencies(db_session)
         seed_countries(db_session)
         db_session.commit()
 
-        for seed in COUNTRIES:
+        for iso_code in COUNTRY_CURRENCY_MAP:
             country = db_session.execute(
-                select(Country).where(Country.iso_code == seed.iso_code)
+                select(Country).where(Country.iso_code == iso_code)
             ).scalars().first()
             # Must NOT use ISO code as name
-            assert country.name != seed.iso_code, (
-                f"Country {seed.iso_code} has ISO code as name: {country.name}"
+            assert country.name != iso_code, (
+                f"Country {iso_code} has ISO code as name: {country.name}"
             )
 
-    def test_correct_currencies_per_country(self, db_session: Session):
+    def test_south_asian_countries_present(self, db_session: Session):
         seed_currencies(db_session)
         seed_countries(db_session)
         db_session.commit()
@@ -128,7 +123,7 @@ class TestCountrySeed:
             country = db_session.execute(
                 select(Country).where(Country.iso_code == iso)
             ).scalars().first()
-            assert country is not None
+            assert country is not None, f"South Asian country {iso} missing"
             assert country.currency_code == currency_code, (
                 f"{iso} should use {currency_code}, got {country.currency_code}"
             )
@@ -142,33 +137,32 @@ class TestCountrySeed:
             select(Country).where(Country.iso_code == "AE")
         ).scalars().first()
         assert uae is not None
-        assert uae.name == "United Arab Emirates"
+        assert "Arab Emirates" in uae.name
         assert uae.currency_code == "AED"
 
-    def test_idempotent第二次_does_not_duplicate(self, db_session: Session):
+    def test_idempotent_does_not_duplicate(self, db_session: Session):
         seed_currencies(db_session)
         first = seed_countries(db_session)
         db_session.commit()
         second = seed_countries(db_session)
         db_session.commit()
 
-        assert first.countries_created == len(COUNTRIES)
+        assert first.countries_created == len(COUNTRY_CURRENCY_MAP)
         assert second.countries_created == 0
-        assert second.countries_skipped == len(COUNTRIES)
+        assert second.countries_skipped == len(COUNTRY_CURRENCY_MAP)
 
 
 # ── Region seeding ───────────────────────────────────────────────────────
 
 
 class TestRegionSeed:
-    def test_creates_regions_for_all_countries(self, db_session: Session):
+    def test_creates_regions(self, db_session: Session):
         seed_currencies(db_session)
         seed_countries(db_session)
         result = seed_regions(db_session)
         db_session.commit()
 
-        total_regions = sum(len(c.regions) for c in COUNTRIES)
-        assert result.regions_created == total_regions
+        assert result.regions_created > 0
         assert result.regions_skipped == 0
 
     def test_regions_linked_to_correct_countries(self, db_session: Session):
@@ -177,18 +171,25 @@ class TestRegionSeed:
         seed_regions(db_session)
         db_session.commit()
 
-        for country_seed in COUNTRIES:
-            country = db_session.execute(
-                select(Country).where(Country.iso_code == country_seed.iso_code)
-            ).scalars().first()
-            regions = db_session.execute(
-                select(Region).where(Region.country_id == country.id)
-            ).scalars().all()
-            region_names = {r.name for r in regions}
-            expected_names = {r.name for r in country_seed.regions}
-            assert region_names == expected_names, (
-                f"{country_seed.iso_code}: expected {expected_names}, got {region_names}"
-            )
+        # Check India has regions
+        india = db_session.execute(
+            select(Country).where(Country.iso_code == "IN")
+        ).scalars().first()
+        assert india is not None
+        india_regions = db_session.execute(
+            select(Region).where(Region.country_id == india.id)
+        ).scalars().all()
+        assert len(india_regions) > 10, f"India should have many states, got {len(india_regions)}"
+
+        # Check US has regions
+        us = db_session.execute(
+            select(Country).where(Country.iso_code == "US")
+        ).scalars().first()
+        assert us is not None
+        us_regions = db_session.execute(
+            select(Region).where(Region.country_id == us.id)
+        ).scalars().all()
+        assert len(us_regions) > 40, f"US should have 50+ states, got {len(us_regions)}"
 
     def test_region_codes_are_populated(self, db_session: Session):
         seed_currencies(db_session)
@@ -196,23 +197,36 @@ class TestRegionSeed:
         seed_regions(db_session)
         db_session.commit()
 
-        for country_seed in COUNTRIES:
-            for region_seed in country_seed.regions:
-                country = db_session.execute(
-                    select(Country).where(Country.iso_code == country_seed.iso_code)
-                ).scalars().first()
-                region = db_session.execute(
-                    select(Region).where(
-                        Region.country_id == country.id,
-                        Region.name == region_seed.name,
-                    )
-                ).scalars().first()
-                assert region is not None
-                assert region.code == region_seed.code, (
-                    f"Region {region_seed.name} code: expected {region_seed.code}, got {region.code}"
-                )
+        # Spot-check a few regions have ISO 3166-2 codes
+        india = db_session.execute(
+            select(Country).where(Country.iso_code == "IN")
+        ).scalars().first()
+        regions = db_session.execute(
+            select(Region).where(Region.country_id == india.id)
+        ).scalars().all()
+        for region in regions:
+            assert region.code and region.code.startswith("IN-"), (
+                f"Region {region.name} should have IN-* code, got {region.code}"
+            )
 
-    def test_idempotent第二次_does_not_duplicate(self, db_session: Session):
+    def test_pakistan_has_all_provinces(self, db_session: Session):
+        seed_currencies(db_session)
+        seed_countries(db_session)
+        seed_regions(db_session)
+        db_session.commit()
+
+        pk = db_session.execute(
+            select(Country).where(Country.iso_code == "PK")
+        ).scalars().first()
+        assert pk is not None
+        pk_regions = db_session.execute(
+            select(Region).where(Region.country_id == pk.id)
+        ).scalars().all()
+        names = {r.name for r in pk_regions}
+        # Pakistan should have at least its 4 provinces + territories
+        assert len(names) >= 4, f"Pakistan should have 4+ regions, got {len(names)}: {names}"
+
+    def test_idempotent_does_not_duplicate(self, db_session: Session):
         seed_currencies(db_session)
         seed_countries(db_session)
         first = seed_regions(db_session)
@@ -220,10 +234,9 @@ class TestRegionSeed:
         second = seed_regions(db_session)
         db_session.commit()
 
-        total_regions = sum(len(c.regions) for c in COUNTRIES)
-        assert first.regions_created == total_regions
+        assert first.regions_created > 0
         assert second.regions_created == 0
-        assert second.regions_skipped == total_regions
+        assert second.regions_skipped == first.regions_created
 
 
 # ── Full seed ────────────────────────────────────────────────────────────
@@ -233,10 +246,9 @@ class TestSeedAll:
     def test_full_seed_creates_everything(self, db_session: Session):
         result = seed_all(db_session)
 
-        assert result.currencies_created == len(CURRENCIES)
-        assert result.countries_created == len(COUNTRIES)
-        total_regions = sum(len(c.regions) for c in COUNTRIES)
-        assert result.regions_created == total_regions
+        assert result.currencies_created > 0
+        assert result.countries_created == len(COUNTRY_CURRENCY_MAP)
+        assert result.regions_created > 0
 
     def test_full_seed_is_idempotent(self, db_session: Session):
         first = seed_all(db_session)
@@ -282,5 +294,31 @@ class TestSeedAll:
 
         assert food.id is not None
 
+    def test_unique_iso_codes(self, db_session: Session):
+        """All countries must have unique ISO codes."""
+        seed_all(db_session)
 
+        countries = db_session.execute(select(Country)).scalars().all()
+        iso_codes = [c.iso_code for c in countries]
+        assert len(iso_codes) == len(set(iso_codes)), "Duplicate ISO codes found"
 
+    def test_currency_countries_shared(self, db_session: Session):
+        """Countries sharing a currency must reference the same Currency record."""
+        seed_all(db_session)
+
+        # Germany and France both use EUR
+        de = db_session.execute(
+            select(Country).where(Country.iso_code == "DE")
+        ).scalars().first()
+        fr = db_session.execute(
+            select(Country).where(Country.iso_code == "FR")
+        ).scalars().first()
+        assert de is not None, "Germany should be seeded"
+        assert fr is not None, "France should be seeded"
+        assert de.currency_code == fr.currency_code == "EUR"
+
+    def test_minimum_country_count(self, db_session: Session):
+        """We should have at least 200 countries worldwide."""
+        result = seed_all(db_session)
+        total = result.countries_created + result.countries_skipped
+        assert total >= 200, f"Expected 200+ countries, got {total}"

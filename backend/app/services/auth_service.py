@@ -280,5 +280,6 @@ def submit_onboarding(db: Session, user: User, payload: dict) -> User:
     db.add(profile)
     db.add(prefs)
     db.flush()
+    db.commit()
     logger.info("Onboarding completed for user %s", user.id)
     return user
