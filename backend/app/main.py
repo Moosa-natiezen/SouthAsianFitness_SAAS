@@ -10,6 +10,8 @@ from app.core.errors import register_exception_handlers
 from app.core.logging import get_logger, setup_logging
 from app.core.request_limits import RequestSizeLimitMiddleware
 from app.core.security_headers import SecurityHeadersMiddleware
+from app.db.session import SessionLocal
+from app.scripts.seed_reference_data import seed_all
 
 setup_logging(debug=settings.debug)
 logger = get_logger(__name__)
@@ -18,6 +20,30 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting %s (%s)", settings.app_name, settings.environment)
+
+    # Seed reference data (idempotent — safe on every startup)
+    try:
+        db = SessionLocal()
+        try:
+            result = seed_all(db, commit=True)
+            total_created = (
+                result.currencies_created
+                + result.countries_created
+                + result.regions_created
+            )
+            if total_created > 0:
+                logger.info(
+                    "Seeded reference data: %d created (currencies=%d, countries=%d, regions=%d)",
+                    total_created,
+                    result.currencies_created,
+                    result.countries_created,
+                    result.regions_created,
+                )
+        finally:
+            db.close()
+    except Exception:
+        logger.exception("Reference data seed failed; application will continue starting")
+
     yield
     logger.info("Shutting down %s", settings.app_name)
 
