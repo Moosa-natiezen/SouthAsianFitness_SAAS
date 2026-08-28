@@ -1,9 +1,19 @@
+import json
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import JSONResponse as _BaseJSONResponse
 
 from app.core.logging import get_logger
+
+
+class JSONResponse(_BaseJSONResponse):
+    """Override default JSONResponse to handle Decimal in validation errors."""
+
+    def render(self, content: object) -> bytes:
+        return json.dumps(content, default=str).encode("utf-8")
+
 
 logger = get_logger(__name__)
 

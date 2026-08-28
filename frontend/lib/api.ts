@@ -336,6 +336,60 @@ export async function generateMealPlan(
   });
 }
 
+/* ── Progress API ─────────────────────────────────────────────────────── */
+
+export type ProgressEntry = {
+  id: string;
+  recorded_on: string;
+  weight_kg: number;
+  waist_cm: number | null;
+  hip_cm: number | null;
+  body_fat_percent: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProgressEntryCreate = {
+  recorded_on: string;
+  weight_kg: number;
+  waist_cm?: number | null;
+  hip_cm?: number | null;
+  body_fat_percent?: number | null;
+  notes?: string | null;
+};
+
+export type ProgressSummary = {
+  starting_weight_kg: number | null;
+  current_weight_kg: number | null;
+  weight_change_kg: number | null;
+  bmi: number | null;
+  fitness_goal: string | null;
+  entry_count: number;
+  height_cm: number | null;
+};
+
+export async function getProgress(): Promise<ProgressEntry[]> {
+  return apiFetch<ProgressEntry[]>("/api/progress");
+}
+
+export async function createProgressEntry(
+  payload: ProgressEntryCreate,
+): Promise<ProgressEntry> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<ProgressEntry>("/api/progress", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getProgressSummary(): Promise<ProgressSummary> {
+  return apiFetch<ProgressSummary>("/api/progress/summary");
+}
+
+/* ── Meal plan API ─────────────────────────────────────────────────────── */
+
 export async function getTodaysMealPlan(): Promise<MealPlanResponse | null> {
   try {
     return await apiFetch<MealPlanResponse>("/api/meal-plans/today");
