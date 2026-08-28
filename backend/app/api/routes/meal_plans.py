@@ -5,17 +5,21 @@ All endpoints require authentication.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_csrf
+from app.api.deps import get_db, require_auth, require_csrf
 from app.models.user import User
 from app.schemas.meal_plan import (
     MealPlanFailureResponse,
     MealPlanGenerateRequest,
     MealPlanResponse,
 )
-from app.services.meal_plan_service import generate_meal_plan
+from app.services.meal_plan_service import (
+    build_plan_response_from_db,
+    generate_meal_plan,
+    get_current_meal_plan,
+)
 
 router = APIRouter(prefix="/meal-plans", tags=["meal-plans"])
 
@@ -110,6 +114,31 @@ def _build_plan_response(result) -> MealPlanResponse | MealPlanFailureResponse:
         ),
         warnings=plan.warnings,
     )
+
+
+@router.get(
+    "/today",
+    response_model=MealPlanResponse,
+)
+def get_today_plan(
+    user: User = Depends(require_auth),
+    db: Session = Depends(get_db),
+) -> MealPlanResponse:
+    """Retrieve the user's current meal plan covering today.
+
+    Returns the persisted plan if one exists for today's date.
+    Returns 404 if no plan covers today.
+    Does NOT generate a new plan.
+    """
+    plan = get_current_meal_plan(db, user_id=user.id)
+
+    if plan is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No current meal plan found for today",
+        )
+
+    return build_plan_response_from_db(plan)
 
 
 @router.post(

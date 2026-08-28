@@ -11,7 +11,7 @@ Orchestrates the full meal plan generation pipeline:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
@@ -22,6 +22,7 @@ from app.models.food import FoodPrice
 from app.models.meal import Meal, MealFood
 from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
 from app.models.user import User, UserPreferences
+from app.schemas.meal_plan import MealPlanResponse
 from app.services.budget_service import BudgetTarget, calculate_budget_targets
 from app.services.food_candidate_service import (
     build_filter_context,
@@ -349,7 +350,7 @@ def persist_meal_plan(
             for food_sort, gen_food in enumerate(gen_meal.foods):
                 meal_food = MealFood(
                     meal_id=meal.id,
-                    food_id=UUID(gen_food.food_id),
+                    food_id=gen_food.food_id if isinstance(gen_food.food_id, UUID) else UUID(gen_food.food_id),
                     servings=Decimal(str(gen_food.serving_quantity)),
                     serving_unit_id=None,  # Will be resolved by serving_unit_code
                     sort_order=food_sort,
@@ -367,6 +368,167 @@ def persist_meal_plan(
 
     db.commit()
     return meal_plan.id
+
+
+def get_current_meal_plan(
+    db: Session,
+    *,
+    user_id: UUID,
+) -> MealPlan | None:
+    """Retrieve the user's currently active meal plan covering today.
+
+    Returns the most recent MealPlan where start_date <= today <= end_date
+    and status is DRAFT or ACTIVE. Returns None if no plan exists.
+    Eagerly loads days → day_meals → meal → meal_foods → food relationships.
+    """
+    from sqlalchemy.orm import joinedload
+
+    today = datetime.now(tz=UTC).date()
+
+    plan = (
+        db.query(MealPlan)
+        .options(
+            joinedload(MealPlan.days)
+            .joinedload(MealPlanDay.day_meals)
+            .joinedload(MealPlanDayMeal.meal)
+            .joinedload(Meal.meal_foods)
+            .selectinload(MealFood.food),
+            joinedload(MealPlan.days)
+            .joinedload(MealPlanDay.day_meals)
+            .joinedload(MealPlanDayMeal.meal)
+            .joinedload(Meal.meal_foods)
+            .selectinload(MealFood.serving_unit),
+        )
+        .filter(
+            MealPlan.user_id == user_id,
+            MealPlan.start_date <= today,
+            MealPlan.end_date >= today,
+            MealPlan.status.in_([MealPlanStatus.DRAFT, MealPlanStatus.ACTIVE]),
+        )
+        .order_by(MealPlan.created_at.desc())
+        .first()
+    )
+
+    return plan
+
+
+def build_plan_response_from_db(plan: MealPlan) -> MealPlanResponse:
+    """Reconstruct a MealPlanResponse from a persisted MealPlan database object.
+
+    Walks the relationship tree: MealPlan → Days → DayMeals → Meal → MealFoods.
+    """
+    from app.models.food import Food
+    from app.schemas.meal_plan import (
+        BudgetTargetOut,
+        GeneratedDayOut,
+        GeneratedFoodOut,
+        GeneratedMealOut,
+        NutritionTargetOut,
+    )
+
+    days = []
+    for db_day in sorted(plan.days, key=lambda d: d.plan_date):
+        meals = []
+        for dm in sorted(db_day.day_meals, key=lambda m: m.sort_order):
+            meal = dm.meal
+            if meal is None:
+                continue
+
+            foods = []
+            for mf in sorted(meal.meal_foods, key=lambda f: f.sort_order):
+                food: Food = mf.food
+                if food is None:
+                    continue
+
+                servings = float(mf.servings) if mf.servings else 1.0
+                calories = float(food.calories) * servings
+                protein = float(food.protein_g) * servings
+                carbs = float(food.carbs_g) * servings
+                fat = float(food.fat_g) * servings
+                portion = float(food.grams_per_serving) * servings if food.grams_per_serving else 0.0
+
+                foods.append(
+                    GeneratedFoodOut(
+                        food_id=str(food.id),
+                        name=food.name,
+                        slug=food.slug,
+                        serving_quantity=servings,
+                        serving_unit_code=getattr(mf.serving_unit, "code", "serving") if mf.serving_unit else "serving",
+                        portion_grams=portion,
+                        calories=calories,
+                        protein_g=protein,
+                        carbs_g=carbs,
+                        fat_g=fat,
+                        estimated_cost=None,
+                        cost_available=False,
+                    )
+                )
+
+            # Compute meal subtotals from foods
+            subtotal_calories = sum(f.calories for f in foods)
+            subtotal_protein = sum(f.protein_g for f in foods)
+            subtotal_carbs = sum(f.carbs_g for f in foods)
+            subtotal_fat = sum(f.fat_g for f in foods)
+
+            meals.append(
+                GeneratedMealOut(
+                    meal_type=dm.meal_type.value if dm.meal_type else meal.meal_type.value,
+                    foods=foods,
+                    subtotal_calories=subtotal_calories,
+                    subtotal_protein_g=subtotal_protein,
+                    subtotal_carbs_g=subtotal_carbs,
+                    subtotal_fat_g=subtotal_fat,
+                    subtotal_estimated_cost=None,
+                    cost_complete=False,
+                )
+            )
+
+        total_calories = sum(m.subtotal_calories for m in meals)
+        total_protein = sum(m.subtotal_protein_g for m in meals)
+        total_carbs = sum(m.subtotal_carbs_g for m in meals)
+        total_fat = sum(m.subtotal_fat_g for m in meals)
+
+        days.append(
+            GeneratedDayOut(
+                plan_date=db_day.plan_date,
+                meals=meals,
+                total_calories=total_calories,
+                total_protein_g=total_protein,
+                total_carbs_g=total_carbs,
+                total_fat_g=total_fat,
+                total_estimated_cost=None,
+                cost_complete=False,
+                warnings=[],
+            )
+        )
+
+    # Build nutrition/budget from persisted plan targets
+    nutrition = NutritionTargetOut(
+        calorie_target=float(plan.daily_calorie_target) if plan.daily_calorie_target else 0,
+        protein_g=float(plan.daily_protein_g) if plan.daily_protein_g else 0,
+        carbs_g=float(plan.daily_carbs_g) if plan.daily_carbs_g else 0,
+        fat_g=float(plan.daily_fat_g) if plan.daily_fat_g else 0,
+        goal=plan.goal.value if plan.goal else "general_fitness",
+        is_bounded=True,
+        warnings=[],
+    )
+    budget = BudgetTargetOut(
+        daily_budget=plan.daily_budget_amount,
+        weekly_budget=None,
+        monthly_budget=None,
+        currency_code=plan.budget_currency_code,
+    )
+
+    return MealPlanResponse(
+        plan_id=str(plan.id),
+        plan_name=plan.name or "Current Plan",
+        start_date=plan.start_date,
+        end_date=plan.end_date,
+        days=days,
+        nutrition=nutrition,
+        budget=budget,
+        warnings=[],
+    )
 
 
 def _build_price_lookup(

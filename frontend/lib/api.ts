@@ -335,3 +335,17 @@ export async function generateMealPlan(
     body: JSON.stringify(body),
   });
 }
+
+export async function getTodaysMealPlan(): Promise<MealPlanResponse | null> {
+  try {
+    return await apiFetch<MealPlanResponse>("/api/meal-plans/today");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    // Only treat "no plan found" as a normal 404 — re-throw all other errors
+    // so callers can distinguish "no plan" from server/network/auth failures.
+    if (msg.includes("No current meal plan found")) {
+      return null;
+    }
+    throw err;
+  }
+}

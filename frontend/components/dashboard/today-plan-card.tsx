@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   generateMealPlan,
+  getTodaysMealPlan,
   type GeneratedDay,
   type MealPlanFailure,
   type MealPlanResponse,
@@ -31,19 +32,26 @@ export function TodayPlanCard() {
 
   const fetchPlan = () => {
     setState({ status: "loading" });
-    generateMealPlan(1, 4)
-      .then((result) => {
-        if ("success" in result && !result.success) {
-          setState({ status: "failure", data: result as MealPlanFailure });
-        } else {
-          const plan = result as MealPlanResponse;
-          setState({ status: "ready", plan, day: plan.days[0] });
+    getTodaysMealPlan()
+      .then((existingPlan) => {
+        if (existingPlan) {
+          setState({ status: "ready", plan: existingPlan, day: existingPlan.days[0] });
+          return;
         }
+        // No existing plan — generate a new one
+        return generateMealPlan(1, 4).then((result) => {
+          if ("success" in result && !result.success) {
+            setState({ status: "failure", data: result as MealPlanFailure });
+          } else {
+            const plan = result as MealPlanResponse;
+            setState({ status: "ready", plan, day: plan.days[0] });
+          }
+        });
       })
       .catch((err: unknown) => {
         setState({
           status: "error",
-          message: err instanceof Error ? err.message : "Failed to generate meal plan.",
+          message: err instanceof Error ? err.message : "Failed to load meal plan.",
         });
       });
   };

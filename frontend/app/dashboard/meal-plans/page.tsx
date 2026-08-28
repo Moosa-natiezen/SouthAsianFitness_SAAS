@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
 import { MealPlanView } from "@/components/meal-plan/meal-plan-view";
 import {
   generateMealPlan,
+  getTodaysMealPlan,
   type MealPlanFailure,
   type MealPlanResponse,
 } from "@/lib/api";
@@ -25,6 +26,22 @@ export default function MealPlansPage() {
   const [planDays, setPlanDays] = useState(1);
   const [mealCount, setMealCount] = useState(4);
   const [state, setState] = useState<PlanState>({ status: "idle" });
+
+  // On mount, try to load today's existing plan
+  useEffect(() => {
+    setState({ status: "loading" });
+    getTodaysMealPlan()
+      .then((plan) => {
+        if (plan) {
+          setState({ status: "ready", plan });
+        } else {
+          setState({ status: "idle" });
+        }
+      })
+      .catch(() => {
+        setState({ status: "idle" });
+      });
+  }, []);
 
   const handleGenerate = async () => {
     setState({ status: "loading" });

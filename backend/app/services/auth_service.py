@@ -32,6 +32,7 @@ def _user_response(user: User) -> dict:
         "id": str(user.id),
         "email": user.email,
         "display_name": user.display_name,
+        "is_active": user.is_active,
         "is_onboarded": user.is_onboarded,
     }
 

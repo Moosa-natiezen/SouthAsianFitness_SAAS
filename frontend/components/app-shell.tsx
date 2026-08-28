@@ -66,8 +66,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1">
           <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
             <div>
-              <p className="text-sm uppercase tracking-[0.12em] text-slate-500">Workspace</p>
-              <h1 className="text-xl font-semibold">Your app</h1>
+              <p className="text-sm uppercase tracking-[0.12em] text-slate-500">Dashboard</p>
+              <h1 className="text-xl font-semibold">South Asian Fitness</h1>
             </div>
             <Button variant="outline" onClick={handleLogout}>
               Log out

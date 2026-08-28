@@ -6,6 +6,7 @@ import { AlertBanner } from "@/components/ui/alert-banner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TodayPlanCard } from "@/components/dashboard/today-plan-card";
 import {
+  getCurrentUser,
   getNutritionAndBudget,
   type NutritionBudgetResponse,
 } from "@/lib/api";
@@ -17,6 +18,21 @@ type LoadState =
 
 export default function DashboardPage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
+  const [displayName, setDisplayName] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentUser()
+      .then((user) => {
+        if (!cancelled && user.display_name) {
+          setDisplayName(user.display_name);
+        }
+      })
+      .catch(() => {
+        // Non-critical: dashboard still works without the name
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,6 +51,8 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, []);
 
+  const greeting = displayName ? `Welcome back, ${displayName}` : "Welcome back";
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -42,7 +60,7 @@ export default function DashboardPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Dashboard
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-slate-900">Welcome back</h1>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-900">{greeting}</h1>
         <p className="mt-2 max-w-2xl text-slate-600">
           Your personalized nutrition targets and today&apos;s meal plan.
         </p>

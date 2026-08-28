@@ -25,6 +25,7 @@ class AuthUser(BaseModel):
     id: UUID
     email: EmailStr
     display_name: str
+    is_active: bool
     is_onboarded: bool
 
 

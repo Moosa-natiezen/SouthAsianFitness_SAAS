@@ -14,6 +14,7 @@ jest.mock("@/lib/api", () => ({
   getBudgetTargets: jest.fn(),
   getNutritionAndBudget: jest.fn(),
   generateMealPlan: jest.fn(),
+  getTodaysMealPlan: jest.fn(),
   getEligibleFoods: jest.fn(),
   getCsrfToken: jest.fn(),
   fetchLocations: jest.fn(),
@@ -38,6 +39,7 @@ const {
   submitOnboarding,
   getNutritionAndBudget,
   generateMealPlan,
+  getTodaysMealPlan,
   fetchLocations,
 } = jest.requireMock("@/lib/api");
 
@@ -253,6 +255,7 @@ describe("onboarding wizard", () => {
 describe("dashboard nutrition display", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    getTodaysMealPlan.mockResolvedValue(null);
   });
 
   it("renders nutrition targets from API response", async () => {
@@ -426,12 +429,15 @@ describe("dashboard nutrition display", () => {
 describe("meal plan generation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    getTodaysMealPlan.mockResolvedValue(null);
   });
 
-  it("renders generate button in idle state", () => {
+  it("renders generate button in idle state", async () => {
     const { default: MealPlansPage } = require("@/app/dashboard/meal-plans/page");
     render(<MealPlansPage />);
-    expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    });
   });
 
   it("shows loading state while generating", async () => {
@@ -440,6 +446,9 @@ describe("meal plan generation", () => {
     const { default: MealPlansPage } = require("@/app/dashboard/meal-plans/page");
     render(<MealPlansPage />);
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /generate plan/i }));
 
     await waitFor(() => {
@@ -501,6 +510,9 @@ describe("meal plan generation", () => {
     const { default: MealPlansPage } = require("@/app/dashboard/meal-plans/page");
     render(<MealPlansPage />);
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /generate plan/i }));
 
     await waitFor(() => {
@@ -521,6 +533,9 @@ describe("meal plan generation", () => {
     const { default: MealPlansPage } = require("@/app/dashboard/meal-plans/page");
     render(<MealPlansPage />);
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /generate plan/i }));
 
     await waitFor(() => {
@@ -534,6 +549,9 @@ describe("meal plan generation", () => {
     const { default: MealPlansPage } = require("@/app/dashboard/meal-plans/page");
     render(<MealPlansPage />);
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    });
     await userEvent.click(screen.getByRole("button", { name: /generate plan/i }));
 
     await waitFor(() => {
@@ -591,6 +609,11 @@ describe("meal plan generation", () => {
 
     const { default: MealPlansPage } = require("@/app/dashboard/meal-plans/page");
     render(<MealPlansPage />);
+
+    // Wait for idle state after getTodaysMealPlan resolves
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /generate plan/i })).toBeTruthy();
+    });
 
     // Select 3 days
     await userEvent.click(screen.getByRole("button", { name: /3 days/i }));
