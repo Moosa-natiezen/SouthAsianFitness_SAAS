@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_auth, require_csrf
+from app.core.logging import get_logger
 from app.models.user import User
 from app.schemas.meal_plan import (
     MealPlanFailureResponse,
@@ -19,7 +20,10 @@ from app.services.meal_plan_service import (
     build_plan_response_from_db,
     generate_meal_plan,
     get_current_meal_plan,
+    persist_meal_plan,
 )
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/meal-plans", tags=["meal-plans"])
 
@@ -50,7 +54,7 @@ def _build_plan_response(result) -> MealPlanResponse | MealPlanFailureResponse:
         for meal in day.meals:
             foods = [
                 GeneratedFoodOut(
-                    food_id=f.food_id,
+                    food_id=str(f.food_id),
                     name=f.name,
                     slug=f.slug,
                     serving_quantity=f.serving_quantity,
@@ -165,5 +169,27 @@ def generate(
         plan_days=plan_days,
         meal_count=meal_count,
     )
+
+    if not result.success or result.failure is not None:
+        return _build_plan_response(result)
+
+    # Persist the generated plan so it can be retrieved later
+    try:
+        persist_meal_plan(db, user_id=user.id, result=result)
+    except Exception:
+        logger.exception(
+            "Failed to persist meal plan for user %s",
+            user.id,
+        )
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Meal plan was generated but could not be saved. Please try again.",
+        )
+
+    # Re-read from DB to get the real plan_id and persisted relationships
+    persisted_plan = get_current_meal_plan(db, user_id=user.id)
+    if persisted_plan is not None:
+        return build_plan_response_from_db(persisted_plan)
 
     return _build_plan_response(result)
