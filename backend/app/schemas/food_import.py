@@ -59,7 +59,7 @@ class SourceProvenanceImport(BaseModel):
     source_date: str | None = Field(default=None, max_length=32)
     verification_status: str = Field(
         default="unverified",
-        pattern=r"^(unverified|pending_review|verified|conflict|retracted)$",
+        pattern=r"^(unverified|pending_review|verified|verified_with_notes|conflict|retracted)$",
     )
     notes: str | None = Field(default=None, max_length=1000)
 

@@ -18,6 +18,7 @@ RUN uv sync --no-dev
 COPY alembic.ini ./
 COPY alembic ./alembic
 COPY app ./app
+COPY data ./data
 
 EXPOSE ${PORT:-8000}
 
