@@ -403,3 +403,109 @@ export async function getTodaysMealPlan(): Promise<MealPlanResponse | null> {
     throw err;
   }
 }
+
+/* ── Settings API ─────────────────────────────────────────────────────── */
+
+export type SettingsProfileData = {
+  age_years: number | null;
+  sex: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  activity_level: string | null;
+  fitness_goal: string | null;
+  diet_pattern: string | null;
+  dietary_tags: string[];
+};
+
+export type SettingsPreferencesData = {
+  weekly_budget_amount: number | null;
+  budget_currency_code: string | null;
+  budget_period: string | null;
+  dietary_tags: string[];
+  cuisine_tags: string[];
+  preferred_region_ids: string[];
+  food_dislikes: string[];
+  preferred_foods: string[];
+};
+
+export type SettingsResponse = {
+  display_name: string;
+  email: string;
+  country_id: string | null;
+  region_id: string | null;
+  preferred_language: string | null;
+  preferred_unit_system: string | null;
+  preferred_currency_code: string | null;
+  profile: SettingsProfileData | null;
+  preferences: SettingsPreferencesData | null;
+};
+
+export type ProfileUpdatePayload = {
+  display_name?: string;
+  country_id?: string | null;
+  region_id?: string | null;
+  preferred_language?: string;
+  preferred_unit_system?: string;
+  preferred_currency_code?: string;
+  age_years?: number;
+  sex?: string;
+  height_cm?: number;
+  weight_kg?: number;
+  activity_level?: string;
+  fitness_goal?: string;
+  diet_pattern?: string;
+};
+
+export type PreferencesUpdatePayload = {
+  weekly_budget_amount?: number | null;
+  budget_currency_code?: string | null;
+  budget_period?: string | null;
+  dietary_tag_slugs?: string[];
+  allergen_tag_slugs?: string[];
+  cuisine_tag_slugs?: string[];
+  preferred_region_ids?: string[];
+  food_dislikes?: string[];
+  preferred_foods?: string[];
+};
+
+export type ChangePasswordPayload = {
+  current_password: string;
+  new_password: string;
+};
+
+export async function getSettings(): Promise<SettingsResponse> {
+  return apiFetch<SettingsResponse>("/api/auth/settings");
+}
+
+export async function updateProfile(
+  payload: ProfileUpdatePayload,
+): Promise<{ status: string }> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<{ status: string }>("/api/auth/profile", {
+    method: "PATCH",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updatePreferences(
+  payload: PreferencesUpdatePayload,
+): Promise<{ status: string }> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<{ status: string }>("/api/auth/preferences", {
+    method: "PATCH",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function changePassword(
+  payload: ChangePasswordPayload,
+): Promise<{ status: string }> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<{ status: string }>("/api/auth/change-password", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify(payload),
+  });
+}
