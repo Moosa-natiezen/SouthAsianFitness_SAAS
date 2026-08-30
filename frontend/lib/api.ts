@@ -509,3 +509,76 @@ export async function changePassword(
     body: JSON.stringify(payload),
   });
 }
+
+/* ── Food Library API ────────────────────────────────────────────────── */
+
+export type FoodNutrition = {
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  fiber_g: number | null;
+  sugar_g: number | null;
+  sodium_mg: number | null;
+};
+
+export type FoodItem = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  category_slug: string | null;
+  is_active: boolean;
+  verification_status: string;
+  serving_size: number;
+  serving_unit: string;
+  grams_per_serving: number | null;
+  nutrition: FoodNutrition;
+  dietary_tags: string[];
+  cuisine_tags: string[];
+};
+
+export type FoodListResponse = {
+  items: FoodItem[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
+export type FoodCategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export type FoodSearchParams = {
+  q?: string;
+  category_slug?: string;
+  dietary_tag_slug?: string;
+  cuisine_tag_slug?: string;
+  verification_status?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export async function getFoodCategories(): Promise<FoodCategory[]> {
+  return apiFetch<FoodCategory[]>("/api/foods/categories");
+}
+
+export async function searchFoods(
+  params: FoodSearchParams = {},
+): Promise<FoodListResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.q) searchParams.set("q", params.q);
+  if (params.category_slug) searchParams.set("category_slug", params.category_slug);
+  if (params.dietary_tag_slug) searchParams.set("dietary_tag_slug", params.dietary_tag_slug);
+  if (params.cuisine_tag_slug) searchParams.set("cuisine_tag_slug", params.cuisine_tag_slug);
+  if (params.verification_status) searchParams.set("verification_status", params.verification_status);
+  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.offset) searchParams.set("offset", String(params.offset));
+
+  const qs = searchParams.toString();
+  const path = `/api/foods${qs ? `?${qs}` : ""}`;
+  return apiFetch<FoodListResponse>(path);
+}
