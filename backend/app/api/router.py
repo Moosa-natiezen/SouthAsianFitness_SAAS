@@ -9,6 +9,7 @@ from app.api.routes import (
     nutrition,
     onboarding,
     progress,
+    settings,
 )
 
 api_router = APIRouter()
@@ -20,3 +21,4 @@ api_router.include_router(nutrition.router)
 api_router.include_router(meal_plans.router)
 api_router.include_router(locations.router)
 api_router.include_router(progress.router)
+api_router.include_router(settings.router)
