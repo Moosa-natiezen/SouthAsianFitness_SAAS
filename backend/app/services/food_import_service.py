@@ -10,7 +10,7 @@ from uuid import UUID
 
 from pydantic import ValidationError
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.currency import Currency
@@ -470,6 +470,48 @@ def _upsert_ingredients(db: Session, record: FoodImportRecord, parent_food: Food
         )
 
 
+def _normalize_verification_status(value: str) -> VerificationStatus:
+    """Safely convert a string to VerificationStatus, falling back to UNVERIFIED."""
+    try:
+        return VerificationStatus(value)
+    except ValueError:
+        return VerificationStatus.UNVERIFIED
+
+
+def _ensure_verification_enum(db: Session) -> None:
+    """Ensure the PostgreSQL verification_status enum contains all application values.
+
+    On SQLite this is a no-op (SQLite doesn't enforce native enums).
+    On PostgreSQL, adds any missing enum values via ALTER TYPE.
+    Does NOT drop or modify existing values.
+    """
+    from sqlalchemy import text
+
+    required = {v.value for v in VerificationStatus}
+    try:
+        rows = db.execute(
+            text(
+                "SELECT e.enumlabel FROM pg_enum e "
+                "JOIN pg_type t ON e.enumtypid = t.oid "
+                "WHERE t.typname = 'verification_status'"
+            )
+        ).fetchall()
+        existing = {row[0] for row in rows}
+    except Exception:  # noqa: BLE001 — Not PostgreSQL or enum type doesn't exist yet
+        return
+
+    missing = required - existing
+    for value in sorted(missing):
+        db.execute(
+            text(
+                "ALTER TYPE verification_status ADD VALUE IF NOT EXISTS :val"
+            ),
+            {"val": value},
+        )
+    if missing:
+        db.commit()
+
+
 def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, Any], *, dry_run: bool = False) -> ImportSummary:
     # Support both raw list and envelope with dataset_source metadata
     if isinstance(dataset, list):
@@ -485,6 +527,9 @@ def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, A
     except ImportValidationError as exc:
         raise ImportValidationError(str(exc)) from exc
 
+    # Verify PostgreSQL enum has all required values before importing
+    _ensure_verification_enum(db)
+
     # Resolve dataset-level source if present
     dataset_source_obj: FoodSource | None = None
     if dataset_source is not None:
@@ -494,6 +539,8 @@ def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, A
     failed_records: list[str] = []
 
     for record in records:
+        # Use a savepoint per food so one failure doesn't poison the transaction
+        savepoint = db.begin_nested()
         try:
             if not record.effective_countries:
                 raise ImportValidationError(f"Food '{record.name}' must include at least one country")
@@ -507,6 +554,10 @@ def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, A
             existing = db.execute(select(Food).where(Food.slug == slug)).scalars().first()
             if existing is not None:
                 summary.skipped += 1
+                if not dry_run:
+                    savepoint.commit()
+                else:
+                    savepoint.rollback()
                 continue
 
             food, action = _upsert_food(db, record, source=dataset_source_obj)
@@ -533,13 +584,22 @@ def import_food_dataset(db: Session, dataset: list[dict[str, Any]] | dict[str, A
 
             _upsert_ingredients(db, record, food)
             db.flush()
-        except (ImportValidationError, ValueError, TypeError, IntegrityError) as exc:
+            if not dry_run:
+                savepoint.commit()
+            else:
+                savepoint.rollback()
+        except (ImportValidationError, ValueError, TypeError, IntegrityError, DataError) as exc:
+            savepoint.rollback()
             failed_records.append(f"{record.name}: {exc}")
             summary.failed += 1
 
-    if failed_records:
+    if failed_records and summary.imported == 0 and summary.skipped == 0:
+        # All records failed — this is a meaningful import failure.
         db.rollback()
-        raise ImportValidationError("; ".join(failed_records))
+        raise ImportValidationError(
+            f"All {len(failed_records)} records failed: "
+            + "; ".join(failed_records[:5])
+        )
 
     if dry_run:
         db.rollback()

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.api.router import api_router
 from app.core.config import settings
@@ -13,6 +13,7 @@ from app.core.logging import get_logger, setup_logging
 from app.core.request_limits import RequestSizeLimitMiddleware
 from app.core.security_headers import SecurityHeadersMiddleware
 from app.db.session import SessionLocal
+from app.models.enums import VerificationStatus
 from app.models.food import Food
 from app.scripts.seed_reference_data import seed_all
 
@@ -47,29 +48,102 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     except Exception:
         logger.exception("Reference data seed failed; application will continue starting")
 
-    # Seed food dataset (idempotent — skip if foods already exist)
+    # Seed food dataset (idempotent — skip if full dataset is present)
+    EXPECTED_FOOD_COUNT = 198  # Expected total foods in south_asian_foods.json
     try:
         food_db = SessionLocal()
         try:
-            has_foods = food_db.execute(
-                select(Food.id).limit(1)
-            ).scalar() is not None
-            if has_foods:
-                logger.info("Food dataset already present; skipping import")
+            existing_count = (
+                food_db.execute(select(func.count(Food.id))).scalar() or 0
+            )
+            eligible_count = (
+                food_db.execute(
+                    select(func.count(Food.id)).where(
+                        Food.verification_status.in_([
+                            VerificationStatus.VERIFIED,
+                            VerificationStatus.VERIFIED_WITH_NOTES,
+                        ]),
+                        Food.is_active.is_(True),
+                    )
+                ).scalar()
+                or 0
+            )
+
+            if existing_count >= EXPECTED_FOOD_COUNT:
+                logger.info(
+                    "Food dataset already present: %d foods (%d eligible); "
+                    "skipping import",
+                    existing_count,
+                    eligible_count,
+                )
+            elif existing_count > 0:
+                logger.warning(
+                    "Food dataset incomplete: %d/%d foods present (%d eligible); "
+                    "importing missing records",
+                    existing_count,
+                    EXPECTED_FOOD_COUNT,
+                    eligible_count,
+                )
+                from app.services.food_import_service import import_foods_from_file
+
+                dataset_path = (
+                    Path(__file__).resolve().parent.parent
+                    / "data"
+                    / "south_asian_foods.json"
+                )
+                if dataset_path.exists():
+                    result = import_foods_from_file(food_db, dataset_path)
+                    final_count = (
+                        food_db.execute(select(func.count(Food.id))).scalar() or 0
+                    )
+                    logger.info(
+                        "Food dataset seed completed: imported=%d skipped=%d "
+                        "failed=%d total_after=%d",
+                        result.imported,
+                        result.skipped,
+                        result.failed,
+                        final_count,
+                    )
+                    if final_count < EXPECTED_FOOD_COUNT:
+                        logger.warning(
+                            "Food dataset still incomplete after import: "
+                            "%d/%d foods",
+                            final_count,
+                            EXPECTED_FOOD_COUNT,
+                        )
+                else:
+                    logger.warning(
+                        "Food dataset not found at %s; meal plans will have no foods",
+                        dataset_path,
+                    )
             else:
                 dataset_path = (
-                    Path(__file__).resolve().parent.parent / "data" / "south_asian_foods.json"
+                    Path(__file__).resolve().parent.parent
+                    / "data"
+                    / "south_asian_foods.json"
                 )
                 if dataset_path.exists():
                     from app.services.food_import_service import import_foods_from_file
 
                     result = import_foods_from_file(food_db, dataset_path)
+                    final_count = (
+                        food_db.execute(select(func.count(Food.id))).scalar() or 0
+                    )
                     logger.info(
-                        "Food dataset imported: %d imported, %d skipped, %d failed",
+                        "Food dataset imported from empty DB: imported=%d "
+                        "skipped=%d failed=%d total_after=%d",
                         result.imported,
                         result.skipped,
                         result.failed,
+                        final_count,
                     )
+                    if final_count < EXPECTED_FOOD_COUNT:
+                        logger.warning(
+                            "Food dataset incomplete after import: "
+                            "%d/%d foods",
+                            final_count,
+                            EXPECTED_FOOD_COUNT,
+                        )
                 else:
                     logger.warning(
                         "Food dataset not found at %s; meal plans will have no foods",
