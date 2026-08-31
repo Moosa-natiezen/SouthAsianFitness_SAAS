@@ -582,3 +582,42 @@ export async function searchFoods(
   const path = `/api/foods${qs ? `?${qs}` : ""}`;
   return apiFetch<FoodListResponse>(path);
 }
+
+/* ── Meal Plan Management API ───────────────────────────────────────── */
+
+export type MealPlanSummary = {
+  id: string;
+  name: string | null;
+  start_date: string;
+  end_date: string;
+  day_count: number;
+  status: string;
+  calorie_target: number | null;
+  created_at: string;
+};
+
+export type MealPlanListResponse = {
+  items: MealPlanSummary[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
+export async function listMealPlans(
+  params: { limit?: number; offset?: number } = {},
+): Promise<MealPlanListResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.offset) searchParams.set("offset", String(params.offset));
+  const qs = searchParams.toString();
+  const path = `/api/meal-plans${qs ? `?${qs}` : ""}`;
+  return apiFetch<MealPlanListResponse>(path);
+}
+
+export async function deleteMealPlan(planId: string): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  await apiFetch<unknown>(`/api/meal-plans/${planId}`, {
+    method: "DELETE",
+    headers: { "X-CSRF-Token": csrfToken },
+  });
+}
