@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,13 +18,6 @@ type LoadState =
   | { status: "ready"; data: NutritionBudgetResponse }
   | { status: "error"; message: string };
 
-/**
- * Maximum number of polling attempts to wait for the webhook to
- * process the upgrade before giving up.
- */
-const MAX_POLL_ATTEMPTS = 15;
-const POLL_INTERVAL_MS = 2000;
-
 /** Check all possible tier key variants for robustness. */
 function isProTier(u: AuthUser | null | undefined): boolean {
   if (!u) return false;
@@ -39,85 +31,40 @@ function isProTier(u: AuthUser | null | undefined): boolean {
 export default function DashboardPage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const router = useRouter();
 
-  /* ── Upgrade polling ─────────────────────────────────────────────── */
-  const [upgradeBanner, setUpgradeBanner] = useState<
-    { kind: "processing" } | { kind: "success" } | null
-  >(() => (searchParams.get("upgraded") === "true" ? { kind: "processing" } : null));
-
-  /**
-   * Clear the ?upgraded=true query param from the URL without
-   * triggering a navigation/re-render.
+  /* ── Upgrade banner ────────────────────────────────────────────────
+   * Capture the flag from the raw URL *once* on mount, then immediately
+   * clean the URL so a refresh never re-shows the banner.
+   * The banner persists in React state independent of the URL.
    */
-  const cleanUpgradedParam = useCallback(() => {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("upgraded")) {
-      url.searchParams.delete("upgraded");
-      window.history.replaceState({}, "", url.toString());
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
+  const [upgradeDismissed, setUpgradeDismissed] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("upgraded") === "true") {
+      setShowUpgradeBanner(true);
+      // Clean the URL bar without triggering a navigation/re-render
+      window.history.replaceState({}, "", "/dashboard");
     }
   }, []);
 
-  /* Poll getCurrentUser() until subscription_tier flips to "pro" */
-  useEffect(() => {
-    if (searchParams.get("upgraded") !== "true") return;
+  /* ── Initial data load ────────────────────────────────────────────── */
 
+  useEffect(() => {
     let cancelled = false;
-    let attempt = 0;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-
-    const poll = async () => {
-      while (!cancelled && attempt < MAX_POLL_ATTEMPTS) {
-        attempt++;
-        try {
-          const user: AuthUser = await getCurrentUser();
-          if (cancelled) return;
-
-          setUserState(user);
-          if (isProTier(user)) {
-            setUpgradeBanner({ kind: "success" });
-            cleanUpgradedParam();
-            return;
-          }
-        } catch {
-          // Transient network error — keep polling
+    getCurrentUser()
+      .then((user) => {
+        setUserState(user);
+        if (!cancelled && user.display_name) {
+          setDisplayName(user.display_name);
         }
-        // Wait before next attempt
-        await new Promise<void>((resolve) => {
-          timer = setTimeout(resolve, POLL_INTERVAL_MS);
-        });
-      }
-      // Timed out — still show a soft message so the user knows to refresh
-      if (!cancelled) {
-        setUpgradeBanner(null);
-        cleanUpgradedParam();
-      }
-    };
-
-    void poll();
-    return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
-    };
-  }, [searchParams, cleanUpgradedParam]);
-
-  /* Re-fetch user on visibility change (handles tab-switch after checkout) */
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible" && upgradeBanner?.kind === "processing") {
-        void getCurrentUser().then((user) => {
-          setUserState(user);
-          if (isProTier(user)) {
-            setUpgradeBanner({ kind: "success" });
-            cleanUpgradedParam();
-          }
-        }).catch(() => {});
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
-  }, [upgradeBanner?.kind, cleanUpgradedParam]);
+      })
+      .catch(() => {
+        // Non-critical: dashboard still works without the name
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   /* ── Initial data load ────────────────────────────────────────────── */
 
@@ -157,19 +104,23 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Upgrade banners */}
-      {upgradeBanner?.kind === "processing" && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm" role="status">
-          <p className="text-center text-sm font-medium text-emerald-800">
-            ⏳ Processing your upgrade… We&apos;ll update your plan once the payment is confirmed.
+      {/* Upgrade celebration banner */}
+      {showUpgradeBanner && !upgradeDismissed && (
+        <div className="relative rounded-2xl border border-emerald-200 bg-emerald-50 p-6 pr-10 shadow-sm">
+          <p className="text-sm font-medium text-emerald-800">
+            🎉 Welcome to Pro! Your account has been upgraded. Enjoy unlimited meal plans!
           </p>
+          <button
+            type="button"
+            onClick={() => setUpgradeDismissed(true)}
+            className="absolute right-3 top-3 rounded p-1 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800"
+            aria-label="Dismiss"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+              <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+            </svg>
+          </button>
         </div>
-      )}
-      {upgradeBanner?.kind === "success" && (
-        <AlertBanner
-          variant="info"
-          message="🎉 Welcome to Pro! Your subscription is now active. Enjoy unlimited meal plans!"
-        />
       )}
 
       {/* Header */}
