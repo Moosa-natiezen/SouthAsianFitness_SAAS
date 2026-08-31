@@ -668,3 +668,48 @@ def _generate_plan_name(nutrition: NutritionTarget) -> str:
         f"{nutrition.goal.replace('_', ' ').title()} Plan - "
         f"{nutrition.calorie_target:.0f} kcal/day"
     )
+
+
+def list_user_meal_plans(
+    db: Session,
+    *,
+    user_id: UUID,
+    limit: int = 20,
+    offset: int = 0,
+) -> tuple[list[MealPlan], int]:
+    """Return a paginated list of the user's meal plans, newest first."""
+    q = db.query(MealPlan).filter(MealPlan.user_id == user_id)
+    total = q.count()
+    items = (
+        q.order_by(MealPlan.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
+    return items, total
+
+
+def delete_meal_plan(
+    db: Session,
+    *,
+    user_id: UUID,
+    plan_id: UUID,
+) -> None:
+    """Delete a meal plan owned by the user.
+
+    Raises HTTPException 404 if the plan does not exist or does not belong to the user.
+    """
+    from fastapi import HTTPException, status
+
+    plan = (
+        db.query(MealPlan)
+        .filter(MealPlan.id == plan_id, MealPlan.user_id == user_id)
+        .first()
+    )
+    if plan is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Meal plan not found",
+        )
+    db.delete(plan)
+    db.commit()

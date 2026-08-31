@@ -111,3 +111,28 @@ class MealPlanFailureResponse(BaseModel):
     reason: str
     conflict_details: list[str] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
+
+
+# ── List / summary schemas ─────────────────────────────────────────────────
+
+
+class MealPlanSummaryOut(BaseModel):
+    """Lightweight representation of a meal plan for the list view."""
+
+    id: str
+    name: str | None
+    start_date: date
+    end_date: date
+    day_count: int
+    status: str
+    calorie_target: float | None
+    created_at: str
+
+
+class MealPlanListResponse(BaseModel):
+    """Paginated list of meal plan summaries."""
+
+    items: list[MealPlanSummaryOut]
+    total: int
+    limit: int
+    offset: int

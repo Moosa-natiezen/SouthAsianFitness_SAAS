@@ -5,7 +5,7 @@ All endpoints require authentication.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_auth, require_csrf
@@ -14,12 +14,16 @@ from app.models.user import User
 from app.schemas.meal_plan import (
     MealPlanFailureResponse,
     MealPlanGenerateRequest,
+    MealPlanListResponse,
     MealPlanResponse,
+    MealPlanSummaryOut,
 )
 from app.services.meal_plan_service import (
     build_plan_response_from_db,
+    delete_meal_plan,
     generate_meal_plan,
     get_current_meal_plan,
+    list_user_meal_plans,
     persist_meal_plan,
 )
 
@@ -118,6 +122,60 @@ def _build_plan_response(result) -> MealPlanResponse | MealPlanFailureResponse:
         ),
         warnings=plan.warnings,
     )
+
+
+@router.get("/", response_model=MealPlanListResponse)
+def list_plans(
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    user: User = Depends(require_auth),
+    db: Session = Depends(get_db),
+) -> MealPlanListResponse:
+    """Return a paginated list of the user's meal plans, newest first."""
+    items, total = list_user_meal_plans(db, user_id=user.id, limit=limit, offset=offset)
+
+    summaries = []
+    for plan in items:
+        day_count = (
+            (plan.end_date - plan.start_date).days + 1
+            if plan.end_date and plan.start_date
+            else len(plan.days)
+        )
+        summaries.append(
+            MealPlanSummaryOut(
+                id=str(plan.id),
+                name=plan.name,
+                start_date=plan.start_date,
+                end_date=plan.end_date,
+                day_count=day_count,
+                status=plan.status.value if plan.status else "draft",
+                calorie_target=float(plan.daily_calorie_target) if plan.daily_calorie_target else None,
+                created_at=plan.created_at.isoformat() if plan.created_at else "",
+            )
+        )
+
+    return MealPlanListResponse(
+        items=summaries, total=total, limit=limit, offset=offset
+    )
+
+
+@router.delete("/{plan_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_plan(
+    plan_id: str,
+    user: User = Depends(require_csrf),
+    db: Session = Depends(get_db),
+) -> None:
+    """Delete a meal plan owned by the authenticated user."""
+    from uuid import UUID as _UUID
+
+    try:
+        plan_uuid = _UUID(plan_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Meal plan not found",
+        )
+    delete_meal_plan(db, user_id=user.id, plan_id=plan_uuid)
 
 
 @router.get(
