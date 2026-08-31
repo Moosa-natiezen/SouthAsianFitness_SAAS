@@ -15,6 +15,7 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.enums import MealPlanStatus, MealType
@@ -23,6 +24,44 @@ from app.models.meal import Meal, MealFood
 from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
 from app.models.user import User, UserPreferences
 from app.schemas.meal_plan import MealPlanResponse
+
+# ── Free-tier usage limits ──────────────────────────────────────────────────
+
+FREE_MONTHLY_MEAL_PLAN_LIMIT = 3
+
+
+def check_meal_plan_limit(db: Session, user: User) -> None:
+    """Check whether the user has exceeded their monthly meal plan limit.
+
+    Pro users have unlimited generations.
+    Free users are limited to FREE_MONTHLY_MEAL_PLAN_LIMIT plans per calendar month.
+
+    Raises HTTPException 403 if the limit is exceeded.
+    """
+    if user.subscription_tier == "pro":
+        return
+
+    # First day of the current calendar month
+    now = datetime.now(tz=UTC)
+    first_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    count = (
+        db.query(func.count(MealPlan.id))
+        .filter(
+            MealPlan.user_id == user.id,
+            MealPlan.created_at >= first_of_month,
+        )
+        .scalar()
+        or 0
+    )
+
+    if count >= FREE_MONTHLY_MEAL_PLAN_LIMIT:
+        from fastapi import HTTPException, status
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Free tier limit reached. Please upgrade to Pro to generate more meal plans.",
+        )
 from app.services.budget_service import BudgetTarget, calculate_budget_targets
 from app.services.food_candidate_service import (
     build_filter_context,

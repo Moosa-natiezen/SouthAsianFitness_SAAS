@@ -334,3 +334,134 @@ def test_delete_plan_missing_csrf():
     fake_id = str(uuid4())
     resp = client.delete(f"/api/meal-plans/{fake_id}")
     assert resp.status_code == 403
+
+
+# ── Usage limit tests ──────────────────────────────────────────────────────
+
+
+class TestMealPlanUsageLimit:
+    def test_pro_user_unlimited(self) -> None:
+        """Verify a pro user can create plans without hitting a limit."""
+        from app.services.meal_plan_service import check_meal_plan_limit
+
+        client = make_client()
+        email = "pro_limit@example.com"
+        api_register(client, email)
+        client = TestClient(app)
+        api_login(client, email)
+
+        user_id = get_user_id_from_db(email)
+        db = db_session.SessionLocal()
+        user = db.query(User).filter(User.id == user_id).first()
+        user.subscription_tier = "pro"
+        db.commit()
+
+        # Should not raise
+        check_meal_plan_limit(db, user)
+        db.close()
+
+    def test_free_user_within_limit(self) -> None:
+        """Verify a free user can create up to 3 plans in the current month."""
+        from app.services.meal_plan_service import check_meal_plan_limit
+
+        client = make_client()
+        email = "free_within@example.com"
+        api_register(client, email)
+        client = TestClient(app)
+        api_login(client, email)
+
+        user_id = get_user_id_from_db(email)
+        db = db_session.SessionLocal()
+
+        # Create 2 plans this month
+        today = datetime.now(tz=UTC).date()
+        for i in range(2):
+            plan = MealPlan(
+                user_id=user_id,
+                name=f"Plan {i}",
+                goal=FitnessGoal.GENERAL_FITNESS,
+                daily_calorie_target=Decimal("2000.00"),
+                start_date=today,
+                end_date=today,
+                status=MealPlanStatus.DRAFT,
+            )
+            db.add(plan)
+        db.commit()
+
+        user = db.query(User).filter(User.id == user_id).first()
+        # Should not raise (< 3)
+        check_meal_plan_limit(db, user)
+        db.close()
+
+    def test_free_user_exceeds_limit(self) -> None:
+        """Verify a free user gets 403 when attempting to generate a 4th plan."""
+        from app.services.meal_plan_service import check_meal_plan_limit
+        from fastapi import HTTPException
+
+        client = make_client()
+        email = "free_exceed@example.com"
+        api_register(client, email)
+        client = TestClient(app)
+        api_login(client, email)
+
+        user_id = get_user_id_from_db(email)
+        db = db_session.SessionLocal()
+
+        # Create 3 plans this month (at the limit)
+        today = datetime.now(tz=UTC).date()
+        for i in range(3):
+            plan = MealPlan(
+                user_id=user_id,
+                name=f"Plan {i}",
+                goal=FitnessGoal.GENERAL_FITNESS,
+                daily_calorie_target=Decimal("2000.00"),
+                start_date=today,
+                end_date=today,
+                status=MealPlanStatus.DRAFT,
+            )
+            db.add(plan)
+        db.commit()
+
+        user = db.query(User).filter(User.id == user_id).first()
+        # Should raise HTTPException 403
+        try:
+            check_meal_plan_limit(db, user)
+            assert False, "Expected HTTPException 403"
+        except HTTPException as exc:
+            assert exc.status_code == 403
+            assert "Free tier limit reached" in exc.detail
+        db.close()
+
+    def test_free_user_old_plans_dont_count(self) -> None:
+        """Verify plans from previous months don't count toward the limit."""
+        from app.services.meal_plan_service import check_meal_plan_limit
+
+        client = make_client()
+        email = "free_old@example.com"
+        api_register(client, email)
+        client = TestClient(app)
+        api_login(client, email)
+
+        user_id = get_user_id_from_db(email)
+        db = db_session.SessionLocal()
+
+        # Create 5 plans from last month
+        for i in range(5):
+            plan = MealPlan(
+                user_id=user_id,
+                name=f"Old Plan {i}",
+                goal=FitnessGoal.GENERAL_FITNESS,
+                daily_calorie_target=Decimal("2000.00"),
+                start_date=date(2026, 1, 1),
+                end_date=date(2026, 1, 1),
+                status=MealPlanStatus.DRAFT,
+            )
+            # Override created_at to be in January
+            plan.created_at = datetime(2026, 1, 15, tzinfo=UTC)
+            db.add(plan)
+        db.commit()
+
+        user = db.query(User).filter(User.id == user_id).first()
+        # Should not raise — old plans don't count
+        check_meal_plan_limit(db, user)
+        db.close()

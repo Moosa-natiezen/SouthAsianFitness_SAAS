@@ -20,6 +20,7 @@ from app.schemas.meal_plan import (
 )
 from app.services.meal_plan_service import (
     build_plan_response_from_db,
+    check_meal_plan_limit,
     delete_meal_plan,
     generate_meal_plan,
     get_current_meal_plan,
@@ -218,6 +219,9 @@ def generate(
     All foods are verified-only. Respects diet pattern, allergies, and dislikes.
     Requires CSRF token for this mutating POST endpoint.
     """
+    # Enforce free-tier usage limit before any heavy computation
+    check_meal_plan_limit(db, user)
+
     plan_days = body.plan_days if body else None
     meal_count = body.meal_count if body else None
 
