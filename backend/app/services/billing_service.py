@@ -166,8 +166,13 @@ def handle_webhook_event(
     attr_custom = attributes.get("custom_data", {}) or {}
     user_id_str = meta_custom.get("user_id") or attr_custom.get("user_id")
 
-    # --- Resolve email fallback ---
-    user_email = attributes.get("user_email")
+    # --- Resolve email fallback (normalized to lowercase) ---
+    user_email = (attributes.get("user_email") or "").strip().lower() or None
+
+    logger.info(
+        "Webhook received: event=%s user_id=%s email=%s",
+        event_name, user_id_str, user_email,
+    )
 
     if not user_id_str and not user_email:
         logger.warning(
@@ -181,10 +186,15 @@ def handle_webhook_event(
         user = user_lookup_fn(db, user_id=user_id_str, email=user_email)
         if user is None:
             logger.warning(
-                "Webhook user not found: user_id=%s email=%s event=%s",
+                "Webhook user not found in DB: user_id=%s email=%s event=%s",
                 user_id_str, user_email, event_name,
             )
             return
+
+        logger.info(
+            "Webhook matched user %s (email=%s) for event=%s",
+            user.id, user.email, event_name,
+        )
 
         if event_name == "subscription_created":
             _handle_created(user, attributes)
@@ -196,6 +206,10 @@ def handle_webhook_event(
             logger.info("Unhandled webhook event: %s", event_name)
 
         db.commit()
+        logger.info(
+            "Webhook committed: user=%s tier=%s status=%s",
+            user.id, user.subscription_tier, user.subscription_status,
+        )
     except Exception:
         db.rollback()
         logger.exception(

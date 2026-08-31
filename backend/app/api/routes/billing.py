@@ -6,6 +6,7 @@ import json
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_csrf
@@ -120,9 +121,11 @@ async def webhook(
                 if user is not None:
                     return user
 
-        # Fallback: look up by email
+        # Fallback: case-insensitive email lookup
         if email:
-            return session.query(User).filter(User.email == email).first()
+            return session.query(User).filter(
+                func.lower(User.email) == email.lower()
+            ).first()
 
         return None
 
