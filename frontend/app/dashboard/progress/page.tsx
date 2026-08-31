@@ -2,11 +2,21 @@
 
 import { useEffect, useState } from "react";
 
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   createProgressEntry,
+  deleteProgressEntry,
   getProgress,
   getProgressSummary,
   type ProgressEntry,
@@ -42,6 +52,11 @@ export default function ProgressPage() {
   const [history, setHistory] = useState<HistoryState>({ status: "loading" });
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [deleteMsg, setDeleteMsg] = useState<{
+    type: "info" | "error";
+    text: string;
+  } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadSummary = () => {
     getProgressSummary()
@@ -68,7 +83,7 @@ export default function ProgressPage() {
   useEffect(() => {
     loadSummary();
     loadHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEntryCreated = () => {
@@ -77,6 +92,24 @@ export default function ProgressPage() {
     loadSummary();
     loadHistory();
     setTimeout(() => setFormSuccess(false), 3000);
+  };
+
+  const handleDelete = async (entryId: string) => {
+    setDeletingId(entryId);
+    setDeleteMsg(null);
+    try {
+      await deleteProgressEntry(entryId);
+      setDeleteMsg({ type: "info", text: "Entry deleted." });
+      loadSummary();
+      loadHistory();
+    } catch (err: unknown) {
+      setDeleteMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to delete entry.",
+      });
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -103,17 +136,25 @@ export default function ProgressPage() {
         <AlertBanner variant="error" message={formError} />
       )}
 
+      {deleteMsg && (
+        <AlertBanner variant={deleteMsg.type} message={deleteMsg.text} />
+      )}
+
       {/* Summary + Form row */}
       <div className="grid gap-4 md:grid-cols-2">
         <SummaryCard state={summary} />
-        <LogForm
-          onError={setFormError}
-          onCreated={handleEntryCreated}
-        />
+        <LogForm onError={setFormError} onCreated={handleEntryCreated} />
       </div>
 
+      {/* Weight Trend Chart */}
+      <WeightChart state={history} />
+
       {/* History */}
-      <HistorySection state={history} />
+      <HistorySection
+        state={history}
+        onDelete={handleDelete}
+        deletingId={deletingId}
+      />
     </div>
   );
 }
@@ -227,6 +268,86 @@ function formatWeightChange(change: number | null): string {
   return `${sign}${change} kg`;
 }
 
+/* ── Weight Trend Chart ─────────────────────────────────────────────────── */
+
+function WeightChart({ state }: { state: HistoryState }) {
+  if (state.status === "loading") {
+    return <Skeleton className="h-64 rounded-2xl" />;
+  }
+
+  if (state.status === "error" || state.entries.length < 2) {
+    return null; // Don't show chart with fewer than 2 data points
+  }
+
+  // Entries are newest first; reverse for chart (oldest → newest)
+  const chartData = [...state.entries]
+    .reverse()
+    .map((e) => ({
+      date: formatChartDate(e.recorded_on),
+      weight: Number(e.weight_kg),
+    }));
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        Weight Trend
+      </p>
+      <div className="mt-4 h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 12, fill: "#64748b" }}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 12, fill: "#64748b" }}
+              tickLine={false}
+              axisLine={false}
+              width={45}
+              domain={["auto", "auto"]}
+            />
+            <Tooltip
+              contentStyle={{
+                borderRadius: "8px",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                fontSize: "13px",
+              }}
+              formatter={(value) => [`${String(value)} kg`, "Weight"]}
+            />
+            <Area
+              type="monotone"
+              dataKey="weight"
+              stroke="#10b981"
+              strokeWidth={2}
+              fill="url(#weightGradient)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
+function formatChartDate(isoDate: string): string {
+  try {
+    return new Date(isoDate + "T00:00:00").toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return isoDate;
+  }
+}
+
 /* ── Log Form ───────────────────────────────────────────────────────────── */
 
 function LogForm({
@@ -276,7 +397,6 @@ function LogForm({
     setSubmitting(true);
     try {
       await createProgressEntry(payload);
-      // Reset form
       setWeight("");
       setWaist("");
       setHip("");
@@ -401,7 +521,15 @@ function LogForm({
 
 /* ── History Section ────────────────────────────────────────────────────── */
 
-function HistorySection({ state }: { state: HistoryState }) {
+function HistorySection({
+  state,
+  onDelete,
+  deletingId,
+}: {
+  state: HistoryState;
+  onDelete: (id: string) => void;
+  deletingId: string | null;
+}) {
   if (state.status === "loading") {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -451,7 +579,8 @@ function HistorySection({ state }: { state: HistoryState }) {
                 <th className="pb-2 pr-4 hidden md:table-cell">Waist</th>
                 <th className="pb-2 pr-4 hidden md:table-cell">Hip</th>
                 <th className="pb-2 pr-4 hidden lg:table-cell">BF%</th>
-                <th className="pb-2 hidden lg:table-cell">Notes</th>
+                <th className="pb-2 pr-4 hidden lg:table-cell">Notes</th>
+                <th className="pb-2 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -498,8 +627,17 @@ function HistorySection({ state }: { state: HistoryState }) {
                     <td className="py-3 pr-4 hidden lg:table-cell text-slate-600">
                       {entry.body_fat_percent != null ? `${entry.body_fat_percent}%` : "—"}
                     </td>
-                    <td className="py-3 hidden lg:table-cell text-slate-500 max-w-[200px] truncate">
+                    <td className="py-3 pr-4 hidden lg:table-cell text-slate-500 max-w-[200px] truncate">
                       {entry.notes ?? "—"}
+                    </td>
+                    <td className="py-3 text-right">
+                      <button
+                        onClick={() => onDelete(entry.id)}
+                        disabled={deletingId === entry.id}
+                        className="text-xs font-medium text-rose-500 hover:text-rose-700 disabled:opacity-50"
+                      >
+                        {deletingId === entry.id ? "..." : "Delete"}
+                      </button>
                     </td>
                   </tr>
                 );

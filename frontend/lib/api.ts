@@ -388,6 +388,14 @@ export async function getProgressSummary(): Promise<ProgressSummary> {
   return apiFetch<ProgressSummary>("/api/progress/summary");
 }
 
+export async function deleteProgressEntry(entryId: string): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  await apiFetch<unknown>(`/api/progress/${entryId}`, {
+    method: "DELETE",
+    headers: { "X-CSRF-Token": csrfToken },
+  });
+}
+
 /* ── Meal plan API ─────────────────────────────────────────────────────── */
 
 export async function getTodaysMealPlan(): Promise<MealPlanResponse | null> {
