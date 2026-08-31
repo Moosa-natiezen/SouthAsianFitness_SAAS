@@ -144,17 +144,25 @@ def handle_webhook_event(
 ) -> None:
     """Process a validated Lemon Squeezy webhook event.
 
+    Lemon Squeezy places checkout custom_data in ``meta.custom_data``
+    for Order, Subscription, and License-key events.  We also fall back
+    to ``data.attributes.custom_data`` for older or non-standard payloads.
+
     Args:
         payload: The parsed JSON webhook body.
         user_lookup_fn: A callable (db, user_id) -> User | None to find a user.
         db_session_factory: A callable that returns a DB session.
     """
-    event_name = payload.get("meta", {}).get("event_name", "")
+    meta = payload.get("meta", {})
+    event_name = meta.get("event_name", "")
     data = payload.get("data", {})
     attributes = data.get("attributes", {})
-    custom_data = attributes.get("custom_data", {}) or {}
 
-    user_id_str = custom_data.get("user_id")
+    # --- Extract user_id from custom_data (canonical LS location: meta.custom_data) ---
+    meta_custom = meta.get("custom_data", {}) or {}
+    attr_custom = attributes.get("custom_data", {}) or {}
+
+    user_id_str = meta_custom.get("user_id") or attr_custom.get("user_id")
     if not user_id_str:
         logger.warning("Webhook missing custom_data.user_id: event=%s", event_name)
         return

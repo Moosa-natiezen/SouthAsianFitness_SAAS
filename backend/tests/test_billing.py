@@ -232,7 +232,10 @@ def test_portal_no_customer_id():
 
 
 def test_webhook_subscription_created():
-    """Verify webhook correctly updates user tier on subscription_created."""
+    """Verify webhook correctly updates user tier on subscription_created.
+
+    Custom data lives in meta.custom_data per the Lemon Squeezy docs.
+    """
     client = make_client()
     api_register(client)
 
@@ -240,7 +243,12 @@ def test_webhook_subscription_created():
     assert user_id is not None
 
     payload = {
-        "meta": {"event_name": "subscription_created"},
+        "meta": {
+            "event_name": "subscription_created",
+            "custom_data": {
+                "user_id": str(user_id),
+            },
+        },
         "data": {
             "type": "subscriptions",
             "id": "ls_sub_789",
@@ -249,9 +257,6 @@ def test_webhook_subscription_created():
                 "customer_id": "ls_cust_456",
                 "status": "active",
                 "renews_at": "2026-09-30T00:00:00Z",
-                "custom_data": {
-                    "user_id": str(user_id),
-                },
             },
         },
     }
@@ -360,6 +365,105 @@ def test_webhook_no_signature():
     assert resp.status_code == 401
 
 
+def test_webhook_subscription_created_meta_priority():
+    """Verify meta.custom_data.user_id takes priority over data.attributes.custom_data."""
+    client = make_client()
+    api_register(client)
+
+    user_id = get_user_id_from_db("billing@example.com")
+    assert user_id is not None
+
+    # Create a second user to prove meta.custom_data wins
+    api_register(client, email="other@example.com")
+    other_id = get_user_id_from_db("other@example.com")
+    assert other_id is not None
+
+    payload = {
+        "meta": {
+            "event_name": "subscription_created",
+            "custom_data": {
+                "user_id": str(user_id),  # ← this should win
+            },
+        },
+        "data": {
+            "type": "subscriptions",
+            "id": "ls_sub_meta",
+            "attributes": {
+                "id": "ls_sub_meta",
+                "customer_id": "ls_cust_meta",
+                "status": "active",
+                "custom_data": {
+                    "user_id": str(other_id),  # ← should be ignored
+                },
+            },
+        },
+    }
+
+    raw_body = json.dumps(payload).encode("utf-8")
+    signature = sign_payload(raw_body, settings.lemon_squeezy_webhook_secret)
+
+    resp = client.post(
+        "/api/billing/webhook",
+        content=raw_body,
+        headers={
+            "Content-Type": "application/json",
+            "X-Signature": signature,
+        },
+    )
+    assert resp.status_code == 200
+
+    # The first user should be upgraded, NOT the second
+    db = db_session.SessionLocal()
+    primary = db.query(User).filter(User.id == user_id).first()
+    other = db.query(User).filter(User.id == other_id).first()
+    assert primary.subscription_tier == "pro"
+    assert other.subscription_tier == "free"  # untouched
+    db.close()
+
+
+def test_webhook_subscription_created_fallback_to_attributes():
+    """Verify fallback to data.attributes.custom_data when meta.custom_data is absent."""
+    client = make_client()
+    api_register(client)
+
+    user_id = get_user_id_from_db("billing@example.com")
+    assert user_id is not None
+
+    payload = {
+        "meta": {"event_name": "subscription_created"},  # no custom_data in meta
+        "data": {
+            "type": "subscriptions",
+            "id": "ls_sub_fb",
+            "attributes": {
+                "id": "ls_sub_fb",
+                "customer_id": "ls_cust_fb",
+                "status": "active",
+                "custom_data": {
+                    "user_id": str(user_id),
+                },
+            },
+        },
+    }
+
+    raw_body = json.dumps(payload).encode("utf-8")
+    signature = sign_payload(raw_body, settings.lemon_squeezy_webhook_secret)
+
+    resp = client.post(
+        "/api/billing/webhook",
+        content=raw_body,
+        headers={
+            "Content-Type": "application/json",
+            "X-Signature": signature,
+        },
+    )
+    assert resp.status_code == 200
+
+    db = db_session.SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
+    assert user.subscription_tier == "pro"
+    db.close()
+
+
 def test_webhook_missing_user_id():
     """Verify webhook handles missing custom_data.user_id gracefully."""
     client = make_client()
@@ -367,9 +471,7 @@ def test_webhook_missing_user_id():
     payload = {
         "meta": {"event_name": "subscription_created"},
         "data": {
-            "attributes": {
-                "custom_data": {},
-            },
+            "attributes": {},
         },
     }
 
