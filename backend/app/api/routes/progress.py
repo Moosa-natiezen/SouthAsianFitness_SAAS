@@ -17,6 +17,7 @@ from app.schemas.progress import (
 )
 from app.services.progress_service import (
     create_progress_entry,
+    delete_progress_entry,
     get_progress_summary,
     list_progress_entries,
 )
@@ -61,6 +62,25 @@ def create_entry(
             detail=str(exc),
         )
     return entry
+
+
+@router.delete("/{entry_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_entry(
+    entry_id: str,
+    user: Annotated[User, Depends(require_csrf)],
+    db: Annotated[Session, Depends(get_db)],
+) -> None:
+    """Delete a progress entry owned by the authenticated user."""
+    from uuid import UUID as _UUID
+
+    try:
+        entry_uuid = _UUID(entry_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Progress entry not found",
+        )
+    delete_progress_entry(db, user, entry_uuid)
 
 
 @router.get("/summary", response_model=ProgressSummaryResponse)

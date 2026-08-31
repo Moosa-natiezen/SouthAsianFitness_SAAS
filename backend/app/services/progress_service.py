@@ -71,6 +71,27 @@ def list_progress_entries(
     )
 
 
+def delete_progress_entry(db: Session, user: User, entry_id: UUID) -> None:
+    """Delete a progress entry owned by the user.
+
+    Raises HTTPException 404 if the entry does not exist or does not belong to the user.
+    """
+    from fastapi import HTTPException, status
+
+    entry = (
+        db.query(ProgressEntry)
+        .filter(ProgressEntry.id == entry_id, ProgressEntry.user_id == user.id)
+        .first()
+    )
+    if entry is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Progress entry not found",
+        )
+    db.delete(entry)
+    db.commit()
+
+
 def get_progress_summary(db: Session, user: User) -> dict:
     """Calculate the user's progress summary.
 

@@ -542,3 +542,112 @@ class TestProgressAPI:
         assert float(data["hip_cm"]) == 95.0
         assert float(data["body_fat_percent"]) == 18.5
         assert data["notes"] == "Felt great"
+
+
+# ── DELETE endpoint tests ──────────────────────────────────────────────────
+
+
+class TestDeleteProgressEntry:
+    def test_delete_entry_success(self) -> None:
+        """Verify DELETE /api/progress/{entry_id} successfully deletes an entry."""
+        client = make_client()
+        api_register(client)
+        client = TestClient(app)
+        api_login(client)
+        csrf = get_csrf(client)
+
+        # Create an entry
+        create_resp = client.post(
+            "/api/progress",
+            json={"recorded_on": "2026-03-01", "weight_kg": 80.0},
+            headers={"X-CSRF-Token": csrf},
+        )
+        assert create_resp.status_code == 201
+        entry_id = create_resp.json()["id"]
+
+        # Verify it exists
+        list_resp = client.get("/api/progress")
+        assert list_resp.status_code == 200
+        assert len(list_resp.json()) == 1
+
+        # Delete it
+        delete_resp = client.delete(
+            f"/api/progress/{entry_id}",
+            headers={"X-CSRF-Token": csrf},
+        )
+        assert delete_resp.status_code == 204
+
+        # Verify it's gone
+        list_resp = client.get("/api/progress")
+        assert list_resp.status_code == 200
+        assert len(list_resp.json()) == 0
+
+    def test_delete_entry_not_found(self) -> None:
+        """Verify DELETE returns 404 for non-existent entry."""
+        client = make_client()
+        api_register(client)
+        client = TestClient(app)
+        api_login(client)
+        csrf = get_csrf(client)
+
+        fake_id = "00000000-0000-0000-0000-000000000000"
+        resp = client.delete(
+            f"/api/progress/{fake_id}",
+            headers={"X-CSRF-Token": csrf},
+        )
+        assert resp.status_code == 404
+
+    def test_delete_entry_user_isolation(self) -> None:
+        """Verify user cannot delete another user's entry."""
+        client = make_client()
+
+        # Create user1 and user2
+        api_register(client, email="deluser1@example.com")
+        api_register(client, email="deluser2@example.com")
+
+        # Login as user2 and create an entry
+        client2 = TestClient(app)
+        api_login(client2, email="deluser2@example.com")
+        csrf2 = get_csrf(client2)
+
+        create_resp = client2.post(
+            "/api/progress",
+            json={"recorded_on": "2026-04-01", "weight_kg": 70.0},
+            headers={"X-CSRF-Token": csrf2},
+        )
+        assert create_resp.status_code == 201
+        entry_id = create_resp.json()["id"]
+
+        # Login as user1 and try to delete user2's entry
+        client1 = TestClient(app)
+        api_login(client1, email="deluser1@example.com")
+        csrf1 = get_csrf(client1)
+
+        resp = client1.delete(
+            f"/api/progress/{entry_id}",
+            headers={"X-CSRF-Token": csrf1},
+        )
+        assert resp.status_code == 404
+
+        # Verify user2's entry still exists
+        list_resp = client2.get("/api/progress")
+        assert list_resp.status_code == 200
+        assert len(list_resp.json()) == 1
+
+    def test_delete_entry_unauthenticated(self) -> None:
+        """Verify unauthenticated DELETE is rejected."""
+        client = make_client()
+        fake_id = "00000000-0000-0000-0000-000000000000"
+        resp = client.delete(f"/api/progress/{fake_id}")
+        assert resp.status_code in (401, 403)
+
+    def test_delete_entry_missing_csrf(self) -> None:
+        """Verify DELETE without CSRF token is rejected."""
+        client = make_client()
+        api_register(client)
+        client = TestClient(app)
+        api_login(client)
+
+        fake_id = "00000000-0000-0000-0000-000000000000"
+        resp = client.delete(f"/api/progress/{fake_id}")
+        assert resp.status_code == 403
