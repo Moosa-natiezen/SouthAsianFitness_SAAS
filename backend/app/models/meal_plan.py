@@ -38,6 +38,7 @@ class MealPlan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             name="non_negative_daily_budget",
         ),
         Index("ix_meal_plans_user_status", "user_id", "status"),
+        Index("ix_meal_plans_user_created", "user_id", "created_at"),
     )
 
     user_id: Mapped[UUID] = mapped_column(
