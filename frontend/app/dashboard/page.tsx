@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,6 +9,7 @@ import { TodayPlanCard } from "@/components/dashboard/today-plan-card";
 import {
   getCurrentUser,
   getNutritionAndBudget,
+  type AuthUser,
   type NutritionBudgetResponse,
 } from "@/lib/api";
 
@@ -16,9 +18,95 @@ type LoadState =
   | { status: "ready"; data: NutritionBudgetResponse }
   | { status: "error"; message: string };
 
+/**
+ * Maximum number of polling attempts to wait for the webhook to
+ * process the upgrade before giving up.
+ */
+const MAX_POLL_ATTEMPTS = 15;
+const POLL_INTERVAL_MS = 2000;
+
 export default function DashboardPage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  /* ── Upgrade polling ─────────────────────────────────────────────── */
+  const [upgradeBanner, setUpgradeBanner] = useState<
+    { kind: "processing" } | { kind: "success" } | null
+  >(() => (searchParams.get("upgraded") === "true" ? { kind: "processing" } : null));
+
+  /**
+   * Clear the ?upgraded=true query param from the URL without
+   * triggering a navigation/re-render.
+   */
+  const cleanUpgradedParam = useCallback(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("upgraded")) {
+      url.searchParams.delete("upgraded");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
+  /* Poll getCurrentUser() until subscription_tier flips to "pro" */
+  useEffect(() => {
+    if (searchParams.get("upgraded") !== "true") return;
+
+    let cancelled = false;
+    let attempt = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const poll = async () => {
+      while (!cancelled && attempt < MAX_POLL_ATTEMPTS) {
+        attempt++;
+        try {
+          const user: AuthUser = await getCurrentUser();
+          if (cancelled) return;
+
+          if (user.subscription_tier === "pro") {
+            setUpgradeBanner({ kind: "success" });
+            cleanUpgradedParam();
+            return;
+          }
+        } catch {
+          // Transient network error — keep polling
+        }
+        // Wait before next attempt
+        await new Promise<void>((resolve) => {
+          timer = setTimeout(resolve, POLL_INTERVAL_MS);
+        });
+      }
+      // Timed out — still show a soft message so the user knows to refresh
+      if (!cancelled) {
+        setUpgradeBanner(null);
+        cleanUpgradedParam();
+      }
+    };
+
+    void poll();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [searchParams, cleanUpgradedParam]);
+
+  /* Re-fetch user on visibility change (handles tab-switch after checkout) */
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible" && upgradeBanner?.kind === "processing") {
+        void getCurrentUser().then((user) => {
+          if (user.subscription_tier === "pro") {
+            setUpgradeBanner({ kind: "success" });
+            cleanUpgradedParam();
+          }
+        }).catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [upgradeBanner?.kind, cleanUpgradedParam]);
+
+  /* ── Initial data load ────────────────────────────────────────────── */
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +143,21 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Upgrade banners */}
+      {upgradeBanner?.kind === "processing" && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm" role="status">
+          <p className="text-center text-sm font-medium text-emerald-800">
+            ⏳ Processing your upgrade… We&apos;ll update your plan once the payment is confirmed.
+          </p>
+        </div>
+      )}
+      {upgradeBanner?.kind === "success" && (
+        <AlertBanner
+          variant="info"
+          message="🎉 Welcome to Pro! Your subscription is now active. Enjoy unlimited meal plans!"
+        />
+      )}
+
       {/* Header */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">

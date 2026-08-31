@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
@@ -107,6 +108,8 @@ export default function SettingsPage() {
   const [weeklyBudget, setWeeklyBudget] = useState("");
   const [budgetPeriod, setBudgetPeriod] = useState("weekly");
 
+  const searchParams = useSearchParams();
+
   /* ── Billing state ────────────────────────────────────────────────── */
   const [user, setUser] = useState<AuthUser | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
@@ -114,6 +117,9 @@ export default function SettingsPage() {
     type: "info" | "error";
     text: string;
   } | null>(null);
+  const [upgradePolling, setUpgradePolling] = useState(
+    searchParams.get("upgraded") === "true",
+  );
 
   /* ── Password form ───────────────────────────────────────────────── */
   const [currentPassword, setCurrentPassword] = useState("");
@@ -203,8 +209,57 @@ export default function SettingsPage() {
     void load();
     return () => {
       cancelled = true;
+    };  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── Upgrade polling after returning from checkout ───────────────── */
+
+  const cleanUpgradedParam = useCallback(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("upgraded")) {
+      url.searchParams.delete("upgraded");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (searchParams.get("upgraded") !== "true") return;
+
+    let cancelled = false;
+    let attempt = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const poll = async () => {
+      while (!cancelled && attempt < 15) {
+        attempt++;
+        try {
+          const userData = await getCurrentUser();
+          if (cancelled) return;
+          if (userData.subscription_tier === "pro") {
+            setUser(userData);
+            setUpgradePolling(false);
+            setBillingMsg({ type: "info", text: "🎉 Welcome to Pro! Your subscription is now active." });
+            cleanUpgradedParam();
+            return;
+          }
+        } catch {
+          // Transient network error — keep polling
+        }
+        await new Promise<void>((resolve) => {
+          timer = setTimeout(resolve, 2000);
+        });
+      }
+      if (!cancelled) {
+        setUpgradePolling(false);
+        cleanUpgradedParam();
+      }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    void poll();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [searchParams, cleanUpgradedParam]);
 
   /* ── Handlers ─────────────────────────────────────────────────────── */
 
@@ -847,6 +902,11 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {upgradePolling && (
+            <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800" role="status">
+              ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
+            </p>
+          )}
           {billingMsg && (
             <AlertBanner variant={billingMsg.type} message={billingMsg.text} />
           )}
