@@ -89,6 +89,23 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_onboarded: Mapped[bool] = mapped_column(nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
+    # ── Lemon Squeezy subscription fields ──────────────────────────────
+    subscription_tier: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="free"
+    )
+    ls_customer_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, unique=True
+    )
+    ls_subscription_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, unique=True
+    )
+    subscription_status: Mapped[str | None] = mapped_column(
+        String(30), nullable=True
+    )
+    subscription_current_period_end: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     country: Mapped[Country | None] = relationship(back_populates="users")
     region: Mapped[Region | None] = relationship(back_populates="users")
     preferred_currency: Mapped[Currency | None] = relationship()

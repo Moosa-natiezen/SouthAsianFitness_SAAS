@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.routes import (
     auth,
+    billing,
     foods,
     health,
     locations,
@@ -22,3 +23,4 @@ api_router.include_router(meal_plans.router)
 api_router.include_router(locations.router)
 api_router.include_router(progress.router)
 api_router.include_router(settings.router)
+api_router.include_router(billing.router)

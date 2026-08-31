@@ -60,6 +60,13 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:3000"
 
+    # ── Lemon Squeezy ─────────────────────────────────────────────────
+    lemon_squeezy_api_key: str = ""
+    lemon_squeezy_webhook_secret: str = ""
+    lemon_squeezy_store_id: str = ""
+    lemon_squeezy_variant_id: str = ""
+    frontend_url: str = "http://localhost:3000"
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
