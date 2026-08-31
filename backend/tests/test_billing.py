@@ -212,7 +212,7 @@ def test_portal_returns_url():
 
 
 def test_portal_no_customer_id():
-    """Verify portal returns 400 when user has no ls_customer_id."""
+    """Verify portal returns 200 with null portal_url when user has no ls_customer_id."""
     client = make_client()
     api_register(client)
     client = TestClient(app)
@@ -223,7 +223,9 @@ def test_portal_no_customer_id():
         "/api/billing/portal",
         headers={"X-CSRF-Token": csrf},
     )
-    assert resp.status_code == 400
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["portal_url"] is None
 
 
 # ── Webhook tests ─────────────────────────────────────────────────────────

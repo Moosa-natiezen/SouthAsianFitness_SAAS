@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  createCheckoutSession,
   createPortalSession,
   fetchLocations,
   getCurrentUser,
@@ -281,12 +282,23 @@ export default function SettingsPage() {
     setPortalLoading(true);
     setBillingMsg(null);
     try {
-      const result = await createPortalSession();
-      window.location.href = result.portal_url;
+      // Free users → checkout page; Pro users → customer portal
+      if (user?.subscription_tier === "pro") {
+        const result = await createPortalSession();
+        if (result.portal_url) {
+          window.location.href = result.portal_url;
+        } else {
+          setBillingMsg({ type: "error", text: "No billing portal available for your account." });
+          setPortalLoading(false);
+        }
+      } else {
+        const result = await createCheckoutSession();
+        window.location.href = result.checkout_url;
+      }
     } catch (err) {
       setBillingMsg({
         type: "error",
-        text: err instanceof Error ? err.message : "Failed to open billing portal.",
+        text: err instanceof Error ? err.message : "Failed to open billing.",
       });
       setPortalLoading(false);
     }

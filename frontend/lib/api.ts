@@ -638,7 +638,7 @@ export type CheckoutResponse = {
 };
 
 export type PortalResponse = {
-  portal_url: string;
+  portal_url: string | null;
 };
 
 export async function createCheckoutSession(): Promise<CheckoutResponse> {

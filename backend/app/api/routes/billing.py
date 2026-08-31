@@ -54,14 +54,17 @@ def portal(
     """Retrieve the Lemon Squeezy customer portal URL.
 
     Returns the portal URL where the user can manage their subscription.
+    If no customer ID exists yet, returns null gracefully.
     """
+    if not user.ls_customer_id:
+        return {"portal_url": None}
     try:
         url = create_portal_url(user)
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
+        logger.warning(
+            "Portal URL unavailable for user %s: %s", user.id, exc,
         )
+        return {"portal_url": None}
     except Exception:
         logger.exception("Failed to get portal URL for user %s", user.id)
         raise HTTPException(
