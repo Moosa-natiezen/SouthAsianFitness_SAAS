@@ -144,13 +144,16 @@ def handle_webhook_event(
 ) -> None:
     """Process a validated Lemon Squeezy webhook event.
 
-    Lemon Squeezy places checkout custom_data in ``meta.custom_data``
-    for Order, Subscription, and License-key events.  We also fall back
-    to ``data.attributes.custom_data`` for older or non-standard payloads.
+    User resolution order:
+    1. ``meta.custom_data.user_id`` (canonical Lemon Squeezy path)
+    2. ``data.attributes.custom_data.user_id`` (fallback for older payloads)
+    3. ``data.attributes.user_email`` (email-based fallback)
 
     Args:
         payload: The parsed JSON webhook body.
-        user_lookup_fn: A callable (db, user_id) -> User | None to find a user.
+        user_lookup_fn: A callable ``(db, user_id=None, email=None) -> User | None``
+            to find a user.  Both arguments are optional; at least one will be
+            provided.
         db_session_factory: A callable that returns a DB session.
     """
     meta = payload.get("meta", {})
@@ -158,20 +161,29 @@ def handle_webhook_event(
     data = payload.get("data", {})
     attributes = data.get("attributes", {})
 
-    # --- Extract user_id from custom_data (canonical LS location: meta.custom_data) ---
+    # --- Resolve user ID (meta.custom_data → attributes.custom_data) ---
     meta_custom = meta.get("custom_data", {}) or {}
     attr_custom = attributes.get("custom_data", {}) or {}
-
     user_id_str = meta_custom.get("user_id") or attr_custom.get("user_id")
-    if not user_id_str:
-        logger.warning("Webhook missing custom_data.user_id: event=%s", event_name)
+
+    # --- Resolve email fallback ---
+    user_email = attributes.get("user_email")
+
+    if not user_id_str and not user_email:
+        logger.warning(
+            "Webhook missing user identifier (no custom_data.user_id or user_email): event=%s",
+            event_name,
+        )
         return
 
     db = db_session_factory()
     try:
-        user = user_lookup_fn(db, user_id_str)
+        user = user_lookup_fn(db, user_id=user_id_str, email=user_email)
         if user is None:
-            logger.warning("Webhook user not found: %s", user_id_str)
+            logger.warning(
+                "Webhook user not found: user_id=%s email=%s event=%s",
+                user_id_str, user_email, event_name,
+            )
             return
 
         if event_name == "subscription_created":
@@ -186,7 +198,10 @@ def handle_webhook_event(
         db.commit()
     except Exception:
         db.rollback()
-        logger.exception("Failed to process webhook event=%s user=%s", event_name, user_id_str)
+        logger.exception(
+            "Failed to process webhook event=%s user_id=%s email=%s",
+            event_name, user_id_str, user_email,
+        )
     finally:
         db.close()
 

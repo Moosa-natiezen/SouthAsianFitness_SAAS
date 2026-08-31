@@ -464,10 +464,56 @@ def test_webhook_subscription_created_fallback_to_attributes():
     db.close()
 
 
+def test_webhook_email_fallback():
+    """Verify fallback to attributes.user_email when no custom_data.user_id exists."""
+    client = make_client()
+    api_register(client)
+
+    user_id = get_user_id_from_db("billing@example.com")
+    assert user_id is not None
+
+    # Webhook carries user_email but NO custom_data.user_id
+    payload = {
+        "meta": {"event_name": "subscription_created"},
+        "data": {
+            "type": "subscriptions",
+            "id": "ls_sub_email",
+            "attributes": {
+                "id": "ls_sub_email",
+                "customer_id": "ls_cust_email",
+                "status": "active",
+                "user_email": "billing@example.com",
+            },
+        },
+    }
+
+    raw_body = json.dumps(payload).encode("utf-8")
+    signature = sign_payload(raw_body, settings.lemon_squeezy_webhook_secret)
+
+    resp = client.post(
+        "/api/billing/webhook",
+        content=raw_body,
+        headers={
+            "Content-Type": "application/json",
+            "X-Signature": signature,
+        },
+    )
+    assert resp.status_code == 200
+
+    # User should be upgraded via email lookup
+    db = db_session.SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
+    assert user.subscription_tier == "pro"
+    assert user.subscription_status == "active"
+    assert user.ls_customer_id == "ls_cust_email"
+    db.close()
+
+
 def test_webhook_missing_user_id():
-    """Verify webhook handles missing custom_data.user_id gracefully."""
+    """Verify webhook handles missing user identifier gracefully."""
     client = make_client()
 
+    # No custom_data.user_id AND no user_email — should skip processing
     payload = {
         "meta": {"event_name": "subscription_created"},
         "data": {

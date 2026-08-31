@@ -102,14 +102,29 @@ async def webhook(
             detail="Invalid JSON payload",
         )
 
-    def user_lookup(session: Session, user_id_str: str):
+    def user_lookup(
+        session: Session,
+        user_id: str | None = None,
+        email: str | None = None,
+    ) -> User | None:
         from uuid import UUID
 
-        try:
-            uid = UUID(user_id_str)
-        except ValueError:
-            return None
-        return session.query(User).filter(User.id == uid).first()
+        # Priority 1: look up by primary key
+        if user_id:
+            try:
+                uid = UUID(user_id)
+            except ValueError:
+                pass
+            else:
+                user = session.query(User).filter(User.id == uid).first()
+                if user is not None:
+                    return user
+
+        # Fallback: look up by email
+        if email:
+            return session.query(User).filter(User.email == email).first()
+
+        return None
 
     def session_factory():
         return db
