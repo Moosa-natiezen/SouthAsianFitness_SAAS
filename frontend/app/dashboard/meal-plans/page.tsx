@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MealPlanView } from "@/components/meal-plan/meal-plan-view";
 import {
+  createCheckoutSession,
   deleteMealPlan,
   generateMealPlan,
   getTodaysMealPlan,
@@ -43,6 +44,8 @@ export default function MealPlansPage() {
     type: "info" | "error";
     text: string;
   } | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   /* ── Load today's plan + history ─────────────────────────────────── */
 
@@ -87,14 +90,30 @@ export default function MealPlansPage() {
         fetchHistory(); // refresh history after generating
       }
     } catch (err: unknown) {
-      setState({
-        status: "error",
-        message: err instanceof Error ? err.message : "Failed to generate meal plan.",
-      });
+      const msg = err instanceof Error ? err.message : "Failed to generate meal plan.";
+      if (msg.includes("Free tier limit reached")) {
+        setShowPaywall(true);
+      } else {
+        setState({ status: "error", message: msg });
+      }
     }
   };
 
   /* ── Delete handler ──────────────────────────────────────────────── */
+
+  const handleUpgrade = async () => {
+    setCheckoutLoading(true);
+    try {
+      const result = await createCheckoutSession();
+      window.location.href = result.checkout_url;
+    } catch (err: unknown) {
+      setDeleteMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to start checkout.",
+      });
+      setCheckoutLoading(false);
+    }
+  };
 
   const handleDelete = async (planId: string) => {
     setDeleteId(planId);
@@ -238,8 +257,29 @@ export default function MealPlansPage() {
         </div>
       )}
 
+      {/* Paywall / Upgrade */}
+      {showPaywall && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm">
+          <p className="text-lg font-semibold text-emerald-800">
+            You've reached your limit
+          </p>
+          <p className="mt-2 text-emerald-700">
+            Free users can generate up to 3 meal plans per month.
+            Upgrade to Pro for unlimited generation.
+          </p>
+          <Button
+            onClick={handleUpgrade}
+            disabled={checkoutLoading}
+            className="mt-4"
+            size="lg"
+          >
+            {checkoutLoading ? "Loading..." : "Upgrade to Pro"}
+          </Button>
+        </div>
+      )}
+
       {/* Idle state */}
-      {state.status === "idle" && (
+      {state.status === "idle" && !showPaywall && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
           <p className="text-lg font-medium text-slate-700">No meal plan yet</p>
           <p className="mt-2 text-slate-500">

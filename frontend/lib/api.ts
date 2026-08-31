@@ -65,6 +65,7 @@ export type AuthUser = {
   display_name: string;
   is_active: boolean;
   is_onboarded: boolean;
+  subscription_tier: string;
 };
 
 export type AuthSession = {
@@ -626,6 +627,32 @@ export async function deleteMealPlan(planId: string): Promise<void> {
   const csrfToken = await getCsrfToken();
   await apiFetch<unknown>(`/api/meal-plans/${planId}`, {
     method: "DELETE",
+    headers: { "X-CSRF-Token": csrfToken },
+  });
+}
+
+/* ── Billing API ─────────────────────────────────────────────────────── */
+
+export type CheckoutResponse = {
+  checkout_url: string;
+};
+
+export type PortalResponse = {
+  portal_url: string;
+};
+
+export async function createCheckoutSession(): Promise<CheckoutResponse> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<CheckoutResponse>("/api/billing/checkout", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+  });
+}
+
+export async function createPortalSession(): Promise<PortalResponse> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<PortalResponse>("/api/billing/portal", {
+    method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
   });
 }

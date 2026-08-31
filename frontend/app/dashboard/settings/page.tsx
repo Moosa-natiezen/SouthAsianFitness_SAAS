@@ -13,11 +13,14 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  createPortalSession,
   fetchLocations,
+  getCurrentUser,
   getSettings,
   updateProfile,
   updatePreferences,
   changePassword,
+  type AuthUser,
   type CountryData,
   type SettingsResponse,
 } from "@/lib/api";
@@ -103,6 +106,14 @@ export default function SettingsPage() {
   const [weeklyBudget, setWeeklyBudget] = useState("");
   const [budgetPeriod, setBudgetPeriod] = useState("weekly");
 
+  /* ── Billing state ────────────────────────────────────────────────── */
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [billingMsg, setBillingMsg] = useState<{
+    type: "info" | "error";
+    text: string;
+  } | null>(null);
+
   /* ── Password form ───────────────────────────────────────────────── */
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -136,14 +147,16 @@ export default function SettingsPage() {
     let cancelled = false;
     async function load() {
       try {
-        const [settingsData, locationsData] = await Promise.all([
+        const [settingsData, locationsData, userData] = await Promise.all([
           getSettings(),
           fetchLocations(),
+          getCurrentUser(),
         ]);
         if (cancelled) return;
 
         setSettings(settingsData);
         setCountries(locationsData);
+        setUser(userData);
 
         // Populate profile form
         setDisplayName(settingsData.display_name ?? "");
@@ -261,6 +274,21 @@ export default function SettingsPage() {
       });
     } finally {
       setPrefsSaving(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    setPortalLoading(true);
+    setBillingMsg(null);
+    try {
+      const result = await createPortalSession();
+      window.location.href = result.portal_url;
+    } catch (err) {
+      setBillingMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to open billing portal.",
+      });
+      setPortalLoading(false);
     }
   };
 
@@ -795,6 +823,43 @@ export default function SettingsPage() {
               {passwordSaving ? "Updating..." : "Update Password"}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* ── Billing Card ──────────────────────────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Billing & Subscription</CardTitle>
+          <CardDescription>
+            Manage your subscription and billing.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {billingMsg && (
+            <AlertBanner variant={billingMsg.type} message={billingMsg.text} />
+          )}
+
+          <div className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-slate-700">Current Plan</p>
+              <p className="text-lg font-semibold text-slate-900">
+                {user?.subscription_tier === "pro" ? "Pro" : "Free"}
+              </p>
+            </div>
+            {user?.subscription_tier !== "pro" && (
+              <Button onClick={handleManageBilling} disabled={portalLoading}>
+                {portalLoading ? "Loading..." : "Upgrade to Pro"}
+              </Button>
+            )}
+          </div>
+
+          {user?.subscription_tier === "pro" && (
+            <div className="flex justify-end">
+              <Button variant="outline" onClick={handleManageBilling} disabled={portalLoading}>
+                {portalLoading ? "Loading..." : "Manage Billing"}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
