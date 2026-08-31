@@ -27,6 +27,7 @@ class AuthUser(BaseModel):
     display_name: str
     is_active: bool
     is_onboarded: bool
+    subscription_tier: str = "free"
 
 
 class AuthSession(BaseModel):

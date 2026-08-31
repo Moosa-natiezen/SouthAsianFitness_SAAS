@@ -118,7 +118,15 @@ def logout(
 
 @router.get("/me")
 def get_current_user_data(user: Annotated[User, Depends(require_auth)]):
-    return AuthUser(**_user_response(user))
+    from fastapi.responses import JSONResponse
+
+    return JSONResponse(
+        content=_user_response(user),
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
 
 
 @router.post("/change-password")

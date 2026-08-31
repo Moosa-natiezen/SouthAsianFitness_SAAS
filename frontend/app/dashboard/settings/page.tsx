@@ -148,6 +148,7 @@ export default function SettingsPage() {
 
   const selectedCountry = countries.find((c) => c.id === countryId);
   const currentRegions = selectedCountry?.regions ?? [];
+  const isPro = user?.subscription_tier === "pro" || (user as Record<string, unknown>)?.tier === "pro" || (user as Record<string, unknown>)?.is_pro === true;
 
   /* ── Load data ───────────────────────────────────────────────────── */
 
@@ -237,7 +238,8 @@ export default function SettingsPage() {
           const userData = await getCurrentUser();
           if (cancelled) return;
           setUserState(userData);
-          if (userData.subscription_tier === "pro") {
+          const pollIsPro = userData.subscription_tier === "pro" || (userData as Record<string, unknown>).tier === "pro" || (userData as Record<string, unknown>).is_pro === true;
+          if (pollIsPro) {
             setUser(userData);
             setUpgradePolling(false);
             setBillingMsg({ type: "info", text: "🎉 Welcome to Pro! Your subscription is now active." });
@@ -341,7 +343,7 @@ export default function SettingsPage() {
     setBillingMsg(null);
     try {
       // Free users → checkout page; Pro users → customer portal
-      if (user?.subscription_tier === "pro") {
+      if (isPro) {
         const result = await createPortalSession();
         if (result.portal_url) {
           window.location.href = result.portal_url;
@@ -918,17 +920,17 @@ export default function SettingsPage() {
             <div>
               <p className="text-sm font-medium text-slate-700">Current Plan</p>
               <p className="text-lg font-semibold text-slate-900">
-                {user?.subscription_tier === "pro" ? "Pro" : "Free"}
+                {isPro ? "Pro" : "Free"}
               </p>
             </div>
-            {user?.subscription_tier !== "pro" && (
+            {!isPro && (
               <Button onClick={handleManageBilling} disabled={portalLoading}>
                 {portalLoading ? "Loading..." : "Upgrade to Pro"}
               </Button>
             )}
           </div>
 
-          {user?.subscription_tier === "pro" && (
+          {isPro && (
             <div className="flex justify-end">
               <Button variant="outline" onClick={handleManageBilling} disabled={portalLoading}>
                 {portalLoading ? "Loading..." : "Manage Billing"}

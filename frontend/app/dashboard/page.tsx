@@ -26,6 +26,16 @@ type LoadState =
 const MAX_POLL_ATTEMPTS = 15;
 const POLL_INTERVAL_MS = 2000;
 
+/** Check all possible tier key variants for robustness. */
+function isProTier(u: AuthUser | null | undefined): boolean {
+  if (!u) return false;
+  return (
+    u.subscription_tier === "pro" ||
+    (u as Record<string, unknown>).tier === "pro" ||
+    (u as Record<string, unknown>).is_pro === true
+  );
+}
+
 export default function DashboardPage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -65,7 +75,7 @@ export default function DashboardPage() {
           if (cancelled) return;
 
           setUserState(user);
-          if (user.subscription_tier === "pro") {
+          if (isProTier(user)) {
             setUpgradeBanner({ kind: "success" });
             cleanUpgradedParam();
             return;
@@ -98,7 +108,7 @@ export default function DashboardPage() {
       if (document.visibilityState === "visible" && upgradeBanner?.kind === "processing") {
         void getCurrentUser().then((user) => {
           setUserState(user);
-          if (user.subscription_tier === "pro") {
+          if (isProTier(user)) {
             setUpgradeBanner({ kind: "success" });
             cleanUpgradedParam();
           }
