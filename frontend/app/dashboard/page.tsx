@@ -12,6 +12,7 @@ import {
   type AuthUser,
   type NutritionBudgetResponse,
 } from "@/lib/api";
+import { setUserState } from "@/lib/user-state";
 
 type LoadState =
   | { status: "loading" }
@@ -63,6 +64,7 @@ export default function DashboardPage() {
           const user: AuthUser = await getCurrentUser();
           if (cancelled) return;
 
+          setUserState(user);
           if (user.subscription_tier === "pro") {
             setUpgradeBanner({ kind: "success" });
             cleanUpgradedParam();
@@ -95,6 +97,7 @@ export default function DashboardPage() {
     const handleVisibility = () => {
       if (document.visibilityState === "visible" && upgradeBanner?.kind === "processing") {
         void getCurrentUser().then((user) => {
+          setUserState(user);
           if (user.subscription_tier === "pro") {
             setUpgradeBanner({ kind: "success" });
             cleanUpgradedParam();
@@ -112,6 +115,7 @@ export default function DashboardPage() {
     let cancelled = false;
     getCurrentUser()
       .then((user) => {
+        setUserState(user);
         if (!cancelled && user.display_name) {
           setDisplayName(user.display_name);
         }

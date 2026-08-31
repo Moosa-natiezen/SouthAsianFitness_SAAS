@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
 import { getCurrentUser } from "@/lib/api";
+import { setUserState } from "@/lib/user-state";
 
 export function ProtectedRoute({
   children,
@@ -25,6 +26,8 @@ export function ProtectedRoute({
         if (!isMounted) {
           return;
         }
+
+        setUserState(currentUser);
 
         if (requireOnboarded && !currentUser.is_onboarded) {
           router.replace("/onboarding");

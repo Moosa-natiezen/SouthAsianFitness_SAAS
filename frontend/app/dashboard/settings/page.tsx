@@ -26,6 +26,7 @@ import {
   type CountryData,
   type SettingsResponse,
 } from "@/lib/api";
+import { setUserState } from "@/lib/user-state";
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
 
@@ -164,6 +165,7 @@ export default function SettingsPage() {
         setSettings(settingsData);
         setCountries(locationsData);
         setUser(userData);
+        setUserState(userData);
 
         // Populate profile form
         setDisplayName(settingsData.display_name ?? "");
@@ -234,6 +236,7 @@ export default function SettingsPage() {
         try {
           const userData = await getCurrentUser();
           if (cancelled) return;
+          setUserState(userData);
           if (userData.subscription_tier === "pro") {
             setUser(userData);
             setUpgradePolling(false);
