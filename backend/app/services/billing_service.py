@@ -220,6 +220,15 @@ def handle_webhook_event(
         db.close()
 
 
+def _extract_portal_url(attributes: dict) -> str | None:
+    """Extract the customer portal URL from webhook attributes."""
+    urls = attributes.get("urls") or {}
+    portal = urls.get("customer_portal")
+    if portal and isinstance(portal, str):
+        return portal
+    return None
+
+
 def _handle_created(user: User, attributes: dict) -> None:
     """Handle subscription_created event."""
     user.ls_customer_id = (
@@ -234,6 +243,10 @@ def _handle_created(user: User, attributes: dict) -> None:
     ends_at = attributes.get("renews_at") or attributes.get("ends_at")
     if ends_at:
         user.subscription_current_period_end = _parse_datetime(ends_at)
+
+    portal = _extract_portal_url(attributes)
+    if portal:
+        user.customer_portal_url = portal
 
     logger.info(
         "Subscription created for user %s: tier=pro status=active",
@@ -256,6 +269,10 @@ def _handle_updated(user: User, attributes: dict) -> None:
     ends_at = attributes.get("renews_at") or attributes.get("ends_at")
     if ends_at:
         user.subscription_current_period_end = _parse_datetime(ends_at)
+
+    portal = _extract_portal_url(attributes)
+    if portal:
+        user.customer_portal_url = portal
 
     logger.info(
         "Subscription updated for user %s: tier=%s status=%s",

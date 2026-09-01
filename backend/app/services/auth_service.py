@@ -35,6 +35,7 @@ def _user_response(user: User) -> dict:
         "is_active": user.is_active,
         "is_onboarded": user.is_onboarded,
         "subscription_tier": user.subscription_tier,
+        "customer_portal_url": user.customer_portal_url,
     }
 
 

@@ -105,6 +105,9 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     subscription_current_period_end: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    customer_portal_url: Mapped[str | None] = mapped_column(
+        String(2048), nullable=True
+    )
 
     country: Mapped[Country | None] = relationship(back_populates="users")
     region: Mapped[Region | None] = relationship(back_populates="users")

@@ -27,7 +27,8 @@ export function setUserState(user: AuthUser | null): void {
     user !== null &&
     currentUser.id === user.id &&
     currentUser.subscription_tier === user.subscription_tier &&
-    currentUser.is_onboarded === user.is_onboarded
+    currentUser.is_onboarded === user.is_onboarded &&
+    currentUser.customer_portal_url === user.customer_portal_url
   ) {
     return;
   }

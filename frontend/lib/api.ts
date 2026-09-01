@@ -103,6 +103,7 @@ export type AuthUser = {
   is_active: boolean;
   is_onboarded: boolean;
   subscription_tier: string;
+  customer_portal_url: string | null;
 };
 
 export type AuthSession = {

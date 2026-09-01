@@ -28,6 +28,7 @@ class AuthUser(BaseModel):
     is_active: bool
     is_onboarded: bool
     subscription_tier: str = "free"
+    customer_portal_url: str | None = None
 
 
 class AuthSession(BaseModel):

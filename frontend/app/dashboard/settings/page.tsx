@@ -342,14 +342,19 @@ export default function SettingsPage() {
     setPortalLoading(true);
     setBillingMsg(null);
     try {
-      // Free users → checkout page; Pro users → customer portal
       if (isPro) {
+        // Prefer the cached portal URL from the webhook; fall back to API
+        const cachedUrl = user?.customer_portal_url;
+        if (cachedUrl) {
+          window.open(cachedUrl, "_blank");
+          setPortalLoading(false);
+          return;
+        }
         const result = await createPortalSession();
         if (result.portal_url) {
-          window.location.href = result.portal_url;
+          window.open(result.portal_url, "_blank");
         } else {
           setBillingMsg({ type: "error", text: "No billing portal available for your account." });
-          setPortalLoading(false);
         }
       } else {
         const result = await createCheckoutSession();
@@ -360,6 +365,7 @@ export default function SettingsPage() {
         type: "error",
         text: err instanceof Error ? err.message : "Failed to open billing.",
       });
+    } finally {
       setPortalLoading(false);
     }
   };
@@ -933,7 +939,7 @@ export default function SettingsPage() {
           {isPro && (
             <div className="flex justify-end">
               <Button variant="outline" onClick={handleManageBilling} disabled={portalLoading}>
-                {portalLoading ? "Loading..." : "Manage Billing"}
+                {portalLoading ? "Loading..." : "Manage Subscription"}
               </Button>
             </div>
           )}
