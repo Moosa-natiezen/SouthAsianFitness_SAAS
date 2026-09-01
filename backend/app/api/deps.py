@@ -65,6 +65,21 @@ def require_auth(user: Annotated[User, Depends(get_current_user)]) -> User:
     return user
 
 
+def require_pro(
+    user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    """Require the authenticated user to have an active Pro subscription."""
+    if (user.subscription_tier or "").lower() != "pro":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "PRO_REQUIRED",
+                "message": "This feature requires an active Pro subscription.",
+            },
+        )
+    return user
+
+
 def require_csrf(
     request: Request,
     user: Annotated[User, Depends(get_current_user)],

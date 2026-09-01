@@ -17,6 +17,8 @@ import json
 import os
 from unittest.mock import MagicMock, patch
 
+from fastapi import Depends
+
 os.environ.setdefault("DATABASE_URL", "sqlite://")
 os.environ.setdefault("SECRET_KEY", "test-secret-key-1234567890abcdefg")
 os.environ.setdefault("CSRF_SECRET_KEY", "test-csrf-secret-key-1234567890abcdef")
@@ -548,3 +550,99 @@ def test_webhook_signature_verification():
     assert verify_webhook_signature(body, "wrong_sig", secret) is False
     assert verify_webhook_signature(body, None, secret) is False
     assert verify_webhook_signature(body, correct_sig, "") is False
+
+
+# ── require_pro dependency tests ─────────────────────────────────────────
+
+
+def _add_pro_test_endpoint() -> None:
+    """Temporarily mount a test endpoint guarded by require_pro on the main app."""
+    from app.api.deps import require_pro
+
+    @app.get("/test-pro-gated")
+    def _pro_only(user: User = Depends(require_pro)):
+        return {"tier": user.subscription_tier}
+
+
+def test_require_pro_rejects_free_user():
+    """Verify require_pro raises 403 for free-tier users."""
+    _add_pro_test_endpoint()
+    try:
+        client = make_client()
+        api_register(client)
+        client = TestClient(app)
+        api_login(client)
+
+        resp = client.get("/test-pro-gated")
+        assert resp.status_code == 403
+        body = resp.json()
+        assert body["detail"]["code"] == "PRO_REQUIRED"
+        assert "Pro subscription" in body["detail"]["message"]
+    finally:
+        _remove_pro_test_endpoint()
+
+
+def test_require_pro_allows_pro_user():
+    """Verify require_pro allows users with subscription_tier='pro'."""
+    _add_pro_test_endpoint()
+    try:
+        client = make_client()
+        api_register(client)
+        client = TestClient(app)
+        api_login(client)
+
+        # Upgrade user to pro via DB
+        db = db_session.SessionLocal()
+        user = db.query(User).filter(User.email == "billing@example.com").first()
+        user.subscription_tier = "pro"
+        db.commit()
+        db.close()
+
+        resp = client.get("/test-pro-gated")
+        assert resp.status_code == 200
+        assert resp.json()["tier"] == "pro"
+    finally:
+        _remove_pro_test_endpoint()
+
+
+def test_require_pro_rejects_unauthenticated():
+    """Verify require_pro raises 401 for unauthenticated requests."""
+    _add_pro_test_endpoint()
+    try:
+        client = make_client()
+        resp = client.get("/test-pro-gated")
+        assert resp.status_code == 401
+    finally:
+        _remove_pro_test_endpoint()
+
+
+def test_require_pro_case_insensitive():
+    """Verify require_pro handles mixed-case tier values like 'Pro'."""
+    _add_pro_test_endpoint()
+    try:
+        client = make_client()
+        api_register(client)
+        client = TestClient(app)
+        api_login(client)
+
+        db = db_session.SessionLocal()
+        user = db.query(User).filter(User.email == "billing@example.com").first()
+        user.subscription_tier = "Pro"  # mixed case
+        db.commit()
+        db.close()
+
+        resp = client.get("/test-pro-gated")
+        assert resp.status_code == 200
+        assert resp.json()["tier"] == "Pro"
+    finally:
+        _remove_pro_test_endpoint()
+
+
+def _remove_pro_test_endpoint() -> None:
+    """Remove the temporary test endpoint from the main app."""
+    routes_to_remove = [
+        route for route in app.routes
+        if getattr(route, "path", None) == "/test-pro-gated"
+    ]
+    for route in routes_to_remove:
+        app.routes.remove(route)
