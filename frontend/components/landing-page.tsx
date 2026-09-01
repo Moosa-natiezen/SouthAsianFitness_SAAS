@@ -1,199 +1,308 @@
+"use client";
+
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { AnimateIn, StaggerIn } from "@/components/animate-in";
+import { FeatureScroll } from "@/components/landing/feature-scroll";
+import { PricingSection } from "@/components/landing/pricing-section";
 
-import { Button } from "@/components/ui/button";
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
-const goals = [
-  "Weight loss",
-  "Weight gain",
-  "Muscle building",
-  "General fitness",
+const HeroScene = dynamic(
+  () => import("@/components/3d/hero-scene").then((m) => m.HeroScene),
+  { ssr: false },
+);
+
+/* ── Old Way vs FlexAI Bento Data ────────────────────────────────────── */
+
+const oldWay = [
+  { icon: "🚫", title: "Bland chicken & rice", desc: "Same meals every day. No flavour, no culture." },
+  { icon: "📉", title: "Restrictive diets", desc: "Cut out entire food groups you grew up with." },
+  { icon: "🤷", title: "Guesswork macros", desc: "No idea if you're hitting protein or overeating carbs." },
+  { icon: "💸", title: "Expensive meal plans", desc: "Imported supplements and organic-only shopping lists." },
 ];
 
-const principles = [
-  "Traditional South Asian meals remain realistic and enjoyable.",
-  "Budget-conscious plans designed for everyday life.",
-  "Flexible guidance across multiple countries and regions.",
+const flexAiWay = [
+  { icon: "🍛", title: "Your cultural cuisine", desc: "Dal, biryani, tikka, paratha — optimized, not eliminated." },
+  { icon: "🎯", title: "Precision macros", desc: "Every meal calculated to hit your exact targets." },
+  { icon: "🤖", title: "AI-powered plans", desc: "Generate personalized plans in seconds, not hours." },
+  { icon: "💰", title: "Budget-aware", desc: "Plans that fit your grocery budget and local prices." },
 ];
+
+/* ── Main Landing Page ──────────────────────────────────────────────── */
 
 export function LandingPage() {
+  const bentoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = bentoRef.current;
+    if (!el) return;
+
+    const ctx = gsap.context(() => {
+      // Parallax reveal for bento cards
+      const cards = el.querySelectorAll("[data-bento]");
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 60, filter: "blur(8px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 75%",
+            end: "bottom 25%",
+            toggleActions: "play none none reverse",
+          },
+        },
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="dark min-h-screen bg-[#09090b] text-zinc-100">
-      {/* ── Header ────────────────────────────────────────────────────── */}
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#c4854c] to-[#e8a838] text-sm font-bold text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20">
-            <span className="relative z-10">SA</span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#c4854c] to-[#e8a838] opacity-50 blur-md" />
+    <div className="dark min-h-screen bg-[#09090b] text-[#f5f0e8] overflow-x-hidden">
+      {/* ── Navigation ─────────────────────────────────────────────────── */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.04] bg-[#09090b]/80 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#c4854c] to-[#e8a838] text-sm font-bold text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20">
+              <span className="relative z-10">SA</span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#c4854c] to-[#e8a838] opacity-50 blur-md" />
+            </div>
+            <p className="text-lg font-semibold text-[#f5f0e8]">South Asian Fitness</p>
           </div>
-          <p className="text-lg font-semibold text-[#f5f0e8]">South Asian Fitness</p>
-        </div>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-zinc-400 md:flex">
-          <a href="#benefits" className="transition hover:text-[#f5f0e8]">Benefits</a>
-          <a href="#goals" className="transition hover:text-[#f5f0e8]">Goals</a>
-          <a href="#about" className="transition hover:text-[#f5f0e8]">About</a>
-        </nav>
-        <div className="flex items-center gap-3">
-          <Link href="/auth/login">
-            <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-[#f5f0e8]">Log in</Button>
-          </Link>
-          <Link href="/auth/signup">
-            <Button size="sm" className="bg-gradient-to-r from-[#c4854c] to-[#e8a838] text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 hover:shadow-[#c4854c]/30">Get started</Button>
-          </Link>
+          <nav className="hidden items-center gap-8 text-sm font-medium text-zinc-400 md:flex">
+            <a href="#features" className="transition hover:text-[#f5f0e8]">Features</a>
+            <a href="#how-it-works" className="transition hover:text-[#f5f0e8]">How it works</a>
+            <a href="#pricing" className="transition hover:text-[#f5f0e8]">Pricing</a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/auth/login"
+              className="rounded-xl px-4 py-2 text-sm font-medium text-zinc-400 transition hover:text-[#f5f0e8]"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-5 py-2.5 text-sm font-semibold text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 transition-all hover:shadow-[#c4854c]/30 hover:brightness-110"
+            >
+              Get started
+            </Link>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-16 pt-8 md:pt-14">
-        {/* ── Hero Section ───────────────────────────────────────────── */}
-        <section className="grid items-center gap-10 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-8">
-            <div className="inline-flex items-center rounded-full border border-[#c4854c]/20 bg-[#c4854c]/10 px-3 py-1 text-sm font-medium text-[#d4a574]">
-              ✨ Personalized for real life, not restrictive diets
-            </div>
+      {/* ── Hero Section ───────────────────────────────────────────────── */}
+      <section className="relative flex min-h-screen items-center overflow-hidden">
+        {/* 3D Background */}
+        <HeroScene />
 
-            <div className="space-y-5">
-              <h1 className="max-w-xl text-4xl font-bold tracking-tight text-[#f5f0e8] md:text-6xl">
-                Get fit without giving up your{" "}
-                <span className="text-gradient-cardamom">South Asian food.</span>
-              </h1>
-              <p className="max-w-xl text-lg text-zinc-400">
-                Learn how to build a realistic fitness plan around the foods, meals,
-                routines, and budgets that fit your life and your region.
-              </p>
-            </div>
+        {/* Gradient orbs */}
+        <div className="absolute left-[-10%] top-[20%] h-[500px] w-[500px] rounded-full bg-[#c4854c]/5 blur-[150px]" />
+        <div className="absolute bottom-[10%] right-[-5%] h-[400px] w-[400px] rounded-full bg-[#e8a838]/5 blur-[120px]" />
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="/auth/signup">
-                <Button size="lg" className="bg-gradient-to-r from-[#c4854c] to-[#e8a838] text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 hover:shadow-[#c4854c]/30">
-                  Create account
-                </Button>
-              </Link>
-              <Link href="/auth/login">
-                <Button variant="outline" size="lg" className="border-white/[0.08] bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06]">
-                  I already have an account
-                </Button>
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
-              <span className="flex items-center gap-1.5">
-                <span className="h-1 w-1 rounded-full bg-[#c4854c]" />
-                Budget-conscious
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-1 w-1 rounded-full bg-[#e8a838]" />
-                Multi-country support
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-1 w-1 rounded-full bg-amber-400" />
-                Flexible lifestyle goals
-              </span>
-            </div>
-          </div>
-
-          {/* Hero card */}
-          <div className="relative overflow-hidden rounded-3xl glass-strong p-6">
-            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#c4854c]/10 blur-[60px]" />
-            <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-[#e8a838]/5 blur-[60px]" />
-
-            <div className="relative space-y-5">
-              <div className="rounded-2xl bg-white/[0.04] p-4">
-                <p className="text-sm font-medium text-zinc-500">Popular focus</p>
-                <p className="mt-2 text-2xl font-semibold text-[#f5f0e8]">Balanced nutrition, not elimination.</p>
+        {/* Content */}
+        <div className="relative z-10 mx-auto max-w-6xl px-6 pt-32 pb-20 md:pt-40">
+          <div className="max-w-3xl">
+            <AnimateIn delay={0.2} y={20} blur={4}>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#c4854c]/20 bg-[#c4854c]/10 px-4 py-1.5 text-sm font-medium text-[#d4a574] mb-8">
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#c4854c]" />
+                AI-powered nutrition for South Asian cuisine
               </div>
-              <div className="space-y-3">
-                {principles.map((item) => (
-                  <div key={item} className="flex gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-                    <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#c4854c]/10 text-xs font-semibold text-[#d4a574]">
-                      ✓
+            </AnimateIn>
+
+            <AnimateIn delay={0.4} y={30} blur={6}>
+              <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl lg:text-8xl">
+                Fitness that fits{" "}
+                <span className="text-gradient-cardamom">your culture.</span>
+                <br />
+                <span className="text-zinc-500">Powered by AI.</span>
+              </h1>
+            </AnimateIn>
+
+            <AnimateIn delay={0.6} y={25} blur={4}>
+              <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400 md:text-xl">
+                Generate personalized, macro-optimized South Asian meal plans in seconds.
+                Stop sacrificing the food you love to hit your goals.
+              </p>
+            </AnimateIn>
+
+            <AnimateIn delay={0.8} y={20} blur={3}>
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  href="/onboarding"
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-8 py-4 text-center text-base font-bold text-white shadow-xl shadow-[#c4854c]/25 transition-all hover:shadow-[#c4854c]/40 hover:brightness-110"
+                >
+                  <span className="relative z-10">Start Your Journey</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#e8a838] to-[#c4854c] opacity-0 transition-opacity group-hover:opacity-100" />
+                </Link>
+                <a
+                  href="#how-it-works"
+                  className="flex items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] px-8 py-4 text-base font-medium text-zinc-300 transition-all hover:bg-white/[0.06] hover:text-white"
+                >
+                  See how it works →
+                </a>
+              </div>
+            </AnimateIn>
+
+            <AnimateIn delay={1.0} y={15} blur={2}>
+              <div className="mt-12 flex flex-wrap gap-6 text-sm text-zinc-500">
+                <span className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#c4854c]" />
+                  198+ South Asian foods
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#e8a838]" />
+                  Multi-country support
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-1 w-1 rounded-full bg-[#c25a3c]" />
+                  Budget-aware plans
+                </span>
+              </div>
+            </AnimateIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Bento Grid: Old Way vs FlexAI ──────────────────────────────── */}
+      <section id="features" className="relative py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6">
+          <AnimateIn>
+            <div className="mb-16 text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#c4854c]">
+                The problem
+              </p>
+              <h2 className="mt-4 font-serif text-3xl font-bold text-[#f5f0e8] md:text-5xl">
+                The old way doesn't work.
+              </h2>
+            </div>
+          </AnimateIn>
+
+          <div ref={bentoRef} className="grid gap-6 md:grid-cols-2">
+            {/* Old Way */}
+            <div className="space-y-4">
+              <div className="mb-6 flex items-center gap-3">
+                <span className="rounded-lg bg-[#c25a3c]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#c25a3c]">
+                  The old way
+                </span>
+                <div className="h-px flex-1 bg-[#c25a3c]/10" />
+              </div>
+              <StaggerIn stagger={0.1}>
+                {oldWay.map((item) => (
+                  <div
+                    key={item.title}
+                    data-bento
+                    className="rounded-2xl border border-[#c25a3c]/10 bg-[#c25a3c]/[0.03] p-5"
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="text-2xl">{item.icon}</span>
+                      <div>
+                        <h3 className="font-medium text-zinc-300">{item.title}</h3>
+                        <p className="mt-1 text-sm text-zinc-500">{item.desc}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-zinc-300">{item}</p>
                   </div>
                 ))}
+              </StaggerIn>
+            </div>
+
+            {/* FlexAI Way */}
+            <div className="space-y-4">
+              <div className="mb-6 flex items-center gap-3">
+                <span className="rounded-lg bg-[#c4854c]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#c4854c]">
+                  The FlexAI way
+                </span>
+                <div className="h-px flex-1 bg-[#c4854c]/10" />
               </div>
+              <StaggerIn stagger={0.1} delay={0.2}>
+                {flexAiWay.map((item) => (
+                  <div
+                    key={item.title}
+                    data-bento
+                    className="rounded-2xl border border-[#c4854c]/15 bg-[#c4854c]/[0.04] p-5 transition-all duration-500 hover:border-[#c4854c]/25 hover:bg-[#c4854c]/[0.07]"
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="text-2xl">{item.icon}</span>
+                      <div>
+                        <h3 className="font-medium text-[#f5f0e8]">{item.title}</h3>
+                        <p className="mt-1 text-sm text-zinc-400">{item.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </StaggerIn>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Benefits Section ────────────────────────────────────────── */}
-        <section id="benefits" className="grid gap-6 md:grid-cols-3">
-          <BenefitCard
-            badge="Smart personalization"
-            title="Built around your goals"
-            description="Choose a plan that matches your stage—fat loss, strength, weight gain, or sustainable everyday fitness."
-          />
-          <BenefitCard
-            badge="Practical budgets"
-            title="Works with real spending"
-            description="Account for the foods and grocery budgets that fit your home, city, and local market realities."
-          />
-          <BenefitCard
-            badge="Regional flexibility"
-            title="Multi-country ready"
-            description="Support for different regions, currencies, languages, and food traditions without forcing a one-size-fits-all model."
-          />
-        </section>
+      {/* ── Feature Scroll: AI Streaming Demo ───────────────────────────── */}
+      <div id="how-it-works">
+        <FeatureScroll />
+      </div>
 
-        {/* ── Goals Section ───────────────────────────────────────────── */}
-        <section id="goals" className="relative overflow-hidden rounded-3xl glass-strong p-8">
-          <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-[#c4854c]/10 blur-[80px]" />
-          <div className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full bg-[#e8a838]/5 blur-[80px]" />
-          <div className="absolute inset-0 bg-grid opacity-30" />
+      {/* ── Pricing ─────────────────────────────────────────────────────── */}
+      <div id="pricing">
+        <PricingSection />
+      </div>
 
-          <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#d4a574]">Popular paths</p>
-              <h2 className="mt-3 text-3xl font-semibold text-[#f5f0e8]">Choose the goal that fits your life.</h2>
+      {/* ── Final CTA ───────────────────────────────────────────────────── */}
+      <section className="relative py-24 md:py-32">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c4854c]/8 blur-[120px]" />
+        </div>
+        <div className="relative mx-auto max-w-3xl px-6 text-center">
+          <AnimateIn>
+            <h2 className="font-serif text-3xl font-bold text-[#f5f0e8] md:text-5xl">
+              Your goals. Your food.{" "}
+              <span className="text-gradient-cardamom">Your plan.</span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-400">
+              Join thousands of people building sustainable fitness habits with the food they love.
+              Start your free account today.
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <Link
+                href="/onboarding"
+                className="rounded-2xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-10 py-4 text-base font-bold text-white shadow-xl shadow-[#c4854c]/25 transition-all hover:shadow-[#c4854c]/40 hover:brightness-110"
+              >
+                Start Your Journey
+              </Link>
+              <Link
+                href="/auth/login"
+                className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-8 py-4 text-base font-medium text-zinc-300 transition-all hover:bg-white/[0.06] hover:text-white"
+              >
+                I already have an account
+              </Link>
             </div>
-            <Link href="/auth/signup">
-              <button className="rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-5 py-2.5 text-sm font-semibold text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 transition-all hover:shadow-[#c4854c]/30 hover:brightness-110">
-                Start your profile
-              </button>
-            </Link>
-          </div>
+          </AnimateIn>
+        </div>
+      </section>
 
-          <div className="relative mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {goals.map((goal) => (
-              <div key={goal} className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4 transition-all hover:bg-white/[0.06]">
-                <p className="text-lg font-medium text-[#f5f0e8]">{goal}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Footer ──────────────────────────────────────────────────── */}
-        <footer id="about" className="flex flex-col gap-4 border-t border-white/[0.06] py-6 text-sm text-zinc-500 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 South Asian Fitness</p>
-          <div className="flex flex-wrap gap-4">
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      <footer className="border-t border-white/[0.04] py-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 text-sm text-zinc-500 md:flex-row md:items-center md:justify-between">
+          <p>© 2026 South Asian Fitness. Built with ❤️ for the diaspora.</p>
+          <div className="flex flex-wrap gap-6">
             <Link href="/auth/login" className="transition hover:text-zinc-300">Login</Link>
             <Link href="/auth/signup" className="transition hover:text-zinc-300">Sign up</Link>
             <Link href="/privacy" className="transition hover:text-zinc-300">Privacy</Link>
             <Link href="/terms" className="transition hover:text-zinc-300">Terms</Link>
           </div>
-        </footer>
-      </main>
-    </div>
-  );
-}
-
-/* ── Benefit Card ─────────────────────────────────────────────────────── */
-
-function BenefitCard({
-  badge,
-  title,
-  description,
-}: {
-  badge: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="group relative overflow-hidden rounded-2xl glass p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.05)]">
-      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#c4854c]/5 blur-[40px] transition-all duration-500 group-hover:bg-[#c4854c]/10" />
-      <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-[#d4a574]">
-        {badge}
-      </p>
-      <h2 className="relative mt-4 text-xl font-semibold text-[#f5f0e8]">{title}</h2>
-      <p className="relative mt-2 text-sm text-zinc-400">{description}</p>
+        </div>
+      </footer>
     </div>
   );
 }
