@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -110,3 +110,36 @@ def list_saved_ai_meal_plans(
         limit=limit,
         offset=offset,
     )
+
+
+@router.delete("/meal-plans/saved/{plan_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_saved_ai_meal_plan(
+    plan_id: str,
+    user: Annotated[User, Depends(require_auth)],
+    db: Session = Depends(get_db),
+) -> None:
+    """Delete a saved AI meal plan owned by the authenticated user."""
+    from uuid import UUID
+
+    try:
+        plan_uuid = UUID(plan_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Saved plan not found",
+        )
+
+    saved = (
+        db.query(SavedMealPlan)
+        .filter(SavedMealPlan.id == plan_uuid, SavedMealPlan.user_id == user.id)
+        .first()
+    )
+    if saved is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Saved plan not found",
+        )
+
+    db.delete(saved)
+    db.commit()
+    logger.info("Deleted saved AI plan %s for user %s", plan_id, user.id)

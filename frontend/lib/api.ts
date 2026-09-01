@@ -716,6 +716,14 @@ export async function listSavedAiMealPlans(
   return apiFetch<SavedMealPlanListResponse>(path);
 }
 
+export async function deleteSavedAiMealPlan(planId: string): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  await apiFetch<unknown>(`/api/ai/meal-plans/saved/${planId}`, {
+    method: "DELETE",
+    headers: { "X-CSRF-Token": csrfToken },
+  });
+}
+
 /* ── Billing API ─────────────────────────────────────────────────────── */
 
 export type CheckoutResponse = {
