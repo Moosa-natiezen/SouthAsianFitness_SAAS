@@ -10,7 +10,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#09090b]">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-medium text-emerald-700 hover:text-emerald-800">
+        <Link href="/" className="text-sm font-medium text-[#c4854c] hover:text-[#c4854c]">
           ← Back to South Asian Fitness
         </Link>
 

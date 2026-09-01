@@ -61,9 +61,9 @@ export default function SavedPlansPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl glass p-6">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-[40px]" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#c4854c]/50/5 blur-[40px]" />
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d4a574]">
             AI Meal Plans
           </p>
           <h1 className="mt-2 text-2xl font-bold text-white">Saved Plans</h1>
@@ -95,8 +95,8 @@ export default function SavedPlansPage() {
       {/* Empty state */}
       {state.status === "ready" && state.data.items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.01] p-12 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10">
-            <svg className="h-7 w-7 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#c4854c]/10">
+            <svg className="h-7 w-7 text-[#d4a574]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </div>
@@ -147,12 +147,12 @@ function PlanCard({
 
   return (
     <div className="group relative overflow-hidden rounded-2xl glass p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.05)]">
-      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-500/5 blur-[30px] transition-all duration-500 group-hover:bg-emerald-500/10" />
+      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#c4854c]/50/5 blur-[30px] transition-all duration-500 group-hover:bg-[#c4854c]/10" />
 
       <div className="relative">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-sm font-semibold text-white line-clamp-1">{plan.title}</h3>
-          <span className="shrink-0 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+          <span className="shrink-0 rounded-md bg-[#c4854c]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#d4a574]">
             AI
           </span>
         </div>
@@ -182,7 +182,7 @@ function PlanCard({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onSelect(plan)}
-              className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-[11px] font-medium text-emerald-300 transition-all hover:bg-emerald-500/20"
+              className="rounded-lg bg-[#c4854c]/10 px-3 py-1.5 text-[11px] font-medium text-[#d4a574] transition-all hover:bg-[#c4854c]/50/20"
             >
               View
             </button>

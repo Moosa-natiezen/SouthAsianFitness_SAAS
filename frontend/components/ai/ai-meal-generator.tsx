@@ -63,11 +63,11 @@ export function AiMealGenerator() {
     <div className="space-y-5">
       {/* ── Form ─────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl glass p-6">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-[40px]" />
-        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-cyan-500/5 blur-[40px]" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#c4854c]/50/5 blur-[40px]" />
+        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-[#e8a838]/5 blur-[40px]" />
 
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d4a574]">
             AI Meal Plan Studio
           </p>
           <h3 className="mt-2 text-lg font-semibold text-white">
@@ -116,7 +116,7 @@ export function AiMealGenerator() {
               <button
                 type="submit"
                 disabled={isStreaming}
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 hover:brightness-110 disabled:opacity-50"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#c4854c]/20 transition-all hover:shadow-[#c4854c]/30 hover:brightness-110 disabled:opacity-50"
               >
                 {isStreaming ? (
                   <span className="flex items-center gap-2">
@@ -158,17 +158,17 @@ export function AiMealGenerator() {
       {/* ── Streaming Output ──────────────────────────────────────────── */}
       {(content || isStreaming) && (
         <div className="relative overflow-hidden rounded-2xl glass p-6">
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-[40px]" />
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#c4854c]/50/5 blur-[40px]" />
 
           <div className="relative">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d4a574]">
                   AI Generated Plan
                 </p>
                 {isStreaming && (
-                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+                  <span className="flex items-center gap-1.5 rounded-full bg-[#c4854c]/10 px-2.5 py-1 text-[10px] font-semibold text-[#d4a574]">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#c4854c] shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
                     Streaming
                   </span>
                 )}
@@ -185,9 +185,9 @@ export function AiMealGenerator() {
             {/* Loading dots */}
             {isStreaming && (
               <div className="mt-4 flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:0ms]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:150ms]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:300ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#c4854c] [animation-delay:0ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#c4854c] [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#c4854c] [animation-delay:300ms]" />
               </div>
             )}
 
@@ -197,7 +197,7 @@ export function AiMealGenerator() {
                 <button
                   onClick={handleSave}
                   disabled={saveLoading}
-                  className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-medium text-emerald-300 transition-all hover:bg-emerald-500/20 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl bg-[#c4854c]/10 border border-[#c4854c]/20 px-4 py-2.5 text-sm font-medium text-[#d4a574] transition-all hover:bg-[#c4854c]/50/20 disabled:opacity-50"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
@@ -247,8 +247,8 @@ export function AiMealGenerator() {
       {/* ── Empty State ───────────────────────────────────────────────── */}
       {!content && !isStreaming && !error && (
         <div className="rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.01] p-10 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10">
-            <svg className="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#c4854c]/10">
+            <svg className="h-6 w-6 text-[#d4a574]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
             </svg>
           </div>
@@ -299,7 +299,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-all focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 disabled:opacity-50"
+        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-all focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30 disabled:opacity-50"
       />
     </div>
   );

@@ -23,7 +23,7 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
     <div className="space-y-4">
       {/* Plan header */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
           Generated Plan
         </p>
         <h2 className="mt-1 text-xl font-semibold text-white">{plan.plan_name}</h2>
@@ -46,7 +46,7 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
                 onClick={() => setSelectedDay(i)}
                 className={`flex-shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                   i === selectedDay
-                    ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                    ? "border-[#c4854c] bg-[#c4854c]/5 text-[#c4854c]"
                     : "border-white/[0.06] bg-white text-zinc-400 hover:bg-white/[0.02]"
                 }`}
               >
@@ -105,10 +105,10 @@ function DaySummary({
     : 0;
 
   return (
-    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+    <div className="rounded-2xl border border-[#c4854c]/20 bg-[#c4854c]/5 p-5 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-emerald-800">Daily Totals</h3>
-        <span className="text-sm text-emerald-700">
+        <h3 className="font-semibold text-[#c4854c]">Daily Totals</h3>
+        <span className="text-sm text-[#c4854c]">
           {Math.round(day.total_calories)} / {Math.round(nutrition.calorie_target)} kcal ({calPct}%)
         </span>
       </div>
@@ -120,7 +120,7 @@ function DaySummary({
       </div>
 
       {day.total_estimated_cost !== null && currency && (
-        <p className="mt-3 text-sm text-emerald-700">
+        <p className="mt-3 text-sm text-[#c4854c]">
           Estimated cost: {currency} {Number(day.total_estimated_cost).toLocaleString()}
           {!day.cost_complete && " (partial — some foods lack pricing)"}
         </p>
@@ -145,18 +145,18 @@ function MacroBar({
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
-        <span className="text-emerald-700">{label}</span>
-        <span className="font-medium text-emerald-800">
+        <span className="text-[#c4854c]">{label}</span>
+        <span className="font-medium text-[#c4854c]">
           {Math.round(actual)}{unit}
         </span>
       </div>
-      <div className="mt-1 h-2 overflow-hidden rounded-full bg-emerald-200">
+      <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#c4854c]/20">
         <div
-          className="h-full rounded-full bg-emerald-600 transition-all"
+          className="h-full rounded-full bg-[#c4854c] transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="mt-0.5 text-xs text-emerald-600">of {Math.round(target)}{unit}</p>
+      <p className="mt-0.5 text-xs text-[#c4854c]">of {Math.round(target)}{unit}</p>
     </div>
   );
 }

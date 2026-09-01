@@ -19,7 +19,7 @@ import {
 const PAGE_SIZE = 20;
 
 const inputClass =
-  "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-all focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30";
+  "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-all focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30";
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
@@ -292,7 +292,7 @@ export default function FoodLibraryPage() {
             onClick={() => handleCategoryClick(null)}
             className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               selectedCategory === null
-                ? "border-emerald-600 bg-emerald-600 text-white"
+                ? "border-[#c4854c] bg-[#c4854c] text-white"
                 : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06]"
             }`}
             role="tab"
@@ -306,7 +306,7 @@ export default function FoodLibraryPage() {
               onClick={() => handleCategoryClick(cat.slug)}
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 selectedCategory === cat.slug
-                  ? "border-emerald-600 bg-emerald-600 text-white"
+                  ? "border-[#c4854c] bg-[#c4854c] text-white"
                   : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06]"
               }`}
               role="tab"

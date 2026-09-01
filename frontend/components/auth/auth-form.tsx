@@ -109,7 +109,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, displayName: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30"
                   placeholder="Your name"
                   autoComplete="name"
                 />
@@ -126,7 +126,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
+                className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30"
                 placeholder="you@example.com"
                 autoComplete={isSignup ? "email" : "username"}
               />
@@ -144,7 +144,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 onChange={(event) =>
                   setForm((current) => ({ ...current, password: event.target.value }))
                 }
-                className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
+                className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30"
                 placeholder="Enter an 8+ character password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
               />
@@ -163,7 +163,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
           <p className="mt-6 text-center text-sm text-zinc-400">
             {isSignup ? "Already have an account?" : "Need an account?"}{" "}
-            <Link href={isSignup ? "/auth/login" : "/auth/signup"} className="font-medium text-emerald-700 hover:text-emerald-800">
+            <Link href={isSignup ? "/auth/login" : "/auth/signup"} className="font-medium text-[#c4854c] hover:text-[#c4854c]">
               {isSignup ? "Log in" : "Sign up"}
             </Link>
           </p>

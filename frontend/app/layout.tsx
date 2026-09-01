@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 
 import "./globals.css";
+import { LenisProvider } from "@/components/lenis-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: "#0a0a0a",
   width: "device-width",
   initialScale: 1,
 };
@@ -63,18 +70,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-grain">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-emerald-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-cardamom focus:px-4 focus:py-2 focus:text-obsidian focus:outline-none"
         >
           Skip to content
         </a>
-        <div id="main-content" className="flex-1 flex flex-col">
-          {children}
-        </div>
+        <LenisProvider>
+          <div id="main-content" className="flex-1 flex flex-col">
+            {children}
+          </div>
+        </LenisProvider>
       </body>
     </html>
   );

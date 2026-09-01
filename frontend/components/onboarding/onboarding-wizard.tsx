@@ -241,7 +241,7 @@ export function OnboardingWizard() {
 
   const renderStep = () => {
     const selectClass =
-      "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30";
+      "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30";
     const inputClass = selectClass;
 
     if (stepIndex === 0) {
@@ -397,12 +397,12 @@ export function OnboardingWizard() {
           {/* Progress bar */}
           <div className="flex gap-2" role="progressbar" aria-valuenow={stepIndex + 1} aria-valuemax={steps.length} aria-label={`Step ${stepIndex + 1} of ${steps.length}`}>
             {steps.map((step, index) => (
-              <div key={step.title} className={`h-2 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-emerald-600" : "bg-white/[0.06]"}`} />
+              <div key={step.title} className={`h-2 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-[#c4854c]" : "bg-white/[0.06]"}`} />
             ))}
           </div>
 
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.12em] text-emerald-700">
+            <p className="text-sm font-medium uppercase tracking-[0.12em] text-[#c4854c]">
               Step {stepIndex + 1} of {steps.length}
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-white">{steps[stepIndex].title}</h2>

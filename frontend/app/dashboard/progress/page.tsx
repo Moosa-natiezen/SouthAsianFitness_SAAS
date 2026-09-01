@@ -116,7 +116,7 @@ export default function ProgressPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
           Progress
         </p>
         <h1 className="mt-2 text-3xl font-semibold text-white">
@@ -169,7 +169,7 @@ function SummaryCard({ state }: { state: SummaryState }) {
   if (state.status === "error") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
           Summary
         </p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
@@ -182,7 +182,7 @@ function SummaryCard({ state }: { state: SummaryState }) {
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
         Summary
       </p>
 
@@ -250,7 +250,7 @@ function StatBlock({
   negative?: boolean;
 }) {
   let valueClass = "text-zinc-100";
-  if (highlight && positive) valueClass = "text-emerald-700";
+  if (highlight && positive) valueClass = "text-[#c4854c]";
   if (highlight && negative) valueClass = "text-rose-600";
 
   return (
@@ -289,7 +289,7 @@ function WeightChart({ state }: { state: HistoryState }) {
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
         Weight Trend
       </p>
       <div className="mt-4 h-64">
@@ -412,7 +412,7 @@ function LogForm({
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
         Log Progress
       </p>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
@@ -425,7 +425,7 @@ function LogForm({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30"
             required
           />
         </div>
@@ -442,7 +442,7 @@ function LogForm({
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="e.g. 72.5"
-            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30"
             required
           />
         </div>
@@ -460,7 +460,7 @@ function LogForm({
               value={waist}
               onChange={(e) => setWaist(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+              className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30"
             />
           </div>
           <div>
@@ -475,7 +475,7 @@ function LogForm({
               value={hip}
               onChange={(e) => setHip(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+              className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30"
             />
           </div>
         </div>
@@ -493,7 +493,7 @@ function LogForm({
             value={bodyFat}
             onChange={(e) => setBodyFat(e.target.value)}
             placeholder="Optional"
-            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30"
           />
         </div>
 
@@ -507,7 +507,7 @@ function LogForm({
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional notes"
             rows={2}
-            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-[#c4854c]/50 focus:outline-none focus:ring-1 focus:ring-[#c4854c]/30"
           />
         </div>
 
@@ -533,7 +533,7 @@ function HistorySection({
   if (state.status === "loading") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
           Weight History
         </p>
         <div className="mt-4 space-y-3">
@@ -548,7 +548,7 @@ function HistorySection({
   if (state.status === "error") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
           Weight History
         </p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
@@ -560,7 +560,7 @@ function HistorySection({
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
         Weight History
       </p>
 
@@ -605,7 +605,7 @@ function HistorySection({
                         <span
                           className={
                             change < 0
-                              ? "text-emerald-600"
+                              ? "text-[#c4854c]"
                               : change > 0
                                 ? "text-rose-600"
                                 : "text-zinc-500"

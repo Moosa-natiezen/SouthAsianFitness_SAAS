@@ -21,23 +21,23 @@ export function LandingPage() {
       {/* ── Header ────────────────────────────────────────────────────── */}
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-400 text-sm font-bold text-white shadow-lg shadow-emerald-500/20">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#c4854c] to-[#e8a838] text-sm font-bold text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20">
             <span className="relative z-10">SA</span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-400 opacity-50 blur-md" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#c4854c] to-[#e8a838] opacity-50 blur-md" />
           </div>
-          <p className="text-lg font-semibold text-white">South Asian Fitness</p>
+          <p className="text-lg font-semibold text-[#f5f0e8]">South Asian Fitness</p>
         </div>
         <nav className="hidden items-center gap-6 text-sm font-medium text-zinc-400 md:flex">
-          <a href="#benefits" className="transition hover:text-white">Benefits</a>
-          <a href="#goals" className="transition hover:text-white">Goals</a>
-          <a href="#about" className="transition hover:text-white">About</a>
+          <a href="#benefits" className="transition hover:text-[#f5f0e8]">Benefits</a>
+          <a href="#goals" className="transition hover:text-[#f5f0e8]">Goals</a>
+          <a href="#about" className="transition hover:text-[#f5f0e8]">About</a>
         </nav>
         <div className="flex items-center gap-3">
           <Link href="/auth/login">
-            <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">Log in</Button>
+            <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-[#f5f0e8]">Log in</Button>
           </Link>
           <Link href="/auth/signup">
-            <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-cyan-400 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30">Get started</Button>
+            <Button size="sm" className="bg-gradient-to-r from-[#c4854c] to-[#e8a838] text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 hover:shadow-[#c4854c]/30">Get started</Button>
           </Link>
         </div>
       </header>
@@ -46,14 +46,14 @@ export function LandingPage() {
         {/* ── Hero Section ───────────────────────────────────────────── */}
         <section className="grid items-center gap-10 md:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-8">
-            <div className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-400">
+            <div className="inline-flex items-center rounded-full border border-[#c4854c]/20 bg-[#c4854c]/10 px-3 py-1 text-sm font-medium text-[#d4a574]">
               ✨ Personalized for real life, not restrictive diets
             </div>
 
             <div className="space-y-5">
-              <h1 className="max-w-xl text-4xl font-bold tracking-tight text-white md:text-6xl">
+              <h1 className="max-w-xl text-4xl font-bold tracking-tight text-[#f5f0e8] md:text-6xl">
                 Get fit without giving up your{" "}
-                <span className="text-gradient">South Asian food.</span>
+                <span className="text-gradient-cardamom">South Asian food.</span>
               </h1>
               <p className="max-w-xl text-lg text-zinc-400">
                 Learn how to build a realistic fitness plan around the foods, meals,
@@ -63,7 +63,7 @@ export function LandingPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/auth/signup">
-                <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-cyan-400 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30">
+                <Button size="lg" className="bg-gradient-to-r from-[#c4854c] to-[#e8a838] text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 hover:shadow-[#c4854c]/30">
                   Create account
                 </Button>
               </Link>
@@ -76,11 +76,11 @@ export function LandingPage() {
 
             <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
               <span className="flex items-center gap-1.5">
-                <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                <span className="h-1 w-1 rounded-full bg-[#c4854c]" />
                 Budget-conscious
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-1 w-1 rounded-full bg-cyan-400" />
+                <span className="h-1 w-1 rounded-full bg-[#e8a838]" />
                 Multi-country support
               </span>
               <span className="flex items-center gap-1.5">
@@ -92,18 +92,18 @@ export function LandingPage() {
 
           {/* Hero card */}
           <div className="relative overflow-hidden rounded-3xl glass-strong p-6">
-            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-500/10 blur-[60px]" />
-            <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-cyan-500/5 blur-[60px]" />
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#c4854c]/10 blur-[60px]" />
+            <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-[#e8a838]/5 blur-[60px]" />
 
             <div className="relative space-y-5">
               <div className="rounded-2xl bg-white/[0.04] p-4">
                 <p className="text-sm font-medium text-zinc-500">Popular focus</p>
-                <p className="mt-2 text-2xl font-semibold text-white">Balanced nutrition, not elimination.</p>
+                <p className="mt-2 text-2xl font-semibold text-[#f5f0e8]">Balanced nutrition, not elimination.</p>
               </div>
               <div className="space-y-3">
                 {principles.map((item) => (
                   <div key={item} className="flex gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-                    <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-xs font-semibold text-emerald-400">
+                    <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#c4854c]/10 text-xs font-semibold text-[#d4a574]">
                       ✓
                     </div>
                     <p className="text-sm text-zinc-300">{item}</p>
@@ -135,17 +135,17 @@ export function LandingPage() {
 
         {/* ── Goals Section ───────────────────────────────────────────── */}
         <section id="goals" className="relative overflow-hidden rounded-3xl glass-strong p-8">
-          <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-emerald-500/10 blur-[80px]" />
-          <div className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full bg-cyan-500/5 blur-[80px]" />
+          <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-[#c4854c]/10 blur-[80px]" />
+          <div className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full bg-[#e8a838]/5 blur-[80px]" />
           <div className="absolute inset-0 bg-grid opacity-30" />
 
           <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-400">Popular paths</p>
-              <h2 className="mt-3 text-3xl font-semibold text-white">Choose the goal that fits your life.</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#d4a574]">Popular paths</p>
+              <h2 className="mt-3 text-3xl font-semibold text-[#f5f0e8]">Choose the goal that fits your life.</h2>
             </div>
             <Link href="/auth/signup">
-              <button className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 hover:brightness-110">
+              <button className="rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-5 py-2.5 text-sm font-semibold text-[#f5f0e8] shadow-lg shadow-[#c4854c]/20 transition-all hover:shadow-[#c4854c]/30 hover:brightness-110">
                 Start your profile
               </button>
             </Link>
@@ -154,7 +154,7 @@ export function LandingPage() {
           <div className="relative mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {goals.map((goal) => (
               <div key={goal} className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4 transition-all hover:bg-white/[0.06]">
-                <p className="text-lg font-medium text-white">{goal}</p>
+                <p className="text-lg font-medium text-[#f5f0e8]">{goal}</p>
               </div>
             ))}
           </div>
@@ -188,11 +188,11 @@ function BenefitCard({
 }) {
   return (
     <div className="group relative overflow-hidden rounded-2xl glass p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.05)]">
-      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-[40px] transition-all duration-500 group-hover:bg-emerald-500/10" />
-      <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#c4854c]/5 blur-[40px] transition-all duration-500 group-hover:bg-[#c4854c]/10" />
+      <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-[#d4a574]">
         {badge}
       </p>
-      <h2 className="relative mt-4 text-xl font-semibold text-white">{title}</h2>
+      <h2 className="relative mt-4 text-xl font-semibold text-[#f5f0e8]">{title}</h2>
       <p className="relative mt-2 text-sm text-zinc-400">{description}</p>
     </div>
   );

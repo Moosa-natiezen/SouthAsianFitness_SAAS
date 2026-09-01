@@ -140,7 +140,7 @@ export default function MealPlansPage() {
     <div className="space-y-6">
       {/* Tab switcher */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#c4854c]">
           Meal Plans
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-white">
@@ -155,7 +155,7 @@ export default function MealPlansPage() {
             onClick={() => setActiveTab("optimizer")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "optimizer"
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                ? "border-[#c4854c]/30 bg-[#c4854c]/10 text-[#d4a574]"
                 : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06]"
             }`}
           >
@@ -165,7 +165,7 @@ export default function MealPlansPage() {
             onClick={() => setActiveTab("ai")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "ai"
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                ? "border-[#c4854c]/30 bg-[#c4854c]/10 text-[#d4a574]"
                 : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06]"
             }`}
           >
@@ -203,7 +203,7 @@ export default function MealPlansPage() {
                   onClick={() => setPlanDays(d)}
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     planDays === d
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                      ? "border-[#c4854c]/30 bg-[#c4854c]/10 text-[#d4a574]"
                       : "border-white/[0.08] bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06]"
                   }`}
                   aria-pressed={planDays === d}
@@ -225,7 +225,7 @@ export default function MealPlansPage() {
                   onClick={() => setMealCount(m)}
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     mealCount === m
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                      ? "border-[#c4854c]/30 bg-[#c4854c]/10 text-[#d4a574]"
                       : "border-white/[0.08] bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06]"
                   }`}
                   aria-pressed={mealCount === m}
@@ -299,11 +299,11 @@ export default function MealPlansPage() {
 
       {/* Paywall / Upgrade */}
       {showPaywall && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm">
-          <p className="text-lg font-semibold text-emerald-800">
+        <div className="rounded-2xl border border-[#c4854c]/20 bg-[#c4854c]/5 p-8 text-center shadow-sm">
+          <p className="text-lg font-semibold text-[#c4854c]">
             You've reached your limit
           </p>
-          <p className="mt-2 text-emerald-700">
+          <p className="mt-2 text-[#c4854c]">
             Free users can generate up to 3 meal plans per month.
             Upgrade to Pro for unlimited generation.
           </p>

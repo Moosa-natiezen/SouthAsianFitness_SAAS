@@ -72,7 +72,7 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-white/[0.08] bg-white/[0.03]/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 text-sm";
+  "w-full rounded-xl border border-white/[0.08] bg-white/[0.03]/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30 text-sm";
 
 const labelClass = "text-sm font-medium text-zinc-400";
 
@@ -914,7 +914,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {upgradePolling && (
-            <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800" role="status">
+            <p className="rounded-lg bg-[#c4854c]/5 px-4 py-3 text-sm font-medium text-[#c4854c]" role="status">
               ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
             </p>
           )}
