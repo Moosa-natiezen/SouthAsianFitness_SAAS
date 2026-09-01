@@ -6,23 +6,21 @@ import remarkGfm from "remark-gfm";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useMealPlanStream } from "@/hooks/use-meal-plan-stream";
 import { saveAiMealPlan } from "@/lib/api";
 
 /**
  * AI Meal Plan Generator with live Markdown streaming.
- *
- * Sends user preferences to the streaming backend endpoint and
- * renders the AI-generated meal plan as Markdown in real time.
+ * Dark luxury glass aesthetic with glowing cursor animation.
  */
 export function AiMealGenerator() {
   const { content, isStreaming, error, generate, reset } =
     useMealPlanStream();
 
-  const [targetCalories, setTargetCalories] = useState<string>("");
-  const [proteinG, setProteinG] = useState<string>("");
+  const [targetCalories, setTargetCalories] = useState("");
+  const [proteinG, setProteinG] = useState("");
   const [cuisineType, setCuisineType] = useState("South Asian");
+
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveMsg, setSaveMsg] = useState<{
     type: "info" | "error";
@@ -53,6 +51,7 @@ export function AiMealGenerator() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveMsg(null);
     generate({
       target_calories: targetCalories ? Number(targetCalories) : undefined,
       protein_g: proteinG ? Number(proteinG) : undefined,
@@ -61,157 +60,183 @@ export function AiMealGenerator() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* ── Form ─────────────────────────────────────────────────────── */}
-      <Card>
-        <CardContent className="pt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="relative overflow-hidden rounded-2xl glass p-6">
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-[40px]" />
+        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-cyan-500/5 blur-[40px]" />
+
+        <div className="relative">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+            AI Meal Plan Studio
+          </p>
+          <h3 className="mt-2 text-lg font-semibold text-white">
+            Generate with AI
+          </h3>
+          <p className="mt-1 text-sm text-zinc-400">
+            Set your targets and let AI create a personalized meal plan.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div className="grid gap-4 sm:grid-cols-3">
-              {/* Target Calories */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="ai-calories"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  Target Calories
-                </label>
-                <input
-                  id="ai-calories"
-                  type="number"
-                  min={500}
-                  max={10000}
-                  placeholder="e.g. 2200"
-                  value={targetCalories}
-                  onChange={(e) => setTargetCalories(e.target.value)}
-                  disabled={isStreaming}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
-                />
-              </div>
-
-              {/* Protein */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="ai-protein"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  Protein (g)
-                </label>
-                <input
-                  id="ai-protein"
-                  type="number"
-                  min={0}
-                  max={500}
-                  placeholder="e.g. 120"
-                  value={proteinG}
-                  onChange={(e) => setProteinG(e.target.value)}
-                  disabled={isStreaming}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
-                />
-              </div>
-
-              {/* Cuisine Type */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="ai-cuisine"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  Cuisine
-                </label>
-                <input
-                  id="ai-cuisine"
-                  type="text"
-                  placeholder="e.g. South Asian"
-                  value={cuisineType}
-                  onChange={(e) => setCuisineType(e.target.value)}
-                  disabled={isStreaming}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
-                />
-              </div>
+              <InputField
+                id="ai-calories"
+                label="Target Calories"
+                placeholder="e.g. 2200"
+                type="number"
+                min={500}
+                max={10000}
+                value={targetCalories}
+                onChange={setTargetCalories}
+                disabled={isStreaming}
+              />
+              <InputField
+                id="ai-protein"
+                label="Protein (g)"
+                placeholder="e.g. 120"
+                type="number"
+                min={0}
+                max={500}
+                value={proteinG}
+                onChange={setProteinG}
+                disabled={isStreaming}
+              />
+              <InputField
+                id="ai-cuisine"
+                label="Cuisine"
+                placeholder="e.g. South Asian"
+                type="text"
+                value={cuisineType}
+                onChange={setCuisineType}
+                disabled={isStreaming}
+              />
             </div>
 
             <div className="flex gap-3">
-              <Button
+              <button
                 type="submit"
                 disabled={isStreaming}
-                size="lg"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 hover:brightness-110 disabled:opacity-50"
               >
                 {isStreaming ? (
                   <span className="flex items-center gap-2">
                     <Spinner />
-                    Generating...
+                    Generating…
                   </span>
                 ) : (
-                  "Generate AI Meal Plan"
+                  <span className="flex items-center gap-2">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                    Generate AI Plan
+                  </span>
                 )}
-              </Button>
+              </button>
 
               {(content || error) && (
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  size="lg"
                   onClick={reset}
                   disabled={isStreaming}
+                  className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-5 py-3 text-sm font-medium text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-zinc-200 disabled:opacity-50"
                 >
                   Clear
-                </Button>
+                </button>
               )}
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* ── Error ─────────────────────────────────────────────────────── */}
       {error && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-          <p className="text-sm font-medium text-red-800">{error}</p>
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+          <p className="text-sm font-medium text-red-300">{error}</p>
         </div>
       )}
 
       {/* ── Streaming Output ──────────────────────────────────────────── */}
       {(content || isStreaming) && (
-        <Card>
-          <CardContent className="pt-4">
-            <div className="mb-3 flex items-center gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                AI Generated Meal Plan
-              </p>
-              {isStreaming && (
-                <span className="flex items-center gap-1 text-xs text-emerald-600">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                  Streaming
-                </span>
-              )}
+        <div className="relative overflow-hidden rounded-2xl glass p-6">
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-[40px]" />
+
+          <div className="relative">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+                  AI Generated Plan
+                </p>
+                {isStreaming && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+                    Streaming
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="prose prose-sm prose-slate max-w-none">
+            {/* Markdown content with streaming cursor */}
+            <div className={`prose prose-sm prose-invert prose-zinc max-w-none ${isStreaming ? "streaming-cursor" : ""}`}>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {content}
               </ReactMarkdown>
             </div>
 
+            {/* Loading dots */}
             {isStreaming && (
-              <div className="mt-3 flex items-center gap-1">
-                <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400 [animation-delay:0ms]" />
-                <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400 [animation-delay:150ms]" />
-                <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400 [animation-delay:300ms]" />
+              <div className="mt-4 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:0ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-emerald-400 [animation-delay:300ms]" />
               </div>
             )}
 
-            {/* Save button — only shown when streaming is done */}
+            {/* Action toolbar — shown when streaming is done */}
             {!isStreaming && content && (
-              <div className="mt-4 flex items-center gap-3">
-                <Button
+              <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-white/[0.06] pt-4">
+                <button
                   onClick={handleSave}
                   disabled={saveLoading}
-                  variant="outline"
+                  className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-medium text-emerald-300 transition-all hover:bg-emerald-500/20 disabled:opacity-50"
                 >
-                  {saveLoading ? "Saving..." : "Save to My Plans"}
-                </Button>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                  </svg>
+                  {saveLoading ? "Saving…" : "Save to My Plans"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(content);
+                  }}
+                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-zinc-200"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                  </svg>
+                  Copy Plan
+                </button>
+
+                <button
+                  onClick={() => {
+                    reset();
+                    generate({
+                      target_calories: targetCalories ? Number(targetCalories) : undefined,
+                      protein_g: proteinG ? Number(proteinG) : undefined,
+                      cuisine_type: cuisineType || undefined,
+                    });
+                  }}
+                  className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-zinc-200"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+                  </svg>
+                  Regenerate
+                </button>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Save notification */}
@@ -221,13 +246,61 @@ export function AiMealGenerator() {
 
       {/* ── Empty State ───────────────────────────────────────────────── */}
       {!content && !isStreaming && !error && (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-          <p className="text-sm text-slate-500">
-            Fill in your preferences above and click &quot;Generate AI Meal
-            Plan&quot; to get a personalized plan powered by AI.
+        <div className="rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.01] p-10 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10">
+            <svg className="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+          </div>
+          <p className="mt-4 text-sm text-zinc-500">
+            Set your preferences above and click &quot;Generate AI Plan&quot; to get a
+            personalized plan powered by AI.
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Input Field ─────────────────────────────────────────────────────── */
+
+function InputField({
+  id,
+  label,
+  type,
+  placeholder,
+  value,
+  onChange,
+  disabled,
+  min,
+  max,
+}: {
+  id: string;
+  label: string;
+  type: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+  min?: number;
+  max?: number;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="text-xs font-medium text-zinc-400">
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        min={min}
+        max={max}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-all focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 disabled:opacity-50"
+      />
     </div>
   );
 }

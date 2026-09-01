@@ -7,9 +7,9 @@ type AlertBannerProps = {
 };
 
 const styles = {
-  info: "border-blue-200 bg-blue-50 text-blue-700",
-  warning: "border-amber-200 bg-amber-50 text-amber-700",
-  error: "border-red-200 bg-red-50 text-red-700",
+  info: "border-emerald-500/20 bg-emerald-500/10 text-emerald-300",
+  warning: "border-amber-500/20 bg-amber-500/10 text-amber-300",
+  error: "border-red-500/20 bg-red-500/10 text-red-300",
 } as const;
 
 export function AlertBanner({ variant, message, className }: AlertBannerProps) {
