@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { DashboardProviders } from "@/components/dashboard/dashboard-providers";
 
 export default function DashboardLayout({
   children,
@@ -8,7 +9,9 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute requireOnboarded={true}>
-      <AppShell>{children}</AppShell>
+      <DashboardProviders>
+        <AppShell>{children}</AppShell>
+      </DashboardProviders>
     </ProtectedRoute>
   );
 }

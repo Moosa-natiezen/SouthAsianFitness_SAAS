@@ -3,6 +3,28 @@ export const apiBaseUrl =
 
 /* ── Shared ────────────────────────────────────────────────────────────── */
 
+/**
+ * Thrown when the backend returns 403 with `detail.code === "PRO_REQUIRED"`.
+ * Listeners can catch this to show an upgrade prompt.
+ */
+export class ProRequiredError extends Error {
+  readonly code = "PRO_REQUIRED" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "ProRequiredError";
+  }
+}
+
+/**
+ * Dispatched on `window` whenever a PRO_REQUIRED 403 is caught.
+ * Components can listen via `addEventListener("pro-required", ...)`.
+ */
+function dispatchProRequired(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("pro-required"));
+  }
+}
+
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers ?? {});
 
@@ -23,6 +45,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
+    let detailObj: Record<string, unknown> | null = null;
 
     try {
       const errorPayload = (await response.json()) as {
@@ -36,9 +59,23 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
         if (item && typeof item.msg === "string") {
           message = item.msg;
         }
+      } else if (
+        typeof errorPayload.detail === "object" &&
+        errorPayload.detail !== null
+      ) {
+        detailObj = errorPayload.detail as Record<string, unknown>;
+        if (typeof detailObj.message === "string") {
+          message = detailObj.message;
+        }
       }
     } catch {
       // Ignore JSON parse failures
+    }
+
+    // Intercept PRO_REQUIRED 403s globally
+    if (response.status === 403 && detailObj?.code === "PRO_REQUIRED") {
+      dispatchProRequired();
+      throw new ProRequiredError(message);
     }
 
     throw new Error(message);
