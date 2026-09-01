@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from app.models.meal_plan import MealPlan, SavedMealPlan
     from app.models.progress import ProgressEntry
     from app.models.tags import CuisineTag, DietaryTag
+    from app.models.workout import SavedWorkoutPlan
 
 
 class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -135,6 +136,10 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         cascade="all, delete-orphan",
     )
     saved_meal_plans: Mapped[list[SavedMealPlan]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    saved_workout_plans: Mapped[list[SavedWorkoutPlan]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

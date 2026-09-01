@@ -133,3 +133,136 @@ async def generate_meal_plan_stream(
 def _sse_chunk(data: dict) -> str:
     """Format a dict as an SSE data line."""
     return f"data: {json.dumps(data)}\n\n"
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Workout Generation
+# ═══════════════════════════════════════════════════════════════════════
+
+WORKOUT_SYSTEM_PROMPT = """You are an expert South Asian fitness coach and strength & conditioning specialist.
+Generate detailed, progressive-overload workout routines tailored to the user's
+experience level, goals, available equipment, and training split.
+
+For each workout day, provide:
+- Day name and focus (e.g., "Day 1 — Push")
+- Each exercise with:
+  - Exercise name (use standard gym terminology)
+  - Sets × Reps (e.g., 4 × 8-10)
+  - Rest interval (e.g., 90s, 2 min)
+  - Tempo if relevant (e.g., 3-1-2-0)
+  - Optional notes (e.g., "focus on mind-muscle connection")
+- Warm-up and cool-down for each day
+- Progressive overload notes for week-over-week progression
+
+Format your response as clean Markdown with clear headers, tables where
+appropriate, and bullet points. Use this structure:
+
+# [Goal] Workout Program
+## Overview
+- Split type, duration, frequency
+- Progressive overload strategy
+## Day 1 — [Focus]
+### Warm-up
+### Working Sets
+| Exercise | Sets × Reps | Rest | Notes |
+|----------|-------------|------|-------|
+| ... | ... | ... | ... |
+### Cool-down
+## Day 2 — [Focus]
+...
+## Weekly Progression Notes
+- Week 1: ... (introduction)
+- Week 2: ... (volume increase)
+- Week 3: ... (intensity increase)
+- Week 4: ... (deload)
+
+Be specific, practical, and evidence-based. Include rep ranges that match
+the user's experience level.
+"""
+
+
+def _build_workout_user_message(
+    goal: str,
+    experience_level: str,
+    split: str,
+    equipment: str,
+) -> str:
+    """Build the user prompt for workout generation."""
+    goal_labels = {
+        "strength": "Maximum Strength",
+        "hypertrophy": "Muscle Hypertrophy",
+        "endurance": "Muscular Endurance",
+        "fat_loss": "Fat Loss & Conditioning",
+    }
+    split_labels = {
+        "upper_lower": "Upper/Lower Split",
+        "push_pull_legs": "Push/Pull/Legs Split",
+        "full_body": "Full Body Training",
+    }
+    equipment_labels = {
+        "gym": "Full Gym (barbells, cables, machines)",
+        "bodyweight": "Bodyweight Only",
+        "dumbbells": "Dumbbells + Basic Equipment",
+    }
+
+    return (
+        f"Generate a complete workout program with the following specifications:\n\n"
+        f"- Primary Goal: {goal_labels.get(goal, goal)}\n"
+        f"- Experience Level: {experience_level.capitalize()}\n"
+        f"- Training Split: {split_labels.get(split, split)}\n"
+        f"- Equipment Available: {equipment_labels.get(equipment, equipment)}\n\n"
+        f"Create a detailed, structured program with specific exercises, sets, reps, "
+        f"rest intervals, and progressive overload notes. Make it practical and "
+        f"achievable for the stated experience level."
+    )
+
+
+async def generate_workout_stream(
+    goal: str,
+    experience_level: str,
+    split: str,
+    equipment: str,
+) -> AsyncGenerator[str, None]:
+    """Generate a workout plan using OpenAI GPT-4o-mini with streaming.
+
+    Yields SSE-formatted chunks matching the meal plan streaming pattern.
+    """
+    api_key = settings.openai_api_key
+    model = settings.openai_model
+
+    if not api_key:
+        logger.error("OPENAI_API_KEY is not configured")
+        yield _sse_chunk({"error": "AI service is not configured. Set OPENAI_API_KEY."})
+        yield "data: [DONE]\n\n"
+        return
+
+    client = AsyncOpenAI(api_key=api_key)
+    user_message = _build_workout_user_message(goal, experience_level, split, equipment)
+
+    logger.info(
+        "Streaming AI workout: goal=%s experience=%s split=%s equipment=%s",
+        goal, experience_level, split, equipment,
+    )
+
+    try:
+        stream = await client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": WORKOUT_SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+            stream=True,
+            temperature=0.7,
+            max_tokens=3000,
+        )
+
+        async for chunk in stream:
+            delta = chunk.choices[0].delta if chunk.choices else None
+            if delta and delta.content:
+                yield _sse_chunk({"text": delta.content})
+
+    except Exception:
+        logger.exception("OpenAI workout streaming failed")
+        yield _sse_chunk({"error": "Failed to generate workout plan. Please try again."})
+
+    yield "data: [DONE]\n\n"

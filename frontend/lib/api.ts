@@ -731,6 +731,70 @@ export async function deleteSavedAiMealPlan(planId: string): Promise<void> {
   });
 }
 
+/* ── AI Workout API ──────────────────────────────────────────────────── */
+
+export type WorkoutGenerateRequest = {
+  goal: "strength" | "hypertrophy" | "endurance" | "fat_loss";
+  experience_level?: "beginner" | "intermediate" | "advanced";
+  split?: "upper_lower" | "push_pull_legs" | "full_body";
+  equipment?: "gym" | "bodyweight" | "dumbbells";
+};
+
+export type SaveWorkoutPlanPayload = {
+  title: string;
+  content: string;
+  goal?: string | null;
+  split?: string | null;
+  equipment?: string | null;
+};
+
+export type SavedWorkoutPlanItem = {
+  id: string;
+  title: string;
+  content: string;
+  goal: string | null;
+  split: string | null;
+  equipment: string | null;
+  created_at: string;
+};
+
+export type SavedWorkoutPlanListResponse = {
+  items: SavedWorkoutPlanItem[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
+export async function saveAiWorkout(
+  payload: SaveWorkoutPlanPayload,
+): Promise<{ status: string; id: string }> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<{ status: string; id: string }>("/api/ai/workouts/saved", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listSavedAiWorkouts(
+  params: { limit?: number; offset?: number } = {},
+): Promise<SavedWorkoutPlanListResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.offset) searchParams.set("offset", String(params.offset));
+  const qs = searchParams.toString();
+  const path = `/api/ai/workouts/saved${qs ? `?${qs}` : ""}`;
+  return apiFetch<SavedWorkoutPlanListResponse>(path);
+}
+
+export async function deleteSavedAiWorkout(planId: string): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  await apiFetch<unknown>(`/api/ai/workouts/saved/${planId}`, {
+    method: "DELETE",
+    headers: { "X-CSRF-Token": csrfToken },
+  });
+}
+
 /* ── Billing API ─────────────────────────────────────────────────────── */
 
 export type CheckoutResponse = {

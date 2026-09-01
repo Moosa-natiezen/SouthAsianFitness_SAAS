@@ -17,6 +17,7 @@ from app.models.progress import ProgressEntry
 from app.models.tags import CuisineTag, DietaryTag, FoodCategory
 from app.models.unit import Unit
 from app.models.user import User, UserFoodPreference, UserPreferences, UserProfile, UserSession
+from app.models.workout import SavedWorkoutPlan
 
 __all__ = [
     "Country",
@@ -35,6 +36,7 @@ __all__ = [
     "MealPlanDayMeal",
     "ProgressEntry",
     "Region",
+    "SavedWorkoutPlan",
     "Unit",
     "User",
     "UserFoodPreference",
