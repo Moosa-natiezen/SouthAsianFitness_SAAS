@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from app.models.currency import Currency
     from app.models.food import Food
     from app.models.geography import Country, Region
-    from app.models.meal_plan import MealPlan
+    from app.models.meal_plan import MealPlan, SavedMealPlan
     from app.models.progress import ProgressEntry
     from app.models.tags import CuisineTag, DietaryTag
 
@@ -131,6 +131,10 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         cascade="all, delete-orphan",
     )
     meal_plans: Mapped[list[MealPlan]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    saved_meal_plans: Mapped[list[SavedMealPlan]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

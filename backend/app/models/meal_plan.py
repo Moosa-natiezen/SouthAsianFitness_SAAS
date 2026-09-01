@@ -10,8 +10,10 @@ from sqlalchemy import (
     Date,
     ForeignKey,
     Index,
+    Integer,
     Numeric,
     String,
+    Text,
     UniqueConstraint,
     Uuid,
 )
@@ -129,3 +131,25 @@ class MealPlanDayMeal(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     meal_plan_day: Mapped[MealPlanDay] = relationship(back_populates="day_meals")
     meal: Mapped[Meal] = relationship(back_populates="plan_day_meals")
+
+
+class SavedMealPlan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    """A saved AI-generated meal plan."""
+
+    __tablename__ = "saved_meal_plans"
+    __table_args__ = (
+        Index("ix_saved_meal_plans_user_created", "user_id", "created_at"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    target_calories: Mapped[int | None] = mapped_column(Integer)
+    protein_g: Mapped[int | None] = mapped_column(Integer)
+
+    user: Mapped[User] = relationship(back_populates="saved_meal_plans")

@@ -136,3 +136,35 @@ class MealPlanListResponse(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+# ── Saved AI meal plans ─────────────────────────────────────────────────
+
+
+class SaveMealPlanRequest(BaseModel):
+    """Request to save an AI-generated meal plan."""
+
+    title: str = Field(..., min_length=1, max_length=255, description="Plan title")
+    content: str = Field(..., min_length=1, description="Full markdown content")
+    target_calories: int | None = Field(None, ge=0, description="Target calories")
+    protein_g: int | None = Field(None, ge=0, description="Target protein in grams")
+
+
+class SavedMealPlanOut(BaseModel):
+    """A saved AI meal plan for display."""
+
+    id: str
+    title: str
+    content: str
+    target_calories: int | None
+    protein_g: int | None
+    created_at: str
+
+
+class SavedMealPlanListResponse(BaseModel):
+    """Paginated list of saved AI meal plans."""
+
+    items: list[SavedMealPlanOut]
+    total: int
+    limit: int
+    offset: int

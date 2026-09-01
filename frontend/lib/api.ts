@@ -669,6 +669,53 @@ export async function deleteMealPlan(planId: string): Promise<void> {
   });
 }
 
+/* ── Saved AI Meal Plans API ──────────────────────────────────────── */
+
+export type SaveMealPlanPayload = {
+  title: string;
+  content: string;
+  target_calories?: number | null;
+  protein_g?: number | null;
+};
+
+export type SavedMealPlanItem = {
+  id: string;
+  title: string;
+  content: string;
+  target_calories: number | null;
+  protein_g: number | null;
+  created_at: string;
+};
+
+export type SavedMealPlanListResponse = {
+  items: SavedMealPlanItem[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
+export async function saveAiMealPlan(
+  payload: SaveMealPlanPayload,
+): Promise<{ status: string; id: string }> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<{ status: string; id: string }>("/api/ai/meal-plans/save", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listSavedAiMealPlans(
+  params: { limit?: number; offset?: number } = {},
+): Promise<SavedMealPlanListResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.offset) searchParams.set("offset", String(params.offset));
+  const qs = searchParams.toString();
+  const path = `/api/ai/meal-plans/saved${qs ? `?${qs}` : ""}`;
+  return apiFetch<SavedMealPlanListResponse>(path);
+}
+
 /* ── Billing API ─────────────────────────────────────────────────────── */
 
 export type CheckoutResponse = {

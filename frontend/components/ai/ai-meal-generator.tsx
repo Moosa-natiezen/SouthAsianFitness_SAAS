@@ -4,9 +4,11 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMealPlanStream } from "@/hooks/use-meal-plan-stream";
+import { saveAiMealPlan } from "@/lib/api";
 
 /**
  * AI Meal Plan Generator with live Markdown streaming.
@@ -21,6 +23,33 @@ export function AiMealGenerator() {
   const [targetCalories, setTargetCalories] = useState<string>("");
   const [proteinG, setProteinG] = useState<string>("");
   const [cuisineType, setCuisineType] = useState("South Asian");
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<{
+    type: "info" | "error";
+    text: string;
+  } | null>(null);
+
+  const handleSave = async () => {
+    if (!content) return;
+    setSaveLoading(true);
+    setSaveMsg(null);
+    try {
+      await saveAiMealPlan({
+        title: cuisineType ? `${cuisineType} AI Plan` : "AI Meal Plan",
+        content,
+        target_calories: targetCalories ? Number(targetCalories) : undefined,
+        protein_g: proteinG ? Number(proteinG) : undefined,
+      });
+      setSaveMsg({ type: "info", text: "Plan saved successfully!" });
+    } catch (err: unknown) {
+      setSaveMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to save plan.",
+      });
+    } finally {
+      setSaveLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,8 +197,26 @@ export function AiMealGenerator() {
                 <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400 [animation-delay:300ms]" />
               </div>
             )}
+
+            {/* Save button — only shown when streaming is done */}
+            {!isStreaming && content && (
+              <div className="mt-4 flex items-center gap-3">
+                <Button
+                  onClick={handleSave}
+                  disabled={saveLoading}
+                  variant="outline"
+                >
+                  {saveLoading ? "Saving..." : "Save to My Plans"}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Save notification */}
+      {saveMsg && (
+        <AlertBanner variant={saveMsg.type} message={saveMsg.text} />
       )}
 
       {/* ── Empty State ───────────────────────────────────────────────── */}
