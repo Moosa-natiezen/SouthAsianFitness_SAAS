@@ -64,7 +64,7 @@ export function TodayPlanCard() {
   if (state.status === "loading") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
           Today&apos;s Plan
         </p>
         <div className="mt-4 space-y-3">
@@ -79,7 +79,7 @@ export function TodayPlanCard() {
   if (state.status === "error") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
           Today&apos;s Plan
         </p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
@@ -93,7 +93,7 @@ export function TodayPlanCard() {
   if (state.status === "failure") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
           Today&apos;s Plan
         </p>
         <AlertBanner variant="warning" message={state.data.reason} className="mt-4" />
@@ -115,7 +115,7 @@ export function TodayPlanCard() {
     <div className="rounded-2xl glass p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
             Today&apos;s Plan
           </p>
           <h2 className="mt-1 text-lg font-semibold text-white">{plan.plan_name}</h2>
@@ -163,18 +163,18 @@ export function TodayPlanCard() {
       </div>
 
       {/* Daily totals */}
-      <div className="mt-4 rounded-xl border border-[#DC143C]/20 bg-[#DC143C]/5 p-4">
+      <div className="mt-4 rounded-xl border border-white/10 bg-[#12121A]/80 p-4 backdrop-blur-xl">
         <div className="flex items-center justify-between">
-          <p className="font-medium text-[#DC143C]">Daily Total</p>
-          <p className="font-semibold text-[#DC143C]">{Math.round(day.total_calories)} kcal</p>
+          <p className="font-medium text-white">Daily Total</p>
+          <p className="font-semibold text-white">{Math.round(day.total_calories)} kcal</p>
         </div>
-        <div className="mt-1 flex gap-4 text-sm text-[#DC143C]">
-          <span>Protein {Math.round(day.total_protein_g)}g</span>
-          <span>Carbs {Math.round(day.total_carbs_g)}g</span>
-          <span>Fat {Math.round(day.total_fat_g)}g</span>
+        <div className="mt-1 flex gap-4 text-sm">
+          <span className="text-[#FF6B3D]">Protein {Math.round(day.total_protein_g)}g</span>
+          <span className="text-[#00E5FF]">Carbs {Math.round(day.total_carbs_g)}g</span>
+          <span className="text-[#34D399]">Fat {Math.round(day.total_fat_g)}g</span>
         </div>
         {plan.nutrition && (
-          <p className="mt-1 text-xs text-[#DC143C]">
+          <p className="mt-1 text-xs text-[#8A8A94]">
             Target: {Math.round(plan.nutrition.calorie_target)} kcal
             ({Math.round(day.total_calories / plan.nutrition.calorie_target * 100)}%)
           </p>

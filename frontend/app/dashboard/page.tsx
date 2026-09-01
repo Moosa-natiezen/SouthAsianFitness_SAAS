@@ -114,7 +114,7 @@ export default function DashboardPage() {
           <div className="absolute inset-0 bg-grid-editorial opacity-60" />
 
           <div className="relative">
-            <p className="font-serif text-xs font-semibold uppercase tracking-[0.25em] text-[#DC143C]">
+            <p className="font-serif text-xs font-semibold uppercase tracking-[0.25em] text-[#8A8A94]">
               Dashboard
             </p>
             <h1 className="mt-4 font-serif text-4xl font-bold tracking-tight text-[#FFFFFF] md:text-5xl lg:text-6xl">
@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
       {/* Error */}
       {state.status === "error" && (
-        <div className="rounded-2xl border border-[#DC143C]/20 bg-[#DC143C]/10 p-4 text-sm text-[#DC143C]">
+        <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 p-4 text-sm text-[#C4C4CC] backdrop-blur-xl">
           {state.message}
         </div>
       )}

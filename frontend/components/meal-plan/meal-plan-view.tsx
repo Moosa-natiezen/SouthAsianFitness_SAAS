@@ -22,8 +22,8 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
   return (
     <div className="space-y-4">
       {/* Plan header */}
-      <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+      <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 p-6 backdrop-blur-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
           Generated Plan
         </p>
         <h2 className="mt-1 text-xl font-semibold text-white">{plan.plan_name}</h2>
@@ -46,8 +46,8 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
                 onClick={() => setSelectedDay(i)}
                 className={`flex-shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                   i === selectedDay
-                    ? "border-[#DC143C] bg-[#DC143C]/5 text-[#DC143C]"
-                    : "border-white/10 bg-white text-[#8A8A94] hover:bg-white/3"
+                    ? "border-white/20 bg-white/8 text-white"
+                    : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
                 }`}
               >
                 <span className="block">Day {i + 1}</span>
@@ -105,22 +105,22 @@ function DaySummary({
     : 0;
 
   return (
-    <div className="rounded-2xl border border-[#DC143C]/20 bg-[#DC143C]/5 p-5 shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 p-5 backdrop-blur-xl">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-[#DC143C]">Daily Totals</h3>
-        <span className="text-sm text-[#DC143C]">
+        <h3 className="font-semibold text-white">Daily Totals</h3>
+        <span className="text-sm text-[#C4C4CC]">
           {Math.round(day.total_calories)} / {Math.round(nutrition.calorie_target)} kcal ({calPct}%)
         </span>
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-3">
-        <MacroBar label="Protein" actual={day.total_protein_g} target={nutrition.protein_g} unit="g" />
-        <MacroBar label="Carbs" actual={day.total_carbs_g} target={nutrition.carbs_g} unit="g" />
-        <MacroBar label="Fat" actual={day.total_fat_g} target={nutrition.fat_g} unit="g" />
+        <MacroBar label="Protein" actual={day.total_protein_g} target={nutrition.protein_g} unit="g" color="protein" />
+        <MacroBar label="Carbs" actual={day.total_carbs_g} target={nutrition.carbs_g} unit="g" color="carbs" />
+        <MacroBar label="Fat" actual={day.total_fat_g} target={nutrition.fat_g} unit="g" color="fat" />
       </div>
 
       {day.total_estimated_cost !== null && currency && (
-        <p className="mt-3 text-sm text-[#DC143C]">
+        <p className="mt-3 text-sm text-[#8A8A94]">
           Estimated cost: {currency} {Number(day.total_estimated_cost).toLocaleString()}
           {!day.cost_complete && " (partial — some foods lack pricing)"}
         </p>
@@ -129,34 +129,45 @@ function DaySummary({
   );
 }
 
+const macroColors = {
+  protein: { bar: "#FF4500", bg: "rgba(255,69,0,0.15)", text: "#FF6B3D" },
+  carbs: { bar: "#00E5FF", bg: "rgba(0,229,255,0.12)", text: "#00E5FF" },
+  fat: { bar: "#10B981", bg: "rgba(16,185,129,0.12)", text: "#34D399" },
+} as const;
+
+type MacroColor = keyof typeof macroColors;
+
 function MacroBar({
   label,
   actual,
   target,
   unit,
+  color,
 }: {
   label: string;
   actual: number;
   target: number;
   unit: string;
+  color: MacroColor;
 }) {
   const pct = target > 0 ? Math.min(Math.round((actual / target) * 100), 100) : 0;
+  const c = macroColors[color];
 
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
-        <span className="text-[#DC143C]">{label}</span>
-        <span className="font-medium text-[#DC143C]">
+        <span style={{ color: c.text }}>{label}</span>
+        <span className="font-medium" style={{ color: c.text }}>
           {Math.round(actual)}{unit}
         </span>
       </div>
-      <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#DC143C]/20">
+      <div className="mt-1 h-2 overflow-hidden rounded-full" style={{ background: c.bg }}>
         <div
-          className="h-full rounded-full bg-[#DC143C] transition-all"
-          style={{ width: `${pct}%` }}
+          className="h-full rounded-full transition-all"
+          style={{ width: `${pct}%`, background: c.bar }}
         />
       </div>
-      <p className="mt-0.5 text-xs text-[#DC143C]">of {Math.round(target)}{unit}</p>
+      <p className="mt-0.5 text-xs text-[#8A8A94]">of {Math.round(target)}{unit}</p>
     </div>
   );
 }

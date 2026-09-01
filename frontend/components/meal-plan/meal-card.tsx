@@ -27,7 +27,7 @@ export function MealCard({ meal, currency }: MealCardProps) {
       </div>
 
       {/* Foods */}
-      <ul className="mt-3 divide-y divide-slate-100">
+      <ul className="mt-3 divide-y divide-white/8">
         {meal.foods.map((food) => (
           <li key={food.food_id} className="flex items-center justify-between py-2 text-sm">
             <div>

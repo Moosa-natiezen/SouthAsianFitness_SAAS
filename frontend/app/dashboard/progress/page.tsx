@@ -116,7 +116,7 @@ export default function ProgressPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
           Progress
         </p>
         <h1 className="mt-2 text-3xl font-semibold text-white">
@@ -169,7 +169,7 @@ function SummaryCard({ state }: { state: SummaryState }) {
   if (state.status === "error") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
           Summary
         </p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
@@ -182,7 +182,7 @@ function SummaryCard({ state }: { state: SummaryState }) {
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
         Summary
       </p>
 
@@ -250,7 +250,8 @@ function StatBlock({
   negative?: boolean;
 }) {
   let valueClass = "text-zinc-100";
-  if (highlight && positive) valueClass = "text-[#DC143C]";
+  if (highlight && positive) valueClass = "text-[#FF6B3D]";
+  if (highlight && !positive) valueClass = "text-[#34D399]";
   if (highlight && negative) valueClass = "text-rose-600";
 
   return (
@@ -289,7 +290,7 @@ function WeightChart({ state }: { state: HistoryState }) {
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
         Weight Trend
       </p>
       <div className="mt-4 h-64">
@@ -412,7 +413,7 @@ function LogForm({
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
         Log Progress
       </p>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
@@ -533,7 +534,7 @@ function HistorySection({
   if (state.status === "loading") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
           Weight History
         </p>
         <div className="mt-4 space-y-3">
@@ -548,7 +549,7 @@ function HistorySection({
   if (state.status === "error") {
     return (
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
           Weight History
         </p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
@@ -560,7 +561,7 @@ function HistorySection({
 
   return (
     <div className="rounded-2xl glass p-6">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
         Weight History
       </p>
 
