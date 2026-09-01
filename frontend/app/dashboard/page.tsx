@@ -6,6 +6,16 @@ import { useEffect, useState } from "react";
 import { AnimateIn, StaggerIn } from "@/components/animate-in";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TodayPlanCard } from "@/components/dashboard/today-plan-card";
+import dynamic from "next/dynamic";
+
+const MacroSphere = dynamic(
+  () => import("@/components/3d/macro-sphere").then((m) => m.MacroSphere),
+  { ssr: false },
+);
+const StreakBadge = dynamic(
+  () => import("@/components/gamification/streak-badge").then((m) => m.StreakBadge),
+  { ssr: false },
+);
 import {
   getCurrentUser,
   getNutritionAndBudget,
@@ -170,6 +180,9 @@ export default function DashboardPage() {
 
           {/* Today's plan — full width */}
           <TodayPlanCard />
+
+          {/* Achievements row */}
+          <AchievementsSection />
         </StaggerIn>
       )}
     </div>
@@ -203,7 +216,15 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
         {Math.round(n.calorie_target).toLocaleString()} <span className="text-sm font-normal text-[#8a8278]">kcal/day</span>
       </p>
 
-      <div className="relative mt-5 grid grid-cols-3 gap-3">
+      {/* 3D Macro Sphere */}
+      <div className="relative mt-2 flex justify-center">
+        <MacroSphere
+          proteinProgress={Math.min(100, (n.protein_g / 150) * 100)}
+          calorieProgress={Math.min(100, (n.calorie_target / 2500) * 100)}
+        />
+      </div>
+
+      <div className="relative mt-3 grid grid-cols-3 gap-3">
         <MacroPill label="Protein" value={`${Math.round(n.protein_g)}g`} color="cardamom" />
         <MacroPill label="Carbs" value={`${Math.round(n.carbs_g)}g`} color="saffron" />
         <MacroPill label="Fat" value={`${Math.round(n.fat_g)}g`} color="terracotta" />
@@ -292,5 +313,52 @@ function MacroPill({
       <p className="text-[9px] uppercase tracking-wider text-[#8a8278]">{label}</p>
       <p className="text-lg font-bold text-[#f5f0e8]">{value}</p>
     </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ACHIEVEMENTS SECTION — Gamification
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function AchievementsSection() {
+  const achievements = [
+    { icon: "🔥", label: "First Plan Generated", unlocked: true },
+    { icon: "📊", label: "Logged First Progress", unlocked: true },
+    { icon: "🎯", label: "Hit Calorie Target", unlocked: false },
+    { icon: "💪", label: "7-Day Streak", unlocked: false },
+  ];
+
+  return (
+    <AnimateIn delay={0.3} y={20}>
+      <div className="rounded-2xl border border-white/[0.04] bg-gradient-to-br from-[#141414] to-[#0a0a0a] p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#e8a838]">
+              Achievements
+            </p>
+            <h2 className="mt-2 font-serif text-lg font-semibold text-[#f5f0e8]">
+              Your Progress Badges
+            </h2>
+          </div>
+          <StreakBadge streak={3} />
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {achievements.map((a, i) => (
+            <div
+              key={i}
+              className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all ${
+                a.unlocked
+                  ? "border-[#e8a838]/20 bg-[#e8a838]/[0.04]"
+                  : "border-white/[0.04] bg-white/[0.01] opacity-40"
+              }`}
+            >
+              <span className="text-2xl grayscale-[50%]">{a.icon}</span>
+              <span className="text-[10px] font-medium text-[#c8c0b4]">{a.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </AnimateIn>
   );
 }
