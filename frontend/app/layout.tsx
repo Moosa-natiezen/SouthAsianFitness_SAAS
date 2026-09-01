@@ -2,13 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 
 import "./globals.css";
-import dynamic from "next/dynamic";
 import { LenisProvider } from "@/components/lenis-provider";
-
-const LiquidBackground = dynamic(
-  () => import("@/components/3d/liquid-background").then((m) => m.LiquidBackground),
-  { ssr: false },
-);
+import { LiquidBackgroundClient } from "@/components/3d/liquid-background-client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -85,7 +80,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <LiquidBackground />
+        <LiquidBackgroundClient />
         <LenisProvider>
           <div id="main-content" className="relative z-10 flex-1 flex flex-col">
             {children}
