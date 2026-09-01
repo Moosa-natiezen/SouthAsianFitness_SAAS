@@ -21,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#05050A",
   width: "device-width",
   initialScale: 1,
 };
@@ -75,7 +75,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-grain">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-cardamom focus:px-4 focus:py-2 focus:text-obsidian focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg          focus:bg-[#FF4500] focus:px-4 focus:py-2 focus:text-[#05050A] focus:outline-none"
         >
           Skip to content
         </a>

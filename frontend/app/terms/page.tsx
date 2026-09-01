@@ -8,16 +8,16 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen bg-[#05050A]">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-medium text-[#c4854c] hover:text-[#c4854c]">
+        <Link href="/" className="text-sm font-medium text-[#FF4500] hover:text-[#FF4500]">
           ← Back to South Asian Fitness
         </Link>
 
         <h1 className="mt-6 text-3xl font-bold text-white">Terms of Service</h1>
-        <p className="mt-2 text-sm text-zinc-500">Last updated: August 2026</p>
+        <p className="mt-2 text-sm text-[#94A3B8]">Last updated: August 2026</p>
 
-        <div className="mt-8 space-y-6 text-zinc-300">
+        <div className="mt-8 space-y-6 text-[#CBD5E1]">
           <section>
             <h2 className="text-xl font-semibold text-white">Acceptance</h2>
             <p className="mt-2">

@@ -93,14 +93,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isPro = user?.subscription_tier === "pro";
 
   return (
-    <div className="dark flex min-h-screen flex-col bg-[#0a0a0a] text-[#f5f0e8]">
+    <div className="dark flex min-h-screen flex-col bg-[#05050A] text-[#FFFFFF]">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-white/[0.04] bg-[#0a0a0a]/80 px-5 py-3 backdrop-blur-xl md:px-8">
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-white/8 bg-[#05050A]/80 px-5 py-3 backdrop-blur-xl md:px-8">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#c4854c] to-[#e8a838] text-[10px] font-bold text-[#0a0a0a]">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF4500] to-[#00E5FF] text-[10px] font-bold text-[#05050A]">
             <span className="relative z-10">SA</span>
           </div>
-          <span className="hidden font-serif text-lg font-semibold tracking-tight text-[#f5f0e8] sm:inline">
+          <span className="hidden font-serif text-lg font-semibold tracking-tight text-[#FFFFFF] sm:inline">
             South Asian Fitness
           </span>
         </Link>
@@ -111,23 +111,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold tracking-wide uppercase ${
                 isPro
-                  ? "border border-[#c4854c]/30 bg-[#c4854c]/10 text-[#d4a574] animate-pulse-glow"
-                  : "border border-white/[0.06] bg-white/[0.03] text-[#8a8278]"
+                  ? "border border-[#FF4500]/30 bg-[#FF4500]/10 text-[#FF6B3D] animate-pulse-glow"
+                  : "border border-white/10 bg-white/4 text-[#64748B]"
               }`}
             >
-              <span className={`h-1 w-1 rounded-full ${isPro ? "bg-[#c4854c]" : "bg-[#8a8278]"}`} />
+              <span className={`h-1 w-1 rounded-full ${isPro ? "bg-[#FF4500]" : "bg-[#64748B]"}`} />
               {isPro ? "Pro" : "Free"}
             </div>
           )}
 
           {/* User avatar */}
           <div className="hidden items-center gap-2 md:flex">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#c4854c]/20 to-[#e8a838]/20 text-[10px] font-semibold text-[#d4a574]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF4500]/20 to-[#00E5FF]/20 text-[10px] font-semibold text-[#FF6B3D]">
               {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-full p-1 text-[#8a8278] transition-colors hover:bg-white/[0.04] hover:text-[#c8c0b4]"
+              className="rounded-full p-1 text-[#64748B] transition-colors hover:bg-white/5 hover:text-[#94A3B8]"
               title="Log out"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -145,7 +145,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Floating Bottom Dock ─────────────────────────────────────── */}
       <nav className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 md:bottom-6">
-        <div className="flex items-center gap-1 rounded-2xl border border-white/[0.06] bg-[#0a0a0a]/90 px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+        <div className="flex items-center gap-1 rounded-2xl border border-white/10 bg-[#05050A]/90 px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
           {navItems.map((item) => {
             const isActive =
               item.href === "/dashboard"
@@ -158,12 +158,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={isActive ? "page" : undefined}
                 className={`group relative flex flex-col items-center gap-1 rounded-xl px-3 py-2 transition-all duration-300 md:px-4 ${
                   isActive
-                    ? "text-[#c4854c]"
-                    : "text-[#8a8278] hover:text-[#c8c0b4]"
+                    ? "text-[#FF4500]"
+                    : "text-[#64748B] hover:text-[#94A3B8]"
                 }`}
               >
                 {isActive && (
-                  <span className="absolute inset-0 rounded-xl bg-[#c4854c]/10" />
+                  <span className="absolute inset-0 rounded-xl bg-[#FF4500]/10" />
                 )}
                 <span className="relative z-10">{item.icon}</span>
                 <span className="relative z-10 text-[9px] font-medium tracking-wide md:text-[10px]">

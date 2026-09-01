@@ -58,8 +58,8 @@ export function ProtectedRoute({
 
   if (isChecking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#09090b] px-4">
-        <div className="rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-sm font-medium text-zinc-400">
+      <div className="flex min-h-screen items-center justify-center bg-[#05050A] px-4">
+        <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#94A3B8]">
           Checking access...
         </div>
       </div>

@@ -87,19 +87,19 @@ export function FeatureScroll() {
     <section className="relative py-24 md:py-32">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c4854c]/5 blur-[120px]" />
+        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FF4500]/5 blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
         {/* Section header */}
         <div className="mb-16 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#c4854c]">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#FF4500]">
             The AI in action
           </p>
-          <h2 className="mt-4 font-serif text-3xl font-bold text-[#f5f0e8] md:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-bold text-[#FFFFFF] md:text-5xl">
             Watch your plan come alive
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">
+          <p className="mx-auto mt-4 max-w-xl text-lg text-[#94A3B8]">
             Real-time streaming. Real South Asian cuisine. Real macro precision.
           </p>
         </div>
@@ -126,37 +126,37 @@ export function FeatureScroll() {
             ].map((item, i) => (
               <div
                 key={item.num}
-                className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.02] p-6 transition-all duration-500 hover:border-[#c4854c]/20 hover:bg-white/[0.04]"
+                className="group relative rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-500 hover:border-[#FF4500]/20 hover:bg-white/5"
               >
-                <span className="font-serif text-4xl font-bold text-[#c4854c]/20 group-hover:text-[#c4854c]/40 transition-colors">
+                <span className="font-serif text-4xl font-bold text-[#FF4500]/20 group-hover:text-[#FF4500]/40 transition-colors">
                   {item.num}
                 </span>
-                <h3 className="mt-2 text-lg font-semibold text-[#f5f0e8]">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{item.desc}</p>
+                <h3 className="mt-2 text-lg font-semibold text-[#FFFFFF]">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#94A3B8]">{item.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Right: streaming mock terminal */}
           <div ref={containerRef} className="relative min-h-[500px]">
-            <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0c0c] shadow-2xl">
+            <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A12] shadow-2xl">
               {/* Terminal header */}
-              <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
-                <div className="h-3 w-3 rounded-full bg-[#c25a3c]/60" />
-                <div className="h-3 w-3 rounded-full bg-[#e8a838]/60" />
-                <div className="h-3 w-3 rounded-full bg-[#c4854c]/60" />
-                <span className="ml-3 text-xs text-zinc-600">AI Meal Generator</span>
-                <span className="ml-auto flex items-center gap-1.5 text-xs text-[#c4854c]">
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#c4854c]" />
+              <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+                <div className="h-3 w-3 rounded-full bg-[#FF4500]/60" />
+                <div className="h-3 w-3 rounded-full bg-[#00E5FF]/60" />
+                <div className="h-3 w-3 rounded-full bg-[#FF4500]/60" />
+                <span className="ml-3 text-xs text-[#94A3B8]">AI Meal Generator</span>
+                <span className="ml-auto flex items-center gap-1.5 text-xs text-[#FF4500]">
+                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#FF4500]" />
                   streaming
                 </span>
               </div>
 
               {/* Progress bar */}
-              <div className="h-0.5 bg-white/[0.03]">
+              <div className="h-0.5 bg-white/4">
                 <div
                   ref={progressRef}
-                  className="h-full origin-left bg-gradient-to-r from-[#c4854c] to-[#e8a838]"
+                  className="h-full origin-left bg-gradient-to-r from-[#FF4500] to-[#00E5FF]"
                   style={{ transform: "scaleX(0)" }}
                 />
               </div>
@@ -164,7 +164,7 @@ export function FeatureScroll() {
               {/* Terminal content */}
               <pre
                 ref={textRef}
-                className="p-6 text-sm leading-relaxed text-zinc-300 font-mono whitespace-pre-wrap"
+                className="p-6 text-sm leading-relaxed text-[#CBD5E1] font-mono whitespace-pre-wrap"
               >
                 {SAMPLE_MEAL_PLAN}
               </pre>

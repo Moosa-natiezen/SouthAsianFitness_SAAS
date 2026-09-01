@@ -31,20 +31,20 @@ export function PricingSection() {
     <section className="relative py-24 md:py-32">
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute right-1/4 top-0 h-[400px] w-[400px] rounded-full bg-[#e8a838]/5 blur-[100px]" />
-        <div className="absolute bottom-0 left-1/4 h-[300px] w-[300px] rounded-full bg-[#c4854c]/5 blur-[80px]" />
+        <div className="absolute right-1/4 top-0 h-[400px] w-[400px] rounded-full bg-[#00E5FF]/5 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/4 h-[300px] w-[300px] rounded-full bg-[#FF4500]/5 blur-[80px]" />
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6">
         {/* Header */}
         <div className="mb-16 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#c4854c]">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#FF4500]">
             Simple pricing
           </p>
-          <h2 className="mt-4 font-serif text-3xl font-bold text-[#f5f0e8] md:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-bold text-[#FFFFFF] md:text-5xl">
             Start free. Upgrade when you're ready.
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">
+          <p className="mx-auto mt-4 max-w-xl text-lg text-[#94A3B8]">
             No credit card required. No hidden fees. Upgrade to Pro when you want unlimited power.
           </p>
         </div>
@@ -52,22 +52,22 @@ export function PricingSection() {
         {/* Cards */}
         <div className="grid gap-6 md:grid-cols-2 md:items-start">
           {/* Free Card */}
-          <div className="relative rounded-3xl border border-white/[0.06] bg-white/[0.02] p-8 transition-all duration-500 hover:bg-white/[0.04]">
+          <div className="relative rounded-3xl border border-white/10 bg-white/3 p-8 transition-all duration-500 hover:bg-white/5">
             <div className="mb-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">Free</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">Free</p>
               <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-[#f5f0e8]">$0</span>
-                <span className="text-sm text-zinc-500">/month</span>
+                <span className="text-4xl font-bold text-[#FFFFFF]">$0</span>
+                <span className="text-sm text-[#94A3B8]">/month</span>
               </div>
-              <p className="mt-2 text-sm text-zinc-400">
+              <p className="mt-2 text-sm text-[#94A3B8]">
                 Everything you need to start your fitness journey.
               </p>
             </div>
 
             <ul className="mb-8 space-y-3">
               {freeFeatures.map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-zinc-300">
-                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-white/[0.06] flex items-center justify-center text-[10px] text-zinc-500">
+                <li key={f} className="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-white/6 flex items-center justify-center text-[10px] text-[#94A3B8]">
                     ✓
                   </span>
                   {f}
@@ -77,39 +77,39 @@ export function PricingSection() {
 
             <Link
               href="/auth/signup"
-              className="block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 text-center text-sm font-semibold text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
+              className="block w-full rounded-xl border border-white/10 bg-white/5 py-3 text-center text-sm font-semibold text-[#CBD5E1] transition-all hover:bg-white/[0.08] hover:text-white"
             >
               Get started free
             </Link>
           </div>
 
           {/* Pro Card — Visually dominant */}
-          <div className="relative scale-[1.03] rounded-3xl border border-[#c4854c]/30 bg-gradient-to-b from-[#c4854c]/10 to-transparent p-8 shadow-[0_0_60px_rgba(196,133,76,0.1)] transition-all duration-500 hover:shadow-[0_0_80px_rgba(196,133,76,0.15)]">
+          <div className="relative scale-[1.03] rounded-3xl border border-[#FF4500]/30 bg-gradient-to-b from-[#FF4500]/10 to-transparent p-8 shadow-[0_0_60px_rgba(255,69,0,0.1)] transition-all duration-500 hover:shadow-[0_0_80px_rgba(255,69,0,0.15)]">
             {/* Glow accent */}
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-[#c4854c]/20 via-transparent to-transparent opacity-50" />
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-[#FF4500]/20 via-transparent to-transparent opacity-50" />
 
             {/* Badge */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <span className="rounded-full bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-4 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#c4854c]/30">
+              <span className="rounded-full bg-gradient-to-r from-[#FF4500] to-[#00E5FF] px-4 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#FF4500]/30">
                 Most Popular
               </span>
             </div>
 
             <div className="relative mb-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#d4a574]">Pro</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6B3D]">Pro</p>
               <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-[#f5f0e8]">$9</span>
-                <span className="text-sm text-zinc-400">/month</span>
+                <span className="text-4xl font-bold text-[#FFFFFF]">$9</span>
+                <span className="text-sm text-[#94A3B8]">/month</span>
               </div>
-              <p className="mt-2 text-sm text-zinc-300">
+              <p className="mt-2 text-sm text-[#CBD5E1]">
                 Full power. Unlimited plans. Complete control.
               </p>
             </div>
 
             <ul className="relative mb-8 space-y-3">
               {proFeatures.map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-zinc-200">
-                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-[#c4854c]/20 flex items-center justify-center text-[10px] text-[#c4854c]">
+                <li key={f} className="flex items-start gap-3 text-sm text-[#E2E8F0]">
+                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-[#FF4500]/20 flex items-center justify-center text-[10px] text-[#FF4500]">
                     ✓
                   </span>
                   {f}
@@ -119,11 +119,11 @@ export function PricingSection() {
 
             <Link
               href="/auth/signup"
-              className="relative block w-full rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-[#c4854c]/25 transition-all hover:shadow-[#c4854c]/40 hover:brightness-110"
+              className="relative block w-full rounded-xl bg-gradient-to-r from-[#FF4500] to-[#00E5FF] py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-[#FF4500]/25 transition-all hover:shadow-[#FF4500]/40 hover:brightness-110"
             >
               Start 14-day free trial
             </Link>
-            <p className="relative mt-3 text-center text-xs text-zinc-500">
+            <p className="relative mt-3 text-center text-xs text-[#94A3B8]">
               No credit card required • Cancel anytime
             </p>
           </div>

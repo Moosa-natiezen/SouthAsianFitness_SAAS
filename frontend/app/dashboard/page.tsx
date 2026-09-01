@@ -86,15 +86,15 @@ export default function DashboardPage() {
       {/* ── Upgrade Banner ──────────────────────────────────────────── */}
       {showUpgradeBanner && !upgradeDismissed && (
         <AnimateIn delay={0} y={-10}>
-          <div className="relative overflow-hidden rounded-2xl border border-[#c4854c]/20 bg-[#c4854c]/5 p-6 pr-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#c4854c]/10 to-[#e8a838]/5" />
-            <p className="relative text-sm font-medium text-[#d4a574]">
+          <div className="relative overflow-hidden rounded-2xl border border-[#FF4500]/20 bg-[#FF4500]/5 p-6 pr-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#FF4500]/10 to-[#00E5FF]/5" />
+            <p className="relative text-sm font-medium text-[#FF6B3D]">
               🎉 Welcome to Pro! Your account has been upgraded. Enjoy unlimited meal plans!
             </p>
             <button
               type="button"
               onClick={() => setUpgradeDismissed(true)}
-              className="absolute right-3 top-3 rounded p-1 text-[#c4854c]/60 hover:bg-[#c4854c]/10 hover:text-[#d4a574]"
+              className="absolute right-3 top-3 rounded p-1 text-[#FF4500]/60 hover:bg-[#FF4500]/10 hover:text-[#FF6B3D]"
               aria-label="Dismiss"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -107,20 +107,20 @@ export default function DashboardPage() {
 
       {/* ── Hero — Editorial Typography ─────────────────────────────── */}
       <AnimateIn delay={0.1} y={40} blur={8}>
-        <div className="relative overflow-hidden rounded-3xl border border-white/[0.04] bg-gradient-to-br from-[#141414] to-[#0a0a0a] p-8 md:p-12">
+        <div className="relative overflow-hidden rounded-3xl border border-white/8 bg-gradient-to-br from-[#0A0A12] to-[#05050A] p-8 md:p-12">
           {/* Decorative orbs */}
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#c4854c]/[0.06] blur-[100px]" />
-          <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-[#e8a838]/[0.04] blur-[80px]" />
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#FF4500]/[0.06] blur-[100px]" />
+          <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-[#00E5FF]/[0.04] blur-[80px]" />
           <div className="absolute inset-0 bg-grid-editorial opacity-60" />
 
           <div className="relative">
-            <p className="font-serif text-xs font-semibold uppercase tracking-[0.25em] text-[#c4854c]">
+            <p className="font-serif text-xs font-semibold uppercase tracking-[0.25em] text-[#FF4500]">
               Dashboard
             </p>
-            <h1 className="mt-4 font-serif text-4xl font-bold tracking-tight text-[#f5f0e8] md:text-5xl lg:text-6xl">
+            <h1 className="mt-4 font-serif text-4xl font-bold tracking-tight text-[#FFFFFF] md:text-5xl lg:text-6xl">
               {greeting}
             </h1>
-            <p className="mt-3 max-w-lg text-base text-[#8a8278]">
+            <p className="mt-3 max-w-lg text-base text-[#64748B]">
               Your personalized nutrition targets and today&apos;s meal plan.
             </p>
 
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/dashboard/meal-plans"
-                className="btn-editorial group inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-5 py-3 text-sm font-semibold text-[#0a0a0a] shadow-lg shadow-[#c4854c]/20"
+                className="btn-editorial group inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-[#FF4500] to-[#00E5FF] px-5 py-3 text-sm font-semibold text-[#05050A] shadow-lg shadow-[#FF4500]/20"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -139,13 +139,13 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/dashboard/food"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-sm font-medium text-[#c8c0b4] transition-all hover:bg-white/[0.05] hover:text-[#f5f0e8]"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/3 px-5 py-3 text-sm font-medium text-[#94A3B8] transition-all hover:bg-white/[0.05] hover:text-[#FFFFFF]"
               >
                 Browse Foods
               </Link>
               <Link
                 href="/dashboard/progress"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-sm font-medium text-[#c8c0b4] transition-all hover:bg-white/[0.05] hover:text-[#f5f0e8]"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/3 px-5 py-3 text-sm font-medium text-[#94A3B8] transition-all hover:bg-white/[0.05] hover:text-[#FFFFFF]"
               >
                 Track Progress
               </Link>
@@ -157,14 +157,14 @@ export default function DashboardPage() {
       {/* Loading */}
       {state.status === "loading" && (
         <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-52 rounded-2xl bg-white/[0.03]" />
-          <Skeleton className="h-52 rounded-2xl bg-white/[0.03]" />
+          <Skeleton className="h-52 rounded-2xl bg-white/4" />
+          <Skeleton className="h-52 rounded-2xl bg-white/4" />
         </div>
       )}
 
       {/* Error */}
       {state.status === "error" && (
-        <div className="rounded-2xl border border-[#c25a3c]/20 bg-[#c25a3c]/10 p-4 text-sm text-[#c25a3c]">
+        <div className="rounded-2xl border border-[#FF4500]/20 bg-[#FF4500]/10 p-4 text-sm text-[#FF4500]">
           {state.message}
         </div>
       )}
@@ -203,17 +203,17 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-gradient-to-br from-[#141414] to-[#0a0a0a] p-6 transition-all duration-500 hover:shadow-[0_0_40px_rgba(196,133,76,0.04)]">
-      <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#c4854c]/[0.05] blur-[50px] transition-all duration-700 group-hover:bg-[#c4854c]/[0.08]" />
+    <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-br from-[#0A0A12] to-[#05050A] p-6 transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,69,0,0.04)]">
+      <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#FF4500]/[0.05] blur-[50px] transition-all duration-700 group-hover:bg-[#FF4500]/[0.08]" />
 
-      <p className="relative font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#c4854c]">
+      <p className="relative font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#FF4500]">
         Nutrition Targets
       </p>
-      <h2 className="relative mt-3 font-serif text-xl font-semibold text-[#f5f0e8]">
+      <h2 className="relative mt-3 font-serif text-xl font-semibold text-[#FFFFFF]">
         {goalLabel[n.goal] ?? n.goal}
       </h2>
       <p className="relative mt-1 text-2xl font-bold text-gradient-cardamom">
-        {Math.round(n.calorie_target).toLocaleString()} <span className="text-sm font-normal text-[#8a8278]">kcal/day</span>
+        {Math.round(n.calorie_target).toLocaleString()} <span className="text-sm font-normal text-[#64748B]">kcal/day</span>
       </p>
 
       {/* 3D Macro Sphere */}
@@ -230,14 +230,14 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
         <MacroPill label="Fat" value={`${Math.round(n.fat_g)}g`} color="terracotta" />
       </div>
 
-      <p className="relative mt-4 text-[11px] text-[#8a8278]">
+      <p className="relative mt-4 text-[11px] text-[#64748B]">
         BMR {Math.round(n.bmr)} · TDEE {Math.round(n.tdee)}
       </p>
 
       {n.warnings.length > 0 && (
         <div className="relative mt-3 space-y-1">
           {n.warnings.map((w, i) => (
-            <p key={i} className="text-[11px] text-[#e8a838]/70">⚠ {w}</p>
+            <p key={i} className="text-[11px] text-[#00E5FF]/70">⚠ {w}</p>
           ))}
         </div>
       )}
@@ -250,34 +250,34 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   const hasBudget = b.daily_budget !== null;
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-gradient-to-br from-[#141414] to-[#0a0a0a] p-6 transition-all duration-500 hover:shadow-[0_0_40px_rgba(232,168,56,0.04)]">
-      <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#e8a838]/[0.04] blur-[50px] transition-all duration-700 group-hover:bg-[#e8a838]/[0.08]" />
+    <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-br from-[#0A0A12] to-[#05050A] p-6 transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,229,255,0.04)]">
+      <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#00E5FF]/[0.04] blur-[50px] transition-all duration-700 group-hover:bg-[#00E5FF]/[0.08]" />
 
-      <p className="relative font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#e8a838]">
+      <p className="relative font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#00E5FF]">
         Budget
       </p>
       {hasBudget ? (
         <>
-          <h2 className="relative mt-3 font-serif text-xl font-semibold text-[#f5f0e8]">
-            {b.currency_code} {Number(b.daily_budget).toLocaleString()} <span className="text-sm font-normal text-[#8a8278]">/ day</span>
+          <h2 className="relative mt-3 font-serif text-xl font-semibold text-[#FFFFFF]">
+            {b.currency_code} {Number(b.daily_budget).toLocaleString()} <span className="text-sm font-normal text-[#64748B]">/ day</span>
           </h2>
           <div className="relative mt-4 space-y-2">
-            <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3 py-2.5">
-              <span className="text-[10px] uppercase tracking-wider text-[#8a8278]">Weekly</span>
-              <span className="text-sm font-semibold text-[#c8c0b4]">
+            <div className="flex items-center justify-between rounded-xl bg-white/3 px-3 py-2.5">
+              <span className="text-[10px] uppercase tracking-wider text-[#64748B]">Weekly</span>
+              <span className="text-sm font-semibold text-[#94A3B8]">
                 {b.currency_code} {Number(b.weekly_budget).toLocaleString()}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3 py-2.5">
-              <span className="text-[10px] uppercase tracking-wider text-[#8a8278]">Monthly</span>
-              <span className="text-sm font-semibold text-[#c8c0b4]">
+            <div className="flex items-center justify-between rounded-xl bg-white/3 px-3 py-2.5">
+              <span className="text-[10px] uppercase tracking-wider text-[#64748B]">Monthly</span>
+              <span className="text-sm font-semibold text-[#94A3B8]">
                 {b.currency_code} {Number(b.monthly_budget).toLocaleString()}
               </span>
             </div>
           </div>
         </>
       ) : (
-        <p className="relative mt-3 text-sm text-[#8a8278]">
+        <p className="relative mt-3 text-sm text-[#64748B]">
           No budget set. Add a weekly food budget in your profile to see budget targets.
         </p>
       )}
@@ -285,7 +285,7 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
       {b.warnings.length > 0 && (
         <div className="relative mt-3 space-y-1">
           {b.warnings.map((w, i) => (
-            <p key={i} className="text-[11px] text-[#e8a838]/70">⚠ {w}</p>
+            <p key={i} className="text-[11px] text-[#00E5FF]/70">⚠ {w}</p>
           ))}
         </div>
       )}
@@ -303,15 +303,15 @@ function MacroPill({
   color: "cardamom" | "saffron" | "terracotta";
 }) {
   const colors = {
-    cardamom: "border-[#c4854c]/20 bg-[#c4854c]/[0.06] text-[#d4a574]",
-    saffron: "border-[#e8a838]/20 bg-[#e8a838]/[0.06] text-[#f0c060]",
-    terracotta: "border-[#c25a3c]/20 bg-[#c25a3c]/[0.06] text-[#d4715a]",
+    cardamom: "border-[#FF4500]/20 bg-[#FF4500]/[0.06] text-[#FF6B3D]",
+    saffron: "border-[#00E5FF]/20 bg-[#00E5FF]/[0.06] text-[#f0c060]",
+    terracotta: "border-[#FF4500]/20 bg-[#FF4500]/[0.06] text-[#d4715a]",
   };
 
   return (
     <div className={`rounded-xl border px-3 py-3 text-center ${colors[color]}`}>
-      <p className="text-[9px] uppercase tracking-wider text-[#8a8278]">{label}</p>
-      <p className="text-lg font-bold text-[#f5f0e8]">{value}</p>
+      <p className="text-[9px] uppercase tracking-wider text-[#64748B]">{label}</p>
+      <p className="text-lg font-bold text-[#FFFFFF]">{value}</p>
     </div>
   );
 }
@@ -330,13 +330,13 @@ function AchievementsSection() {
 
   return (
     <AnimateIn delay={0.3} y={20}>
-      <div className="rounded-2xl border border-white/[0.04] bg-gradient-to-br from-[#141414] to-[#0a0a0a] p-6">
+      <div className="rounded-2xl border border-white/8 bg-gradient-to-br from-[#0A0A12] to-[#05050A] p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#e8a838]">
+            <p className="font-serif text-[11px] font-semibold uppercase tracking-[0.25em] text-[#00E5FF]">
               Achievements
             </p>
-            <h2 className="mt-2 font-serif text-lg font-semibold text-[#f5f0e8]">
+            <h2 className="mt-2 font-serif text-lg font-semibold text-[#FFFFFF]">
               Your Progress Badges
             </h2>
           </div>
@@ -349,12 +349,12 @@ function AchievementsSection() {
               key={i}
               className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all ${
                 a.unlocked
-                  ? "border-[#e8a838]/20 bg-[#e8a838]/[0.04]"
-                  : "border-white/[0.04] bg-white/[0.01] opacity-40"
+                  ? "border-[#00E5FF]/20 bg-[#00E5FF]/[0.04]"
+                  : "border-white/8 bg-white/2 opacity-40"
               }`}
             >
               <span className="text-2xl grayscale-[50%]">{a.icon}</span>
-              <span className="text-[10px] font-medium text-[#c8c0b4]">{a.label}</span>
+              <span className="text-[10px] font-medium text-[#94A3B8]">{a.label}</span>
             </div>
           ))}
         </div>

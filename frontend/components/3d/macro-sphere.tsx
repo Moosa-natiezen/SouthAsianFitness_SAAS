@@ -21,8 +21,8 @@ function SphereMesh({ proteinProgress, calorieProgress }: MacroSphereProps) {
   const overallProgress = Math.min(100, (proteinProgress + calorieProgress) / 2) / 100;
 
   // Color transitions: low = muted terracotta, high = bright saffron
-  const baseColor = useMemo(() => new THREE.Color("#c25a3c"), []);
-  const glowColor = useMemo(() => new THREE.Color("#e8a838"), []);
+  const baseColor = useMemo(() => new THREE.Color("#FF4500"), []);
+  const glowColor = useMemo(() => new THREE.Color("#00E5FF"), []);
   const currentColor = useMemo(
     () => baseColor.clone().lerp(glowColor, overallProgress),
     [baseColor, glowColor, overallProgress],
@@ -97,7 +97,7 @@ function Particles({ count = 40 }: { count?: number }) {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 8, 8]} />
-      <meshBasicMaterial color="#e8a838" transparent opacity={0.6} />
+      <meshBasicMaterial color="#00E5FF" transparent opacity={0.6} />
     </instancedMesh>
   );
 }
@@ -109,7 +109,7 @@ function LoadingFallback() {
   return (
     <mesh scale={1.5}>
       <sphereGeometry args={[1, 16, 16]} />
-      <meshBasicMaterial color="#c4854c" wireframe />
+      <meshBasicMaterial color="#FF4500" wireframe />
     </mesh>
   );
 }
@@ -127,9 +127,9 @@ export function MacroSphere({ proteinProgress, calorieProgress }: MacroSpherePro
         style={{ background: "transparent" }}
       >
         <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={0.8} color="#f5f0e8" />
-        <pointLight position={[-3, 2, 4]} intensity={0.5} color="#e8a838" />
-        <pointLight position={[3, -2, 3]} intensity={0.3} color="#c25a3c" />
+        <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFFFFF" />
+        <pointLight position={[-3, 2, 4]} intensity={0.5} color="#00E5FF" />
+        <pointLight position={[3, -2, 3]} intensity={0.3} color="#FF4500" />
 
         <Suspense fallback={<LoadingFallback />}>
           <PresentationControls
@@ -151,7 +151,7 @@ export function MacroSphere({ proteinProgress, calorieProgress }: MacroSpherePro
             opacity={0.3}
             scale={5}
             blur={2.5}
-            color="#c4854c"
+            color="#FF4500"
           />
         </Suspense>
       </Canvas>
