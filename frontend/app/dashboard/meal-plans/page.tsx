@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AiMealGenerator } from "@/components/ai/ai-meal-generator";
 import { MealPlanView } from "@/components/meal-plan/meal-plan-view";
 import {
   createCheckoutSession,
@@ -46,6 +47,7 @@ export default function MealPlansPage() {
   } | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"optimizer" | "ai">("optimizer");
 
   /* ── Load today's plan + history ─────────────────────────────────── */
 
@@ -136,18 +138,56 @@ export default function MealPlansPage() {
 
   return (
     <div className="space-y-6">
-      {/* Generate controls */}
+      {/* Tab switcher */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Meal Plans
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-          {state.status === "ready" ? "Your Plan" : "Generate Your Plan"}
+          Generate Your Plan
+        </h1>
+        <p className="mt-2 text-slate-600">
+          Create a personalized meal plan using our optimizer or AI assistant.
+        </p>
+
+        <div className="mt-6 flex gap-2">
+          <button
+            onClick={() => setActiveTab("optimizer")}
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              activeTab === "optimizer"
+                ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            Deterministic Optimizer
+          </button>
+          <button
+            onClick={() => setActiveTab("ai")}
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              activeTab === "ai"
+                ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            AI Generator ✨
+          </button>
+        </div>
+      </div>
+
+      {/* AI Generator Tab */}
+      {activeTab === "ai" && <AiMealGenerator />}
+
+      {/* Optimizer Tab */}
+      {activeTab === "optimizer" && (
+        <>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 className="text-xl font-semibold text-slate-900">
+          {state.status === "ready" ? "Your Plan" : "Optimizer Plan"}
         </h1>
         <p className="mt-2 text-slate-600">
           {state.status === "ready"
             ? "View your current plan or generate a new one."
-            : "Create a personalized meal plan based on your nutrition targets and food preferences."}
+            : "Generate a structured plan based on your nutrition targets and food database."}
         </p>
 
         {/* Controls */}
@@ -289,8 +329,10 @@ export default function MealPlansPage() {
         </div>
       )}
 
-      {/* Current plan display */}
-      {state.status === "ready" && <MealPlanView plan={state.plan} />}
+          {/* Current plan display */}
+          {state.status === "ready" && <MealPlanView plan={state.plan} />}
+        </>
+      )}
 
       {/* Delete notification */}
       {deleteMsg && (
