@@ -32,3 +32,5 @@ class OnboardingRequest(BaseModel):
 class OnboardingResponse(BaseModel):
     status: str = "ok"
     is_onboarded: bool = True
+    target_calories: int | None = None
+    target_protein_g: float | None = None

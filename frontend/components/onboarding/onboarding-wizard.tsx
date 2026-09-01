@@ -1,24 +1,89 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchLocations, submitOnboarding, type CountryData } from "@/lib/api";
+import {
+  fetchLocations,
+  submitOnboarding,
+  type CountryData,
+} from "@/lib/api";
 
-/* ── Constants ─────────────────────────────────────────────────────────── */
+/* ── Activity Levels ──────────────────────────────────────────────────── */
 
-/** Backend ActivityLevel enum — these exact values are sent to the API. */
 const activityLevels = [
-  { value: "sedentary", label: "Sedentary", desc: "Desk job, little exercise" },
-  { value: "lightly_active", label: "Lightly active", desc: "Light walks, occasional exercise" },
-  { value: "moderately_active", label: "Moderately active", desc: "Regular exercise 3–5×/week" },
-  { value: "very_active", label: "Very active", desc: "Intense exercise 6–7×/week" },
-  { value: "extra_active", label: "Extra active", desc: "Athlete-level training" },
+  {
+    value: "sedentary",
+    label: "Sedentary",
+    desc: "Desk job, little exercise",
+    multiplier: "1.2×",
+  },
+  {
+    value: "lightly_active",
+    label: "Lightly Active",
+    desc: "Light walks, occasional exercise",
+    multiplier: "1.375×",
+  },
+  {
+    value: "moderately_active",
+    label: "Moderately Active",
+    desc: "Regular exercise 3–5×/week",
+    multiplier: "1.55×",
+  },
+  {
+    value: "very_active",
+    label: "Very Active",
+    desc: "Intense exercise 6–7×/week",
+    multiplier: "1.725×",
+  },
+  {
+    value: "extra_active",
+    label: "Extra Active",
+    desc: "Athlete-level training",
+    multiplier: "1.9×",
+  },
 ] as const;
 
-/** Backend DietPattern enum values. */
+/* ── Fitness Goals ────────────────────────────────────────────────────── */
+
+const fitnessGoals = [
+  {
+    value: "weight_loss",
+    label: "Cut",
+    icon: "🔥",
+    desc: "Lose body fat while preserving muscle",
+    tagline: "Shed fat. Stay strong.",
+    calAdj: "-500 kcal",
+  },
+  {
+    value: "weight_gain",
+    label: "Bulk",
+    icon: "💪",
+    desc: "Gain weight and mass progressively",
+    tagline: "Build mass. Fuel growth.",
+    calAdj: "+400 kcal",
+  },
+  {
+    value: "muscle_building",
+    label: "Recomp",
+    icon: "⚡",
+    desc: "Build muscle while managing fat",
+    tagline: "Sculpt. Define. Perform.",
+    calAdj: "+300 kcal",
+  },
+  {
+    value: "general_fitness",
+    label: "Maintain",
+    icon: "🌿",
+    desc: "Stay healthy and maintain current physique",
+    tagline: "Balance. Consistency. Life.",
+    calAdj: "0 kcal",
+  },
+] as const;
+
+/* ── Diet Patterns ────────────────────────────────────────────────────── */
+
 const dietPatterns = [
   { value: "omnivore", label: "Omnivore", desc: "I eat everything" },
   { value: "vegetarian", label: "Vegetarian", desc: "No meat, fish, or poultry" },
@@ -27,15 +92,12 @@ const dietPatterns = [
   { value: "pescetarian", label: "Pescetarian", desc: "Vegetarian + fish" },
 ] as const;
 
-const steps = [
-  { title: "Location", description: "Set your basics and region." },
-  { title: "Body info", description: "Add your key measurements." },
-  { title: "Goal & activity", description: "Reflect your daily routine and objective." },
-  { title: "Food preferences", description: "Tell us what fits your routine." },
-  { title: "Budget", description: "Share your realistic food budget." },
-];
+/* ── Types ────────────────────────────────────────────────────────────── */
 
-/* ── Types ─────────────────────────────────────────────────────────────── */
+type GoalValue = (typeof fitnessGoals)[number]["value"];
+type ActivityValue = (typeof activityLevels)[number]["value"];
+type DietValue = (typeof dietPatterns)[number]["value"];
+type SexValue = "female" | "male" | "other";
 
 type FormState = {
   country_id: string;
@@ -44,12 +106,12 @@ type FormState = {
   preferred_language: string;
   unit_system: "metric" | "imperial";
   age_years: string;
-  sex: "female" | "male" | "other";
+  sex: SexValue;
   height_cm: string;
   weight_kg: string;
-  activity_level: "sedentary" | "lightly_active" | "moderately_active" | "very_active" | "extra_active";
-  fitness_goal: "weight_loss" | "weight_gain" | "muscle_building" | "general_fitness";
-  diet_pattern: "omnivore" | "vegetarian" | "eggetarian" | "vegan" | "pescetarian";
+  activity_level: ActivityValue;
+  fitness_goal: GoalValue;
+  diet_pattern: DietValue;
   dietary_tag_slugs: string;
   allergen_tag_slugs: string;
   food_dislikes: string;
@@ -79,16 +141,82 @@ const initialForm: FormState = {
   budget_period: "weekly",
 };
 
-/* ── Helpers ───────────────────────────────────────────────────────────── */
+/* ── Helpers ──────────────────────────────────────────────────────────── */
 
 function parseList(values: string) {
-  return values
-    .split(",")
-    .map((v) => v.trim())
-    .filter(Boolean);
+  return values.split(",").map((v) => v.trim()).filter(Boolean);
 }
 
-/* ── Component ─────────────────────────────────────────────────────────── */
+/** Client-side TDEE preview (same formula as backend). */
+function calcPreview(form: FormState) {
+  const age = Number(form.age_years) || 28;
+  const h = Number(form.height_cm) || 170;
+  const w = Number(form.weight_kg) || 70;
+  const sex = form.sex;
+
+  let bmr: number;
+  if (sex === "male") {
+    bmr = 10 * w + 6.25 * h - 5 * age - 5;
+  } else if (sex === "female") {
+    bmr = 10 * w + 6.25 * h - 5 * age - 161;
+  } else {
+    const bm = 10 * w + 6.25 * h - 5 * age - 5;
+    const bf = 10 * w + 6.25 * h - 5 * age - 161;
+    bmr = (bm + bf) / 2;
+  }
+
+  const mult: Record<string, number> = {
+    sedentary: 1.2, lightly_active: 1.375, moderately_active: 1.55,
+    very_active: 1.725, extra_active: 1.9,
+  };
+  const adj: Record<string, number> = {
+    weight_loss: -500, weight_gain: 400, muscle_building: 300, general_fitness: 0,
+  };
+
+  const tdee = bmr * (mult[form.activity_level] ?? 1.55);
+  const calTarget = tdee + (adj[form.fitness_goal] ?? 0);
+  const protein = w * 1.8;
+
+  return {
+    bmr: Math.round(bmr),
+    tdee: Math.round(tdee),
+    target_calories: Math.max(1000, Math.min(6000, Math.round(calTarget))),
+    protein_g: Math.round(protein),
+  };
+}
+
+/* ── Animation Helpers ────────────────────────────────────────────────── */
+
+function FadeSlide({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(32px)";
+    const raf = requestAnimationFrame(() => {
+      el.style.transition = "opacity 0.5s cubic-bezier(.16,1,.3,1), transform 0.5s cubic-bezier(.16,1,.3,1)";
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
+}
+
+/* ── Main Component ───────────────────────────────────────────────────── */
 
 export function OnboardingWizard() {
   const router = useRouter();
@@ -96,8 +224,13 @@ export function OnboardingWizard() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [calculating, setCalculating] = useState(false);
+  const [result, setResult] = useState<{
+    target_calories: number;
+    target_protein_g: number;
+  } | null>(null);
 
-  /* ── Locations data from API ───────────────────────────────────────── */
+  /* ── Locations ──────────────────────────────────────────────────────── */
   const [countries, setCountries] = useState<CountryData[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
@@ -109,7 +242,6 @@ export function OnboardingWizard() {
         const data = await fetchLocations();
         if (cancelled) return;
         setCountries(data);
-        // Auto-select first country and set its currency
         if (data.length > 0 && !form.country_id) {
           setForm((c) => ({
             ...c,
@@ -119,9 +251,7 @@ export function OnboardingWizard() {
         }
       } catch (err) {
         if (!cancelled) {
-          setLocationsError(
-            err instanceof Error ? err.message : "Unable to load countries.",
-          );
+          setLocationsError(err instanceof Error ? err.message : "Unable to load countries.");
         }
       } finally {
         if (!cancelled) setLocationsLoading(false);
@@ -141,7 +271,6 @@ export function OnboardingWizard() {
   const handleSelect = (event: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
     if (name === "country_id") {
-      // When country changes, update currency to match and reset region
       const newCountry = countries.find((c) => c.id === value);
       setForm((c) => ({
         ...c,
@@ -154,38 +283,32 @@ export function OnboardingWizard() {
     updateField(name as keyof FormState, value as never);
   };
 
-  /* ── Validation ─────────────────────────────────────────────────────── */
+  /* ── Live preview ───────────────────────────────────────────────────── */
+  const preview = calcPreview(form);
 
+  /* ── Validation ─────────────────────────────────────────────────────── */
   const validateStep = (): string | null => {
-    if (stepIndex === 0) {
-      if (!form.country_id) return "Choose a country.";
-      if (!form.preferred_currency_code.trim()) return "Add a preferred currency code.";
-      return null;
-    }
+    if (stepIndex === 0) return null; // goal
     if (stepIndex === 1) {
       if (!form.age_years || Number(form.age_years) <= 0) return "Enter a valid age.";
-      if (!form.sex) return "Select a sex.";
       if (!form.height_cm || Number(form.height_cm) <= 0) return "Enter a valid height.";
       if (!form.weight_kg || Number(form.weight_kg) <= 0) return "Enter a valid weight.";
       return null;
     }
-    if (stepIndex === 2) {
-      if (!form.activity_level) return "Choose an activity level.";
-      if (!form.fitness_goal) return "Select your primary goal.";
-      return null;
-    }
+    if (stepIndex === 2) return null; // activity
     if (stepIndex === 3) {
-      if (!form.diet_pattern) return "Select your diet pattern.";
+      if (!form.country_id) return "Choose a country.";
       return null;
     }
-    if (!form.budget_period.trim()) return "Choose a budget period.";
-    return null;
+    if (stepIndex === 4) return null; // diet
+    if (stepIndex === 5) return null; // preferences
+    return null; // budget
   };
 
   /* ── Navigation ─────────────────────────────────────────────────────── */
-
   const canGoBack = stepIndex > 0;
-  const isLastStep = stepIndex === steps.length - 1;
+  const isLastStep = stepIndex === 6;
+  const totalSteps = 7;
 
   const handleNext = () => {
     const err = validateStep();
@@ -200,13 +323,19 @@ export function OnboardingWizard() {
     setStepIndex((c) => Math.max(0, c - 1));
   };
 
-  /* ── Submit ─────────────────────────────────────────────────────────── */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !loading) {
+      e.preventDefault();
+      handleNext();
+    }
+  };
 
+  /* ── Submit ─────────────────────────────────────────────────────────── */
   const submitForm = async () => {
     setError(null);
-    setLoading(true);
+    setCalculating(true);
     try {
-      await submitOnboarding({
+      const response = await submitOnboarding({
         country_id: form.country_id,
         region_id: form.region_id || null,
         preferred_currency_code: form.preferred_currency_code.trim().slice(0, 3).toUpperCase(),
@@ -226,206 +355,480 @@ export function OnboardingWizard() {
         weekly_budget_amount: Number(form.weekly_budget_amount) || 0,
         budget_period: form.budget_period,
       });
-      router.push("/dashboard");
-      router.refresh();
+
+      // Show result
+      setResult({
+        target_calories: response.target_calories ?? preview.target_calories,
+        target_protein_g: response.target_protein_g ?? preview.protein_g,
+      });
+      setCalculating(false);
+
+      // Brief delay to admire the results, then redirect
+      setTimeout(() => {
+        router.push("/dashboard");
+        router.refresh();
+      }, 2500);
     } catch (caughtError) {
+      setCalculating(false);
       setError(
         caughtError instanceof Error ? caughtError.message : "Unable to save onboarding details.",
       );
-    } finally {
-      setLoading(false);
     }
   };
 
   /* ── Step content ───────────────────────────────────────────────────── */
 
-  const renderStep = () => {
-    const selectClass =
-      "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30";
-    const inputClass = selectClass;
+  const selectClass =
+    "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30";
 
+  const renderStep = () => {
+    // ─── Step 0: Goal Selection ────────────────────────────────────────
     if (stepIndex === 0) {
+      return (
+        <FadeSlide>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {fitnessGoals.map((g) => (
+              <button
+                key={g.value}
+                type="button"
+                onClick={() => updateField("fitness_goal", g.value as GoalValue)}
+                className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-300 ${
+                  form.fitness_goal === g.value
+                    ? "border-[#c4854c]/60 bg-[#c4854c]/10 shadow-[0_0_30px_rgba(196,133,76,0.15)]"
+                    : "border-white/[0.06] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                }`}
+              >
+                {form.fitness_goal === g.value && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#c4854c]/5 to-transparent" />
+                )}
+                <div className="relative">
+                  <div className="mb-3 text-3xl">{g.icon}</div>
+                  <h3 className="text-lg font-semibold text-white">{g.label}</h3>
+                  <p className="mt-1 text-sm text-zinc-400">{g.tagline}</p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-medium text-zinc-500">
+                      {g.calAdj}
+                    </span>
+                    <span className="text-xs text-zinc-600">{g.desc}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </FadeSlide>
+      );
+    }
+
+    // ─── Step 1: Body Metrics ──────────────────────────────────────────
+    if (stepIndex === 1) {
+      return (
+        <FadeSlide>
+          <div className="space-y-6">
+            <div className="grid gap-5 sm:grid-cols-3">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-zinc-400">Age</label>
+                <input
+                  type="number"
+                  min={13}
+                  max={120}
+                  value={form.age_years}
+                  onChange={(e) => updateField("age_years", e.target.value)}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-zinc-400">Height (cm)</label>
+                <input
+                  type="number"
+                  value={form.height_cm}
+                  onChange={(e) => updateField("height_cm", e.target.value)}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-zinc-400">Weight (kg)</label>
+                <input
+                  type="number"
+                  value={form.weight_kg}
+                  onChange={(e) => updateField("weight_kg", e.target.value)}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-[#c4854c]/50 focus:ring-1 focus:ring-[#c4854c]/30"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-400">Sex</label>
+              <div className="flex gap-3">
+                {(["female", "male", "other"] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => updateField("sex", s)}
+                    className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                      form.sex === s
+                        ? "border-[#c4854c]/60 bg-[#c4854c]/10 text-[#c4854c]"
+                        : "border-white/[0.06] bg-white/[0.03] text-zinc-400 hover:border-white/[0.12]"
+                    }`}
+                  >
+                    {s.charAt(0).toUpperCase() + s.slice(1).replace("_", " ")}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Live TDEE Preview */}
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-600 mb-3">
+                Live Preview
+              </p>
+              <div className="grid grid-cols-4 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-[#c4854c]">{preview.bmr}</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">BMR kcal</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-[#e8a838]">{preview.tdee}</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">TDEE kcal</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-white">{preview.target_calories}</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">Target kcal</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-[#c25a3c]">{preview.protein_g}g</p>
+                  <p className="text-[10px] text-zinc-600 mt-0.5">Protein</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FadeSlide>
+      );
+    }
+
+    // ─── Step 2: Activity Level ────────────────────────────────────────
+    if (stepIndex === 2) {
+      return (
+        <FadeSlide>
+          <div className="space-y-3">
+            {activityLevels.map((a) => (
+              <button
+                key={a.value}
+                type="button"
+                onClick={() => updateField("activity_level", a.value as ActivityValue)}
+                className={`w-full rounded-xl border p-4 text-left transition-all duration-200 ${
+                  form.activity_level === a.value
+                    ? "border-[#c4854c]/60 bg-[#c4854c]/10"
+                    : "border-white/[0.06] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-white">{a.label}</p>
+                    <p className="text-sm text-zinc-500">{a.desc}</p>
+                  </div>
+                  <span className="rounded-lg bg-white/[0.06] px-2.5 py-1 text-xs font-mono text-zinc-500">
+                    {a.multiplier}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </FadeSlide>
+      );
+    }
+
+    // ─── Step 3: Location ──────────────────────────────────────────────
+    if (stepIndex === 3) {
       if (locationsLoading) {
         return (
-          <div className="flex items-center justify-center py-8" aria-live="polite">
-            <p className="text-sm text-zinc-500">Loading countries...</p>
-          </div>
+          <FadeSlide>
+            <div className="flex items-center justify-center py-12">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c4854c] border-t-transparent" />
+              <span className="ml-3 text-sm text-zinc-500">Loading countries...</span>
+            </div>
+          </FadeSlide>
         );
       }
       if (locationsError) {
         return (
-          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {locationsError}
-          </div>
+          <FadeSlide>
+            <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              {locationsError}
+            </div>
+          </FadeSlide>
         );
       }
       return (
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="country" className="text-sm font-medium text-zinc-400">Country</label>
-            <select id="country" name="country_id" value={form.country_id} onChange={handleSelect} className={selectClass}>
-              {countries.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-            </select>
+        <FadeSlide>
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-400">Country</label>
+              <select
+                name="country_id"
+                value={form.country_id}
+                onChange={handleSelect}
+                className={selectClass}
+              >
+                {countries.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-400">Region / state</label>
+              <select
+                name="region_id"
+                value={form.region_id}
+                onChange={(e) => updateField("region_id", e.target.value)}
+                className={selectClass}
+              >
+                <option value="">Select region (optional)</option>
+                {currentRegions.map((r) => (
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-zinc-400">Currency</label>
+                <input
+                  value={form.preferred_currency_code}
+                  onChange={(e) => updateField("preferred_currency_code", e.target.value)}
+                  className={selectClass}
+                  placeholder="PKR"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-zinc-400">Unit System</label>
+                <select
+                  name="unit_system"
+                  value={form.unit_system}
+                  onChange={(e) => updateField("unit_system", e.target.value as "metric" | "imperial")}
+                  className={selectClass}
+                >
+                  <option value="metric">Metric (kg, cm)</option>
+                  <option value="imperial">Imperial (lbs, in)</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="region" className="text-sm font-medium text-zinc-400">Region / state / province</label>
-            <select id="region" name="region_id" value={form.region_id} onChange={(e) => updateField("region_id", e.target.value)} className={selectClass}>
-              <option value="">Select region</option>
-              {currentRegions.map((r) => (<option key={r.id} value={r.id}>{r.name}</option>))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="currency" className="text-sm font-medium text-zinc-400">Preferred currency</label>
-            <input id="currency" value={form.preferred_currency_code} onChange={(e) => updateField("preferred_currency_code", e.target.value)} className={inputClass} placeholder="PKR" />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="language" className="text-sm font-medium text-zinc-400">Preferred language</label>
-            <input id="language" value={form.preferred_language} onChange={(e) => updateField("preferred_language", e.target.value)} className={inputClass} placeholder="en" />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="unit_system" className="text-sm font-medium text-zinc-400">Unit system</label>
-            <select id="unit_system" name="unit_system" value={form.unit_system} onChange={(e) => updateField("unit_system", e.target.value as FormState["unit_system"])} className={selectClass}>
-              <option value="metric">Metric</option>
-              <option value="imperial">Imperial</option>
-            </select>
-          </div>
-        </div>
+        </FadeSlide>
       );
     }
 
-    if (stepIndex === 1) {
+    // ─── Step 4: Diet Pattern ──────────────────────────────────────────
+    if (stepIndex === 4) {
       return (
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="age" className="text-sm font-medium text-zinc-400">Age</label>
-            <input id="age" type="number" min={13} max={120} value={form.age_years} onChange={(e) => updateField("age_years", e.target.value)} className={inputClass} />
+        <FadeSlide>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {dietPatterns.map((d) => (
+              <button
+                key={d.value}
+                type="button"
+                onClick={() => updateField("diet_pattern", d.value as DietValue)}
+                className={`rounded-xl border p-4 text-left transition-all duration-200 ${
+                  form.diet_pattern === d.value
+                    ? "border-[#c4854c]/60 bg-[#c4854c]/10"
+                    : "border-white/[0.06] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.06]"
+                }`}
+              >
+                <p className="font-medium text-white">{d.label}</p>
+                <p className="text-sm text-zinc-500">{d.desc}</p>
+              </button>
+            ))}
           </div>
-          <div className="space-y-2">
-            <label htmlFor="sex" className="text-sm font-medium text-zinc-400">Sex</label>
-            <select id="sex" name="sex" value={form.sex} onChange={(e) => updateField("sex", e.target.value as FormState["sex"])} className={selectClass}>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="height" className="text-sm font-medium text-zinc-400">Height (cm)</label>
-            <input id="height" type="number" value={form.height_cm} onChange={(e) => updateField("height_cm", e.target.value)} className={inputClass} />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="weight" className="text-sm font-medium text-zinc-400">Weight (kg)</label>
-            <input id="weight" type="number" value={form.weight_kg} onChange={(e) => updateField("weight_kg", e.target.value)} className={inputClass} />
-          </div>
-        </div>
+        </FadeSlide>
       );
     }
 
-    if (stepIndex === 2) {
+    // ─── Step 5: Food Preferences ──────────────────────────────────────
+    if (stepIndex === 5) {
       return (
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="activity" className="text-sm font-medium text-zinc-400">Activity level</label>
-            <select id="activity" name="activity_level" value={form.activity_level} onChange={(e) => updateField("activity_level", e.target.value as FormState["activity_level"])} className={selectClass}>
-              {activityLevels.map((a) => (<option key={a.value} value={a.value}>{a.label} — {a.desc}</option>))}
-            </select>
+        <FadeSlide>
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-400">Foods you like (optional)</label>
+              <input
+                value={form.preferred_foods}
+                onChange={(e) => updateField("preferred_foods", e.target.value)}
+                className={selectClass}
+                placeholder="rice, dal, chicken, yogurt"
+              />
+              <p className="text-xs text-zinc-600">Comma-separated</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-400">Foods you dislike (optional)</label>
+              <input
+                value={form.food_dislikes}
+                onChange={(e) => updateField("food_dislikes", e.target.value)}
+                className={selectClass}
+                placeholder="fried snacks, excessive sugar"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-400">Allergies / restrictions (optional)</label>
+              <input
+                value={form.allergen_tag_slugs}
+                onChange={(e) => updateField("allergen_tag_slugs", e.target.value)}
+                className={selectClass}
+                placeholder="nuts, dairy"
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <label htmlFor="goal" className="text-sm font-medium text-zinc-400">Primary goal</label>
-            <select id="goal" name="fitness_goal" value={form.fitness_goal} onChange={(e) => updateField("fitness_goal", e.target.value as FormState["fitness_goal"])} className={selectClass}>
-              <option value="weight_loss">Weight loss</option>
-              <option value="weight_gain">Weight gain</option>
-              <option value="muscle_building">Muscle building</option>
-              <option value="general_fitness">General fitness</option>
-            </select>
-          </div>
-        </div>
+        </FadeSlide>
       );
     }
 
-    if (stepIndex === 3) {
-      return (
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="diet_pattern" className="text-sm font-medium text-zinc-400">Diet pattern</label>
-            <select id="diet_pattern" name="diet_pattern" value={form.diet_pattern} onChange={(e) => updateField("diet_pattern", e.target.value as FormState["diet_pattern"])} className={selectClass}>
-              {dietPatterns.map((d) => (<option key={d.value} value={d.value}>{d.label} — {d.desc}</option>))}
-            </select>
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="preferred_foods" className="text-sm font-medium text-zinc-400">Foods you like (optional)</label>
-            <input id="preferred_foods" value={form.preferred_foods} onChange={(e) => updateField("preferred_foods", e.target.value)} className={inputClass} placeholder="rice, dal, chicken, yogurt" />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="food_dislikes" className="text-sm font-medium text-zinc-400">Foods you dislike (optional)</label>
-            <input id="food_dislikes" value={form.food_dislikes} onChange={(e) => updateField("food_dislikes", e.target.value)} className={inputClass} placeholder="fried snacks, excessive sugar" />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="allergies" className="text-sm font-medium text-zinc-400">Allergies / restrictions (optional)</label>
-            <input id="allergies" value={form.allergen_tag_slugs} onChange={(e) => updateField("allergen_tag_slugs", e.target.value)} className={inputClass} placeholder="nuts, dairy" />
-          </div>
-        </div>
-      );
-    }
-
-    // Step 5: Budget
+    // ─── Step 6: Budget ────────────────────────────────────────────────
     return (
-      <div className="grid gap-5 md:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="budget" className="text-sm font-medium text-zinc-400">Approximate weekly budget</label>
-          <input id="budget" type="number" min={0} value={form.weekly_budget_amount} onChange={(e) => updateField("weekly_budget_amount", e.target.value)} className={inputClass} placeholder="2500" />
+      <FadeSlide>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-400">Weekly budget</label>
+            <input
+              type="number"
+              min={0}
+              value={form.weekly_budget_amount}
+              onChange={(e) => updateField("weekly_budget_amount", e.target.value)}
+              className={selectClass}
+              placeholder="2500"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-400">Frequency</label>
+            <select
+              name="budget_period"
+              value={form.budget_period}
+              onChange={(e) => updateField("budget_period", e.target.value)}
+              className={selectClass}
+            >
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
         </div>
-        <div className="space-y-2">
-          <label htmlFor="budget_period" className="text-sm font-medium text-zinc-400">Budget frequency</label>
-          <select id="budget_period" name="budget_period" value={form.budget_period} onChange={(e) => updateField("budget_period", e.target.value)} className={selectClass}>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
-      </div>
+      </FadeSlide>
     );
   };
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[#09090b] px-4 py-8">
-      <Card className="w-full max-w-3xl border-white/[0.06] shadow-xl">
-        <CardHeader>
-          <CardTitle>Complete your onboarding</CardTitle>
-          <CardDescription>{steps[stepIndex].description}</CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          {/* Progress bar */}
-          <div className="flex gap-2" role="progressbar" aria-valuenow={stepIndex + 1} aria-valuemax={steps.length} aria-label={`Step ${stepIndex + 1} of ${steps.length}`}>
-            {steps.map((step, index) => (
-              <div key={step.title} className={`h-2 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-[#c4854c]" : "bg-white/[0.06]"}`} />
-            ))}
+  /* ── Calculating Overlay ────────────────────────────────────────────── */
+  if (calculating) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+        <FadeSlide className="text-center">
+          <div className="relative mx-auto mb-8 h-24 w-24">
+            <div className="absolute inset-0 animate-spin rounded-full border-2 border-[#c4854c]/20 border-t-[#c4854c]" />
+            <div className="absolute inset-2 animate-spin rounded-full border-2 border-[#e8a838]/20 border-b-[#e8a838] [animation-direction:reverse] [animation-duration:1.5s]" />
+            <div className="absolute inset-0 flex items-center justify-center text-3xl">⚡</div>
           </div>
+          <h2 className="font-serif text-3xl font-bold text-white">Calculating your plan</h2>
+          <p className="mt-3 text-zinc-500">
+            Running Mifflin-St Jeor equations across your profile...
+          </p>
+        </FadeSlide>
+      </div>
+    );
+  }
 
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.12em] text-[#c4854c]">
-              Step {stepIndex + 1} of {steps.length}
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">{steps[stepIndex].title}</h2>
-          </div>
-
-          {renderStep()}
-
-          {error && (
-            <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {error}
+  /* ── Result State ───────────────────────────────────────────────────── */
+  if (result) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+        <FadeSlide className="text-center">
+          <div className="mb-6 text-5xl">🎯</div>
+          <h2 className="font-serif text-4xl font-bold text-white">Your targets are set</h2>
+          <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
+            <div className="rounded-2xl border border-[#c4854c]/20 bg-[#c4854c]/5 p-5">
+              <p className="text-3xl font-bold text-[#c4854c]">{result.target_calories}</p>
+              <p className="mt-1 text-xs text-zinc-500">kcal / day</p>
             </div>
-          )}
-
-          <div className="flex justify-between gap-3 pt-2">
-            <Button variant="outline" onClick={handleBack} disabled={!canGoBack || loading}>
-              Back
-            </Button>
-            <Button onClick={handleNext} disabled={loading}>
-              {loading ? "Saving..." : isLastStep ? "Finish onboarding" : "Next"}
-            </Button>
+            <div className="rounded-2xl border border-[#c25a3c]/20 bg-[#c25a3c]/5 p-5">
+              <p className="text-3xl font-bold text-[#c25a3c]">{result.target_protein_g}g</p>
+              <p className="mt-1 text-xs text-zinc-500">protein / day</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <p className="mt-8 text-sm text-zinc-600">Redirecting to your dashboard...</p>
+        </FadeSlide>
+      </div>
+    );
+  }
+
+  /* ── Main Form ──────────────────────────────────────────────────────── */
+  return (
+    <div
+      className="flex min-h-screen items-center justify-center bg-[#0a0a0a] px-4 py-8"
+      onKeyDown={handleKeyDown}
+    >
+      <div className="w-full max-w-2xl">
+        {/* Header */}
+        <FadeSlide key={`header-${stepIndex}`}>
+          <div className="mb-10 text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#c4854c]/60">
+              Step {stepIndex + 1} of {totalSteps}
+            </p>
+            <h1 className="mt-3 font-serif text-3xl font-bold text-white sm:text-4xl">
+              {stepIndex === 0 && "What's your goal?"}
+              {stepIndex === 1 && "Tell us about yourself"}
+              {stepIndex === 2 && "How active are you?"}
+              {stepIndex === 3 && "Where are you based?"}
+              {stepIndex === 4 && "Your diet preference"}
+              {stepIndex === 5 && "Food preferences"}
+              {stepIndex === 6 && "Weekly food budget"}
+            </h1>
+          </div>
+        </FadeSlide>
+
+        {/* Progress */}
+        <div className="mb-8 flex gap-1.5" role="progressbar">
+          {Array.from({ length: totalSteps }, (_, i) => (
+            <div
+              key={i}
+              className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                i <= stepIndex ? "bg-[#c4854c]" : "bg-white/[0.06]"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Step Content */}
+        <div key={`step-${stepIndex}`} className="min-h-[360px]">
+          {renderStep()}
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            {error}
+          </div>
+        )}
+
+        {/* Navigation */}
+        <FadeSlide className="mt-8 flex items-center justify-between gap-4">
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={!canGoBack || loading}
+            className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/[0.06] disabled:opacity-30"
+          >
+            Back
+          </button>
+
+          <div className="flex items-center gap-3">
+            {/* Step counter */}
+            <span className="text-xs text-zinc-700">
+              {stepIndex + 1}/{totalSteps}
+            </span>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={loading}
+              className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#c4854c] to-[#e8a838] px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#c4854c]/20 transition-all hover:shadow-[#c4854c]/30 hover:brightness-110 disabled:opacity-50"
+            >
+              {isLastStep ? "Calculate & Finish" : "Continue"}
+            </button>
+          </div>
+        </FadeSlide>
+      </div>
     </div>
   );
 }

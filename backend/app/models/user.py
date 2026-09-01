@@ -194,6 +194,8 @@ class UserProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
         default=DietPattern.OMNIVORE,
     )
+    target_calories: Mapped[int | None] = mapped_column(nullable=True)
+    target_protein_g: Mapped[float | None] = mapped_column(Numeric(6, 1), nullable=True)
 
     user: Mapped[User] = relationship(back_populates="profile")
     dietary_tags: Mapped[list[DietaryTag]] = relationship(

@@ -23,6 +23,7 @@ from app.models.enums import DietaryTagKind, DietPattern
 from app.models.geography import Country, Region
 from app.models.tags import DietaryTag
 from app.models.user import User, UserPreferences, UserProfile, UserSession
+from app.services.nutrition_service import calculate_nutrition_targets
 
 logger = get_logger(__name__)
 
@@ -247,6 +248,23 @@ def submit_onboarding(db: Session, user: User, payload: dict) -> User:
     profile.dietary_tags = []
     db.add(profile)
     db.flush()
+
+    # Calculate and store TDEE targets
+    nutrition = calculate_nutrition_targets(
+        sex=str(profile.sex.value) if hasattr(profile.sex, 'value') else str(profile.sex),
+        age=profile.age_years,
+        height_cm=float(profile.height_cm),
+        weight_kg=float(profile.weight_kg),
+        activity_level=str(profile.activity_level.value) if hasattr(profile.activity_level, 'value') else str(profile.activity_level),
+        goal=str(profile.fitness_goal.value) if hasattr(profile.fitness_goal, 'value') else str(profile.fitness_goal),
+    )
+    profile.target_calories = int(nutrition.calorie_target)
+    profile.target_protein_g = nutrition.protein_g
+    logger.info(
+        "TDEE calculated for user %s: BMR=%.0f TDEE=%.0f target_cal=%.0f protein=%.1fg",
+        user.id, nutrition.bmr, nutrition.tdee,
+        nutrition.calorie_target, nutrition.protein_g,
+    )
 
     dietary_tag_slugs = list(payload.get("dietary_tag_slugs", [])) + list(
         payload.get("allergen_tag_slugs", [])

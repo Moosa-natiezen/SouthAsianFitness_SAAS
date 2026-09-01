@@ -328,9 +328,16 @@ export async function getCurrentUser(): Promise<AuthUser> {
   return apiFetch<AuthUser>("/api/auth/me");
 }
 
-export async function submitOnboarding(payload: OnboardingRequest): Promise<void> {
+export type OnboardingResponse = {
+  status: string;
+  is_onboarded: boolean;
+  target_calories: number | null;
+  target_protein_g: number | null;
+};
+
+export async function submitOnboarding(payload: OnboardingRequest): Promise<OnboardingResponse> {
   const csrfToken = await getCsrfToken();
-  await apiFetch<unknown>("/api/auth/onboarding", {
+  return apiFetch<OnboardingResponse>("/api/auth/onboarding", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
     body: JSON.stringify(payload),
