@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
+    ai,
     auth,
     billing,
     foods,
@@ -24,3 +25,4 @@ api_router.include_router(locations.router)
 api_router.include_router(progress.router)
 api_router.include_router(settings.router)
 api_router.include_router(billing.router)
+api_router.include_router(ai.router)

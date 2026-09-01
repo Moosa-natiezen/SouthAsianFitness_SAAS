@@ -97,6 +97,31 @@ class NutritionBudgetResponse(BaseModel):
     budget: BudgetTargetResponse
 
 
+class MealPlanRequest(BaseModel):
+    """Request for AI-generated streaming meal plan."""
+
+    target_calories: float | None = Field(
+        None, ge=500, le=10000,
+        description="Daily calorie target in kcal",
+    )
+    protein_g: float | None = Field(
+        None, ge=0, le=500,
+        description="Daily protein target in grams",
+    )
+    dietary_preferences: list[str] = Field(
+        default_factory=list,
+        description="Dietary preferences (e.g., vegetarian, vegan, halal, keto)",
+    )
+    allergies: list[str] = Field(
+        default_factory=list,
+        description="Allergies to exclude (e.g., peanuts, shellfish, gluten)",
+    )
+    cuisine_type: str | None = Field(
+        None,
+        description="Preferred cuisine type (e.g., South Asian, Mediterranean, East Asian)",
+    )
+
+
 class FoodEligibilityResponse(BaseModel):
     """Food verification eligibility summary."""
 

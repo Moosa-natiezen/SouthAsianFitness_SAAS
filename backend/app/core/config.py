@@ -60,6 +60,10 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:3000"
 
+    # ── OpenAI ────────────────────────────────────────────────────────
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o-mini"
+
     # ── Lemon Squeezy ─────────────────────────────────────────────────
     lemon_squeezy_api_key: str = ""
     lemon_squeezy_webhook_secret: str = ""
