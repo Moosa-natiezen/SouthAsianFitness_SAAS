@@ -149,11 +149,11 @@ export function TodayPlanCard() {
                         : `${food.portion_grams}g`}
                     </span>
                   </span>
-                  <span className="text-slate-500">{Math.round(food.calories)} kcal</span>
+                  <span className="text-zinc-500">{Math.round(food.calories)} kcal</span>
                 </div>
               ))}
             </div>
-            <div className="mt-2 flex gap-3 text-xs text-slate-500">
+            <div className="mt-2 flex gap-3 text-xs text-zinc-500">
               <span>P {Math.round(meal.subtotal_protein_g)}g</span>
               <span>C {Math.round(meal.subtotal_carbs_g)}g</span>
               <span>F {Math.round(meal.subtotal_fat_g)}g</span>

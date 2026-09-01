@@ -72,9 +72,9 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm";
+  "w-full rounded-xl border border-white/[0.08] bg-white/[0.03]/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 text-sm";
 
-const labelClass = "text-sm font-medium text-slate-700";
+const labelClass = "text-sm font-medium text-zinc-400";
 
 /* ── Component ─────────────────────────────────────────────────────────── */
 
@@ -412,7 +412,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
+        <h2 className="text-2xl font-semibold text-white">Settings</h2>
         <Skeleton className="h-48 w-full" />
         <Skeleton className="h-48 w-full" />
         <Skeleton className="h-48 w-full" />
@@ -423,7 +423,7 @@ export default function SettingsPage() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
+        <h2 className="text-2xl font-semibold text-white">Settings</h2>
         <AlertBanner variant="error" message={error} />
       </div>
     );
@@ -433,7 +433,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
+      <h2 className="text-2xl font-semibold text-white">Settings</h2>
 
       {/* ── Profile & Location Card ──────────────────────────────────── */}
       <Card>
@@ -922,10 +922,10 @@ export default function SettingsPage() {
             <AlertBanner variant={billingMsg.type} message={billingMsg.text} />
           )}
 
-          <div className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3">
+          <div className="flex items-center justify-between rounded-lg bg-white/[0.03]/[0.04] px-4 py-3">
             <div>
-              <p className="text-sm font-medium text-slate-700">Current Plan</p>
-              <p className="text-lg font-semibold text-slate-900">
+              <p className="text-sm font-medium text-zinc-400">Current Plan</p>
+              <p className="text-lg font-semibold text-white">
                 {isPro ? "Pro" : "Free"}
               </p>
             </div>

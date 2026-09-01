@@ -22,12 +22,12 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
   return (
     <div className="space-y-4">
       {/* Plan header */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl glass p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Generated Plan
         </p>
-        <h2 className="mt-1 text-xl font-semibold text-slate-900">{plan.plan_name}</h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="mt-1 text-xl font-semibold text-white">{plan.plan_name}</h2>
+        <p className="mt-1 text-sm text-zinc-500">
           {plan.start_date} → {plan.end_date}
           {" · "}
           {plan.days.length} {plan.days.length === 1 ? "day" : "days"}
@@ -36,7 +36,7 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
 
       {/* Day selector for multi-day plans */}
       {hasMultipleDays && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
           <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Select day">
             {plan.days.map((d, i) => (
               <button
@@ -47,11 +47,11 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
                 className={`flex-shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                   i === selectedDay
                     ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    : "border-white/[0.06] bg-white text-zinc-400 hover:bg-white/[0.02]"
                 }`}
               >
                 <span className="block">Day {i + 1}</span>
-                <span className="block text-xs text-slate-400">{formatDate(d.plan_date)}</span>
+                <span className="block text-xs text-zinc-500">{formatDate(d.plan_date)}</span>
               </button>
             ))}
           </div>

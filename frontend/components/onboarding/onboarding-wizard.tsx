@@ -241,14 +241,14 @@ export function OnboardingWizard() {
 
   const renderStep = () => {
     const selectClass =
-      "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100";
+      "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30";
     const inputClass = selectClass;
 
     if (stepIndex === 0) {
       if (locationsLoading) {
         return (
           <div className="flex items-center justify-center py-8" aria-live="polite">
-            <p className="text-sm text-slate-500">Loading countries...</p>
+            <p className="text-sm text-zinc-500">Loading countries...</p>
           </div>
         );
       }
@@ -262,28 +262,28 @@ export function OnboardingWizard() {
       return (
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="country" className="text-sm font-medium text-slate-700">Country</label>
+            <label htmlFor="country" className="text-sm font-medium text-zinc-400">Country</label>
             <select id="country" name="country_id" value={form.country_id} onChange={handleSelect} className={selectClass}>
               {countries.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
             </select>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="region" className="text-sm font-medium text-slate-700">Region / state / province</label>
+            <label htmlFor="region" className="text-sm font-medium text-zinc-400">Region / state / province</label>
             <select id="region" name="region_id" value={form.region_id} onChange={(e) => updateField("region_id", e.target.value)} className={selectClass}>
               <option value="">Select region</option>
               {currentRegions.map((r) => (<option key={r.id} value={r.id}>{r.name}</option>))}
             </select>
           </div>
           <div className="space-y-2">
-            <label htmlFor="currency" className="text-sm font-medium text-slate-700">Preferred currency</label>
+            <label htmlFor="currency" className="text-sm font-medium text-zinc-400">Preferred currency</label>
             <input id="currency" value={form.preferred_currency_code} onChange={(e) => updateField("preferred_currency_code", e.target.value)} className={inputClass} placeholder="PKR" />
           </div>
           <div className="space-y-2">
-            <label htmlFor="language" className="text-sm font-medium text-slate-700">Preferred language</label>
+            <label htmlFor="language" className="text-sm font-medium text-zinc-400">Preferred language</label>
             <input id="language" value={form.preferred_language} onChange={(e) => updateField("preferred_language", e.target.value)} className={inputClass} placeholder="en" />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="unit_system" className="text-sm font-medium text-slate-700">Unit system</label>
+            <label htmlFor="unit_system" className="text-sm font-medium text-zinc-400">Unit system</label>
             <select id="unit_system" name="unit_system" value={form.unit_system} onChange={(e) => updateField("unit_system", e.target.value as FormState["unit_system"])} className={selectClass}>
               <option value="metric">Metric</option>
               <option value="imperial">Imperial</option>
@@ -297,11 +297,11 @@ export function OnboardingWizard() {
       return (
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="age" className="text-sm font-medium text-slate-700">Age</label>
+            <label htmlFor="age" className="text-sm font-medium text-zinc-400">Age</label>
             <input id="age" type="number" min={13} max={120} value={form.age_years} onChange={(e) => updateField("age_years", e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-2">
-            <label htmlFor="sex" className="text-sm font-medium text-slate-700">Sex</label>
+            <label htmlFor="sex" className="text-sm font-medium text-zinc-400">Sex</label>
             <select id="sex" name="sex" value={form.sex} onChange={(e) => updateField("sex", e.target.value as FormState["sex"])} className={selectClass}>
               <option value="female">Female</option>
               <option value="male">Male</option>
@@ -309,11 +309,11 @@ export function OnboardingWizard() {
             </select>
           </div>
           <div className="space-y-2">
-            <label htmlFor="height" className="text-sm font-medium text-slate-700">Height (cm)</label>
+            <label htmlFor="height" className="text-sm font-medium text-zinc-400">Height (cm)</label>
             <input id="height" type="number" value={form.height_cm} onChange={(e) => updateField("height_cm", e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-2">
-            <label htmlFor="weight" className="text-sm font-medium text-slate-700">Weight (kg)</label>
+            <label htmlFor="weight" className="text-sm font-medium text-zinc-400">Weight (kg)</label>
             <input id="weight" type="number" value={form.weight_kg} onChange={(e) => updateField("weight_kg", e.target.value)} className={inputClass} />
           </div>
         </div>
@@ -324,13 +324,13 @@ export function OnboardingWizard() {
       return (
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="activity" className="text-sm font-medium text-slate-700">Activity level</label>
+            <label htmlFor="activity" className="text-sm font-medium text-zinc-400">Activity level</label>
             <select id="activity" name="activity_level" value={form.activity_level} onChange={(e) => updateField("activity_level", e.target.value as FormState["activity_level"])} className={selectClass}>
               {activityLevels.map((a) => (<option key={a.value} value={a.value}>{a.label} — {a.desc}</option>))}
             </select>
           </div>
           <div className="space-y-2">
-            <label htmlFor="goal" className="text-sm font-medium text-slate-700">Primary goal</label>
+            <label htmlFor="goal" className="text-sm font-medium text-zinc-400">Primary goal</label>
             <select id="goal" name="fitness_goal" value={form.fitness_goal} onChange={(e) => updateField("fitness_goal", e.target.value as FormState["fitness_goal"])} className={selectClass}>
               <option value="weight_loss">Weight loss</option>
               <option value="weight_gain">Weight gain</option>
@@ -346,21 +346,21 @@ export function OnboardingWizard() {
       return (
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="diet_pattern" className="text-sm font-medium text-slate-700">Diet pattern</label>
+            <label htmlFor="diet_pattern" className="text-sm font-medium text-zinc-400">Diet pattern</label>
             <select id="diet_pattern" name="diet_pattern" value={form.diet_pattern} onChange={(e) => updateField("diet_pattern", e.target.value as FormState["diet_pattern"])} className={selectClass}>
               {dietPatterns.map((d) => (<option key={d.value} value={d.value}>{d.label} — {d.desc}</option>))}
             </select>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="preferred_foods" className="text-sm font-medium text-slate-700">Foods you like (optional)</label>
+            <label htmlFor="preferred_foods" className="text-sm font-medium text-zinc-400">Foods you like (optional)</label>
             <input id="preferred_foods" value={form.preferred_foods} onChange={(e) => updateField("preferred_foods", e.target.value)} className={inputClass} placeholder="rice, dal, chicken, yogurt" />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="food_dislikes" className="text-sm font-medium text-slate-700">Foods you dislike (optional)</label>
+            <label htmlFor="food_dislikes" className="text-sm font-medium text-zinc-400">Foods you dislike (optional)</label>
             <input id="food_dislikes" value={form.food_dislikes} onChange={(e) => updateField("food_dislikes", e.target.value)} className={inputClass} placeholder="fried snacks, excessive sugar" />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="allergies" className="text-sm font-medium text-slate-700">Allergies / restrictions (optional)</label>
+            <label htmlFor="allergies" className="text-sm font-medium text-zinc-400">Allergies / restrictions (optional)</label>
             <input id="allergies" value={form.allergen_tag_slugs} onChange={(e) => updateField("allergen_tag_slugs", e.target.value)} className={inputClass} placeholder="nuts, dairy" />
           </div>
         </div>
@@ -371,11 +371,11 @@ export function OnboardingWizard() {
     return (
       <div className="grid gap-5 md:grid-cols-2">
         <div className="space-y-2">
-          <label htmlFor="budget" className="text-sm font-medium text-slate-700">Approximate weekly budget</label>
+          <label htmlFor="budget" className="text-sm font-medium text-zinc-400">Approximate weekly budget</label>
           <input id="budget" type="number" min={0} value={form.weekly_budget_amount} onChange={(e) => updateField("weekly_budget_amount", e.target.value)} className={inputClass} placeholder="2500" />
         </div>
         <div className="space-y-2">
-          <label htmlFor="budget_period" className="text-sm font-medium text-slate-700">Budget frequency</label>
+          <label htmlFor="budget_period" className="text-sm font-medium text-zinc-400">Budget frequency</label>
           <select id="budget_period" name="budget_period" value={form.budget_period} onChange={(e) => updateField("budget_period", e.target.value)} className={selectClass}>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
@@ -386,8 +386,8 @@ export function OnboardingWizard() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-8">
-      <Card className="w-full max-w-3xl border-slate-200 shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-[#09090b] px-4 py-8">
+      <Card className="w-full max-w-3xl border-white/[0.06] shadow-xl">
         <CardHeader>
           <CardTitle>Complete your onboarding</CardTitle>
           <CardDescription>{steps[stepIndex].description}</CardDescription>
@@ -397,7 +397,7 @@ export function OnboardingWizard() {
           {/* Progress bar */}
           <div className="flex gap-2" role="progressbar" aria-valuenow={stepIndex + 1} aria-valuemax={steps.length} aria-label={`Step ${stepIndex + 1} of ${steps.length}`}>
             {steps.map((step, index) => (
-              <div key={step.title} className={`h-2 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-emerald-600" : "bg-slate-200"}`} />
+              <div key={step.title} className={`h-2 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-emerald-600" : "bg-white/[0.06]"}`} />
             ))}
           </div>
 
@@ -405,7 +405,7 @@ export function OnboardingWizard() {
             <p className="text-sm font-medium uppercase tracking-[0.12em] text-emerald-700">
               Step {stepIndex + 1} of {steps.length}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-900">{steps[stepIndex].title}</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-white">{steps[stepIndex].title}</h2>
           </div>
 
           {renderStep()}

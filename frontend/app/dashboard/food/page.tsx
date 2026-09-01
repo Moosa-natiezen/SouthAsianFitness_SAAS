@@ -19,7 +19,7 @@ import {
 const PAGE_SIZE = 20;
 
 const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100";
+  "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-600 transition-all focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30";
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
@@ -39,7 +39,7 @@ function FoodCard({ food }: { food: FoodItem }) {
       <CardContent className="space-y-3">
         {/* Header: name + category */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold leading-snug text-slate-900">
+          <h3 className="text-sm font-semibold leading-snug text-white">
             {food.name}
           </h3>
           {food.category && (
@@ -51,13 +51,13 @@ function FoodCard({ food }: { food: FoodItem }) {
 
         {/* Description */}
         {food.description && (
-          <p className="text-xs leading-relaxed text-slate-500 line-clamp-2">
+          <p className="text-xs leading-relaxed text-zinc-400 line-clamp-2">
             {food.description}
           </p>
         )}
 
         {/* Serving */}
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-zinc-500">
           Per {formatServing(food.serving_size, food.serving_unit)}
         </p>
 
@@ -71,7 +71,7 @@ function FoodCard({ food }: { food: FoodItem }) {
 
         {/* Micro-nutrition */}
         {(food.nutrition.sugar_g != null || food.nutrition.sodium_mg != null) && (
-          <div className="flex gap-3 text-xs text-slate-400">
+          <div className="flex gap-3 text-xs text-zinc-500">
             {food.nutrition.sugar_g != null && (
               <span>Sugar {formatMacro(food.nutrition.sugar_g)}g</span>
             )}
@@ -113,11 +113,11 @@ function NutrientPill({
   unit: string;
 }) {
   return (
-    <div className="rounded-md bg-slate-50 px-2 py-1 text-center">
-      <p className="text-[10px] font-medium uppercase text-slate-400">{label}</p>
-      <p className="text-sm font-semibold text-slate-800">
+    <div className="rounded-md bg-white/[0.04] px-2 py-1 text-center">
+      <p className="text-[10px] font-medium uppercase text-zinc-500">{label}</p>
+      <p className="text-sm font-semibold text-zinc-200">
         {value}
-        <span className="text-[10px] font-normal text-slate-400"> {unit}</span>
+        <span className="text-[10px] font-normal text-zinc-500"> {unit}</span>
       </p>
     </div>
   );
@@ -251,8 +251,8 @@ export default function FoodLibraryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Food Library</h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="text-2xl font-semibold text-white">Food Library</h2>
+        <p className="mt-1 text-sm text-zinc-400">
           Browse {total} verified South Asian foods with full nutrition data.
         </p>
       </div>
@@ -271,7 +271,7 @@ export default function FoodLibraryPage() {
           aria-label="Search foods"
         />
         <svg
-          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -293,7 +293,7 @@ export default function FoodLibraryPage() {
             className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               selectedCategory === null
                 ? "border-emerald-600 bg-emerald-600 text-white"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06]"
             }`}
             role="tab"
             aria-selected={selectedCategory === null}
@@ -307,7 +307,7 @@ export default function FoodLibraryPage() {
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 selectedCategory === cat.slug
                   ? "border-emerald-600 bg-emerald-600 text-white"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06]"
               }`}
               role="tab"
               aria-selected={selectedCategory === cat.slug}
@@ -332,11 +332,11 @@ export default function FoodLibraryPage() {
 
       {/* Empty state */}
       {!loading && foods.length === 0 && (
-        <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-16 text-center">
-          <p className="text-sm font-medium text-slate-600">
+        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.01] py-16 text-center">
+          <p className="text-sm font-medium text-zinc-400">
             No foods found matching your criteria.
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-zinc-500">
             Try a different search term or category.
           </p>
         </div>

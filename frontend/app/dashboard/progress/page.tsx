@@ -115,14 +115,14 @@ export default function ProgressPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl glass p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Progress
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+        <h1 className="mt-2 text-3xl font-semibold text-white">
           Track Your Progress
         </h1>
-        <p className="mt-2 max-w-2xl text-slate-600">
+        <p className="mt-2 max-w-2xl text-zinc-400">
           Log your weight and measurements to see how you&apos;re progressing
           toward your fitness goal.
         </p>
@@ -168,7 +168,7 @@ function SummaryCard({ state }: { state: SummaryState }) {
 
   if (state.status === "error") {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl glass p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Summary
         </p>
@@ -181,13 +181,13 @@ function SummaryCard({ state }: { state: SummaryState }) {
   const hasEntries = d.entry_count > 0;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl glass p-6">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
         Summary
       </p>
 
       {!hasEntries ? (
-        <p className="mt-4 text-slate-600">
+        <p className="mt-4 text-zinc-400">
           No progress entries yet. Log your first weight to start tracking.
         </p>
       ) : (
@@ -226,7 +226,7 @@ function SummaryCard({ state }: { state: SummaryState }) {
           </div>
 
           {d.height_cm != null && (
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-zinc-500">
               Height: {d.height_cm} cm
             </p>
           )}
@@ -249,13 +249,13 @@ function StatBlock({
   positive?: boolean;
   negative?: boolean;
 }) {
-  let valueClass = "text-slate-900";
+  let valueClass = "text-zinc-100";
   if (highlight && positive) valueClass = "text-emerald-700";
   if (highlight && negative) valueClass = "text-rose-600";
 
   return (
-    <div className="rounded-xl bg-slate-50 px-4 py-3">
-      <p className="text-xs text-slate-500">{label}</p>
+    <div className="rounded-xl bg-white/[0.04] px-4 py-3">
+      <p className="text-xs text-zinc-500">{label}</p>
       <p className={`text-lg font-semibold ${valueClass}`}>{value}</p>
     </div>
   );
@@ -288,7 +288,7 @@ function WeightChart({ state }: { state: HistoryState }) {
     }));
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl glass p-6">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
         Weight Trend
       </p>
@@ -411,13 +411,13 @@ function LogForm({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl glass p-6">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
         Log Progress
       </p>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
         <div>
-          <label htmlFor="progress-date" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="progress-date" className="block text-sm font-medium text-zinc-300">
             Date
           </label>
           <input
@@ -425,13 +425,13 @@ function LogForm({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="progress-weight" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="progress-weight" className="block text-sm font-medium text-zinc-300">
             Weight (kg) *
           </label>
           <input
@@ -442,14 +442,14 @@ function LogForm({
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="e.g. 72.5"
-            className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="progress-waist" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="progress-waist" className="block text-sm font-medium text-zinc-300">
               Waist (cm)
             </label>
             <input
@@ -460,11 +460,11 @@ function LogForm({
               value={waist}
               onChange={(e) => setWaist(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
             />
           </div>
           <div>
-            <label htmlFor="progress-hip" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="progress-hip" className="block text-sm font-medium text-zinc-300">
               Hip (cm)
             </label>
             <input
@@ -475,13 +475,13 @@ function LogForm({
               value={hip}
               onChange={(e) => setHip(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="progress-bodyfat" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="progress-bodyfat" className="block text-sm font-medium text-zinc-300">
             Body Fat (%)
           </label>
           <input
@@ -493,12 +493,12 @@ function LogForm({
             value={bodyFat}
             onChange={(e) => setBodyFat(e.target.value)}
             placeholder="Optional"
-            className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
           />
         </div>
 
         <div>
-          <label htmlFor="progress-notes" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="progress-notes" className="block text-sm font-medium text-zinc-300">
             Notes
           </label>
           <textarea
@@ -507,7 +507,7 @@ function LogForm({
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional notes"
             rows={2}
-            className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="mt-1 block w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
           />
         </div>
 
@@ -532,7 +532,7 @@ function HistorySection({
 }) {
   if (state.status === "loading") {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl glass p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Weight History
         </p>
@@ -547,7 +547,7 @@ function HistorySection({
 
   if (state.status === "error") {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl glass p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
           Weight History
         </p>
@@ -559,20 +559,20 @@ function HistorySection({
   const { entries } = state;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl glass p-6">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-700">
         Weight History
       </p>
 
       {entries.length === 0 ? (
-        <p className="mt-4 text-slate-600">
+        <p className="mt-4 text-zinc-400">
           No entries yet. Use the form above to log your first measurement.
         </p>
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-xs font-medium text-slate-500">
+              <tr className="border-b border-white/[0.06] text-xs font-medium text-zinc-500">
                 <th className="pb-2 pr-4">Date</th>
                 <th className="pb-2 pr-4">Weight</th>
                 <th className="pb-2 pr-4 hidden sm:table-cell">Change</th>
@@ -592,12 +592,12 @@ function HistorySection({
                 return (
                   <tr
                     key={entry.id}
-                    className="border-b border-slate-100 last:border-0"
+                    className="border-b border-white/[0.04] last:border-0"
                   >
-                    <td className="py-3 pr-4 font-medium text-slate-900">
+                    <td className="py-3 pr-4 font-medium text-zinc-100">
                       {formatDate(entry.recorded_on)}
                     </td>
-                    <td className="py-3 pr-4 text-slate-900">
+                    <td className="py-3 pr-4 text-zinc-100">
                       {entry.weight_kg} kg
                     </td>
                     <td className="py-3 pr-4 hidden sm:table-cell">
@@ -608,26 +608,26 @@ function HistorySection({
                               ? "text-emerald-600"
                               : change > 0
                                 ? "text-rose-600"
-                                : "text-slate-500"
+                                : "text-zinc-500"
                           }
                         >
                           {change > 0 ? "+" : ""}
                           {change.toFixed(1)} kg
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-zinc-500">—</span>
                       )}
                     </td>
-                    <td className="py-3 pr-4 hidden md:table-cell text-slate-600">
+                    <td className="py-3 pr-4 hidden md:table-cell text-zinc-400">
                       {entry.waist_cm != null ? `${entry.waist_cm} cm` : "—"}
                     </td>
-                    <td className="py-3 pr-4 hidden md:table-cell text-slate-600">
+                    <td className="py-3 pr-4 hidden md:table-cell text-zinc-400">
                       {entry.hip_cm != null ? `${entry.hip_cm} cm` : "—"}
                     </td>
-                    <td className="py-3 pr-4 hidden lg:table-cell text-slate-600">
+                    <td className="py-3 pr-4 hidden lg:table-cell text-zinc-400">
                       {entry.body_fat_percent != null ? `${entry.body_fat_percent}%` : "—"}
                     </td>
-                    <td className="py-3 pr-4 hidden lg:table-cell text-slate-500 max-w-[200px] truncate">
+                    <td className="py-3 pr-4 hidden lg:table-cell text-zinc-500 max-w-[200px] truncate">
                       {entry.notes ?? "—"}
                     </td>
                     <td className="py-3 text-right">
