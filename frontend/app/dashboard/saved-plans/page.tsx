@@ -61,13 +61,13 @@ export default function SavedPlansPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl glass p-6">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#FF4500]/50/5 blur-[40px]" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#DC143C]/50/5 blur-[40px]" />
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF6B3D]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
             AI Meal Plans
           </p>
           <h1 className="mt-2 text-2xl font-bold text-white">Saved Plans</h1>
-          <p className="mt-1 text-sm text-[#94A3B8]">
+          <p className="mt-1 text-sm text-[#8A8A94]">
             Your archived AI-generated meal plans. Click any plan to read the full details.
           </p>
         </div>
@@ -95,13 +95,13 @@ export default function SavedPlansPage() {
       {/* Empty state */}
       {state.status === "ready" && state.data.items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-white/10 bg-white/2 p-12 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FF4500]/10">
-            <svg className="h-7 w-7 text-[#FF6B3D]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#DC143C]/10">
+            <svg className="h-7 w-7 text-[#FF4060]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </div>
           <h2 className="mt-4 text-lg font-semibold text-white">No saved plans yet</h2>
-          <p className="mt-2 text-sm text-[#94A3B8]">
+          <p className="mt-2 text-sm text-[#8A8A94]">
             Generate an AI meal plan and click &quot;Save to My Plans&quot; to see it here.
           </p>
         </div>
@@ -147,12 +147,12 @@ function PlanCard({
 
   return (
     <div className="group relative overflow-hidden rounded-2xl glass p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.05)]">
-      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#FF4500]/50/5 blur-[30px] transition-all duration-500 group-hover:bg-[#FF4500]/10" />
+      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#DC143C]/50/5 blur-[30px] transition-all duration-500 group-hover:bg-[#DC143C]/10" />
 
       <div className="relative">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-sm font-semibold text-white line-clamp-1">{plan.title}</h3>
-          <span className="shrink-0 rounded-md bg-[#FF4500]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#FF6B3D]">
+          <span className="shrink-0 rounded-md bg-[#DC143C]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#FF4060]">
             AI
           </span>
         </div>
@@ -160,36 +160,36 @@ function PlanCard({
         {/* Meta pills */}
         <div className="mt-2 flex flex-wrap gap-1.5">
           {plan.target_calories && (
-            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-[#94A3B8]">
+            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-[#8A8A94]">
               {plan.target_calories} kcal
             </span>
           )}
           {plan.protein_g && (
-            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-[#94A3B8]">
+            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-[#8A8A94]">
               {plan.protein_g}g protein
             </span>
           )}
         </div>
 
         {/* Content preview */}
-        <div className="mt-3 line-clamp-4 text-xs leading-relaxed text-[#94A3B8]">
+        <div className="mt-3 line-clamp-4 text-xs leading-relaxed text-[#8A8A94]">
           {plan.content.slice(0, 200)}...
         </div>
 
         {/* Footer */}
         <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
-          <span className="text-[10px] text-[#94A3B8]">{createdDate}</span>
+          <span className="text-[10px] text-[#8A8A94]">{createdDate}</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => onSelect(plan)}
-              className="rounded-lg bg-[#FF4500]/10 px-3 py-1.5 text-[11px] font-medium text-[#FF6B3D] transition-all hover:bg-[#FF4500]/50/20"
+              className="rounded-lg bg-[#DC143C]/10 px-3 py-1.5 text-[11px] font-medium text-[#FF4060] transition-all hover:bg-[#DC143C]/50/20"
             >
               View
             </button>
             <button
               onClick={() => onDelete(plan.id)}
               disabled={deleting}
-              className="rounded-lg border border-white/10 bg-white/3 px-3 py-1.5 text-[11px] font-medium text-[#94A3B8] transition-all hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50"
+              className="rounded-lg border border-white/10 bg-white/3 px-3 py-1.5 text-[11px] font-medium text-[#8A8A94] transition-all hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50"
             >
               {deleting ? "..." : "Delete"}
             </button>
@@ -219,7 +219,7 @@ function PlanModal({
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-[#05050A]/90 px-6 py-4 backdrop-blur-xl">
           <div>
             <h2 className="text-lg font-semibold text-white">{plan.title}</h2>
-            <div className="mt-1 flex items-center gap-3 text-xs text-[#94A3B8]">
+            <div className="mt-1 flex items-center gap-3 text-xs text-[#8A8A94]">
               <span>{formatDate(plan.created_at)}</span>
               {plan.target_calories && <span>· {plan.target_calories} kcal</span>}
               {plan.protein_g && <span>· {plan.protein_g}g protein</span>}
@@ -227,7 +227,7 @@ function PlanModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-[#94A3B8] transition-colors hover:bg-white/6 hover:text-[#CBD5E1]"
+            className="rounded-lg p-2 text-[#8A8A94] transition-colors hover:bg-white/6 hover:text-[#C4C4CC]"
             aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

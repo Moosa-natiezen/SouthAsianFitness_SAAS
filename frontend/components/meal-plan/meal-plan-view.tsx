@@ -23,11 +23,11 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
     <div className="space-y-4">
       {/* Plan header */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#FF4500]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
           Generated Plan
         </p>
         <h2 className="mt-1 text-xl font-semibold text-white">{plan.plan_name}</h2>
-        <p className="mt-1 text-sm text-[#94A3B8]">
+        <p className="mt-1 text-sm text-[#8A8A94]">
           {plan.start_date} → {plan.end_date}
           {" · "}
           {plan.days.length} {plan.days.length === 1 ? "day" : "days"}
@@ -46,12 +46,12 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
                 onClick={() => setSelectedDay(i)}
                 className={`flex-shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                   i === selectedDay
-                    ? "border-[#FF4500] bg-[#FF4500]/5 text-[#FF4500]"
-                    : "border-white/10 bg-white text-[#94A3B8] hover:bg-white/3"
+                    ? "border-[#DC143C] bg-[#DC143C]/5 text-[#DC143C]"
+                    : "border-white/10 bg-white text-[#8A8A94] hover:bg-white/3"
                 }`}
               >
                 <span className="block">Day {i + 1}</span>
-                <span className="block text-xs text-[#94A3B8]">{formatDate(d.plan_date)}</span>
+                <span className="block text-xs text-[#8A8A94]">{formatDate(d.plan_date)}</span>
               </button>
             ))}
           </div>
@@ -105,10 +105,10 @@ function DaySummary({
     : 0;
 
   return (
-    <div className="rounded-2xl border border-[#FF4500]/20 bg-[#FF4500]/5 p-5 shadow-sm">
+    <div className="rounded-2xl border border-[#DC143C]/20 bg-[#DC143C]/5 p-5 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-[#FF4500]">Daily Totals</h3>
-        <span className="text-sm text-[#FF4500]">
+        <h3 className="font-semibold text-[#DC143C]">Daily Totals</h3>
+        <span className="text-sm text-[#DC143C]">
           {Math.round(day.total_calories)} / {Math.round(nutrition.calorie_target)} kcal ({calPct}%)
         </span>
       </div>
@@ -120,7 +120,7 @@ function DaySummary({
       </div>
 
       {day.total_estimated_cost !== null && currency && (
-        <p className="mt-3 text-sm text-[#FF4500]">
+        <p className="mt-3 text-sm text-[#DC143C]">
           Estimated cost: {currency} {Number(day.total_estimated_cost).toLocaleString()}
           {!day.cost_complete && " (partial — some foods lack pricing)"}
         </p>
@@ -145,18 +145,18 @@ function MacroBar({
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
-        <span className="text-[#FF4500]">{label}</span>
-        <span className="font-medium text-[#FF4500]">
+        <span className="text-[#DC143C]">{label}</span>
+        <span className="font-medium text-[#DC143C]">
           {Math.round(actual)}{unit}
         </span>
       </div>
-      <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#FF4500]/20">
+      <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#DC143C]/20">
         <div
-          className="h-full rounded-full bg-[#FF4500] transition-all"
+          className="h-full rounded-full bg-[#DC143C] transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="mt-0.5 text-xs text-[#FF4500]">of {Math.round(target)}{unit}</p>
+      <p className="mt-0.5 text-xs text-[#DC143C]">of {Math.round(target)}{unit}</p>
     </div>
   );
 }

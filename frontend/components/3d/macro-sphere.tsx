@@ -21,8 +21,8 @@ function SphereMesh({ proteinProgress, calorieProgress }: MacroSphereProps) {
   const overallProgress = Math.min(100, (proteinProgress + calorieProgress) / 2) / 100;
 
   // Color transitions: low = muted terracotta, high = bright saffron
-  const baseColor = useMemo(() => new THREE.Color("#FF4500"), []);
-  const glowColor = useMemo(() => new THREE.Color("#00E5FF"), []);
+  const baseColor = useMemo(() => new THREE.Color("#DC143C"), []);
+  const glowColor = useMemo(() => new THREE.Color("#7B61FF"), []);
   const currentColor = useMemo(
     () => baseColor.clone().lerp(glowColor, overallProgress),
     [baseColor, glowColor, overallProgress],
@@ -97,7 +97,7 @@ function Particles({ count = 40 }: { count?: number }) {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 8, 8]} />
-      <meshBasicMaterial color="#00E5FF" transparent opacity={0.6} />
+      <meshBasicMaterial color="#7B61FF" transparent opacity={0.6} />
     </instancedMesh>
   );
 }
@@ -109,7 +109,7 @@ function LoadingFallback() {
   return (
     <mesh scale={1.5}>
       <sphereGeometry args={[1, 16, 16]} />
-      <meshBasicMaterial color="#FF4500" wireframe />
+      <meshBasicMaterial color="#DC143C" wireframe />
     </mesh>
   );
 }
@@ -128,8 +128,8 @@ export function MacroSphere({ proteinProgress, calorieProgress }: MacroSpherePro
       >
         <ambientLight intensity={0.3} />
         <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFFFFF" />
-        <pointLight position={[-3, 2, 4]} intensity={0.5} color="#00E5FF" />
-        <pointLight position={[3, -2, 3]} intensity={0.3} color="#FF4500" />
+        <pointLight position={[-3, 2, 4]} intensity={0.5} color="#7B61FF" />
+        <pointLight position={[3, -2, 3]} intensity={0.3} color="#DC143C" />
 
         <Suspense fallback={<LoadingFallback />}>
           <PresentationControls
@@ -151,7 +151,7 @@ export function MacroSphere({ proteinProgress, calorieProgress }: MacroSpherePro
             opacity={0.3}
             scale={5}
             blur={2.5}
-            color="#FF4500"
+            color="#DC143C"
           />
         </Suspense>
       </Canvas>

@@ -29,10 +29,10 @@ function BadgeEmblem() {
           <mesh>
             <cylinderGeometry args={[0.9, 0.9, 0.15, 64]} />
             <meshPhysicalMaterial
-              color="#FF4500"
+              color="#DC143C"
               metalness={0.9}
               roughness={0.15}
-              emissive="#FF4500"
+              emissive="#DC143C"
               emissiveIntensity={0.15}
               envMapIntensity={2}
             />
@@ -42,10 +42,10 @@ function BadgeEmblem() {
           <mesh position={[0, 0.08, 0]}>
             <torusGeometry args={[0.55, 0.04, 16, 64]} />
             <meshPhysicalMaterial
-              color="#00E5FF"
+              color="#7B61FF"
               metalness={0.95}
               roughness={0.1}
-              emissive="#00E5FF"
+              emissive="#7B61FF"
               emissiveIntensity={0.2}
             />
           </mesh>
@@ -57,7 +57,7 @@ function BadgeEmblem() {
               color="#FFFFFF"
               metalness={0.8}
               roughness={0.1}
-              emissive="#00E5FF"
+              emissive="#7B61FF"
               emissiveIntensity={0.4}
             />
           </mesh>
@@ -66,7 +66,7 @@ function BadgeEmblem() {
           <mesh position={[0, 0.08, 0]}>
             <torusGeometry args={[0.78, 0.02, 16, 64]} />
             <meshPhysicalMaterial
-              color="#FF6B3D"
+              color="#FF4060"
               metalness={0.85}
               roughness={0.2}
             />
@@ -80,7 +80,7 @@ function BadgeEmblem() {
 function LoadingFallback() {
   return (
     <RoundedBox args={[1, 1, 0.2]} radius={0.1} smoothness={4}>
-      <meshBasicMaterial color="#FF4500" wireframe />
+      <meshBasicMaterial color="#DC143C" wireframe />
     </RoundedBox>
   );
 }
@@ -103,7 +103,7 @@ export function StreakBadge({ streak = 1 }: StreakBadgeProps) {
       >
         <ambientLight intensity={0.4} />
         <directionalLight position={[3, 4, 5]} intensity={0.7} color="#FFFFFF" />
-        <pointLight position={[-2, 1, 3]} intensity={0.4} color="#00E5FF" />
+        <pointLight position={[-2, 1, 3]} intensity={0.4} color="#7B61FF" />
 
         <Suspense fallback={<LoadingFallback />}>
           <BadgeEmblem />
@@ -112,14 +112,14 @@ export function StreakBadge({ streak = 1 }: StreakBadgeProps) {
             opacity={0.25}
             scale={4}
             blur={2}
-            color="#FF4500"
+            color="#DC143C"
           />
           <Environment preset="studio" environmentIntensity={0.4} />
         </Suspense>
       </Canvas>
 
       {/* Streak count overlay */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#05050A]/80 px-3 py-1 text-xs font-bold text-[#00E5FF] backdrop-blur-sm border border-[#00E5FF]/20">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#05050A]/80 px-3 py-1 text-xs font-bold text-[#7B61FF] backdrop-blur-sm border border-[#7B61FF]/20">
         🔥 {streak} day{streak !== 1 ? "s" : ""}
       </div>
     </div>

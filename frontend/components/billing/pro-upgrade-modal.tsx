@@ -51,26 +51,26 @@ export function ProUpgradeModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl glass-strong">
         {/* Glow accents */}
-        <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-[#FF4500]/50/15 blur-[60px]" />
-        <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-[#00E5FF]/10 blur-[60px]" />
+        <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-[#DC143C]/50/15 blur-[60px]" />
+        <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-[#7B61FF]/10 blur-[60px]" />
 
         <div className="relative p-8">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF4500] to-[#00E5FF] text-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#DC143C] to-[#7B61FF] text-sm">
                   ✨
                 </div>
                 <h2 className="text-xl font-bold text-white">Upgrade to Pro</h2>
               </div>
-              <p className="mt-1 text-sm text-[#94A3B8]">
+              <p className="mt-1 text-sm text-[#8A8A94]">
                 Unlock the full power of your fitness journey.
               </p>
             </div>
             <button
               onClick={handleClose}
-              className="rounded-lg p-1.5 text-[#94A3B8] transition-colors hover:bg-white/6 hover:text-[#CBD5E1]"
+              className="rounded-lg p-1.5 text-[#8A8A94] transition-colors hover:bg-white/6 hover:text-[#C4C4CC]"
               aria-label="Close"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -99,7 +99,7 @@ export function ProUpgradeModal() {
             <button
               onClick={handleUpgrade}
               disabled={loading}
-              className="flex-1 rounded-xl bg-gradient-to-r from-[#FF4500] to-[#00E5FF] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#FF4500]/20 transition-all hover:shadow-[#FF4500]/30 hover:brightness-110 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-gradient-to-r from-[#DC143C] to-[#7B61FF] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#DC143C]/20 transition-all hover:shadow-[#DC143C]/30 hover:brightness-110 disabled:opacity-50"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -115,7 +115,7 @@ export function ProUpgradeModal() {
             </button>
             <button
               onClick={handleClose}
-              className="rounded-xl border border-white/10 bg-white/4 px-4 py-3 text-sm font-medium text-[#94A3B8] transition-all hover:bg-white/6 hover:text-[#E2E8F0]"
+              className="rounded-xl border border-white/10 bg-white/4 px-4 py-3 text-sm font-medium text-[#8A8A94] transition-all hover:bg-white/6 hover:text-[#E8E8EC]"
             >
               Not now
             </button>
@@ -130,7 +130,7 @@ function PerkItem({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-3">
       <span className="text-lg">{icon}</span>
-      <span className="text-sm text-[#CBD5E1]">{text}</span>
+      <span className="text-sm text-[#C4C4CC]">{text}</span>
     </div>
   );
 }

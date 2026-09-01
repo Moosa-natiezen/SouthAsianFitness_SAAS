@@ -10,14 +10,14 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#05050A]">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-medium text-[#FF4500] hover:text-[#FF4500]">
+        <Link href="/" className="text-sm font-medium text-[#DC143C] hover:text-[#DC143C]">
           ← Back to South Asian Fitness
         </Link>
 
         <h1 className="mt-6 text-3xl font-bold text-white">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-[#94A3B8]">Last updated: August 2026</p>
+        <p className="mt-2 text-sm text-[#8A8A94]">Last updated: August 2026</p>
 
-        <div className="mt-8 space-y-6 text-[#CBD5E1]">
+        <div className="mt-8 space-y-6 text-[#C4C4CC]">
           <section>
             <h2 className="text-xl font-semibold text-white">Information We Collect</h2>
             <p className="mt-2">

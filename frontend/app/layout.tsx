@@ -2,7 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 
 import "./globals.css";
+import dynamic from "next/dynamic";
 import { LenisProvider } from "@/components/lenis-provider";
+
+const LiquidBackground = dynamic(
+  () => import("@/components/3d/liquid-background").then((m) => m.LiquidBackground),
+  { ssr: false },
+);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,12 +81,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-grain">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg          focus:bg-[#FF4500] focus:px-4 focus:py-2 focus:text-[#05050A] focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg          focus:bg-[#DC143C] focus:px-4 focus:py-2 focus:text-[#05050A] focus:outline-none"
         >
           Skip to content
         </a>
+        <LiquidBackground />
         <LenisProvider>
-          <div id="main-content" className="flex-1 flex flex-col">
+          <div id="main-content" className="relative z-10 flex-1 flex flex-col">
             {children}
           </div>
         </LenisProvider>

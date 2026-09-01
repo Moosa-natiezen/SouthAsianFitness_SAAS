@@ -38,8 +38,8 @@ function HeroArtifact() {
     <mesh ref={meshRef} scale={2.2} position={[0, 0, 0]}>
       <icosahedronGeometry args={[1, 6]} />
       <MeshDistortMaterial
-        color="#FF4500"
-        emissive="#00E5FF"
+        color="#DC143C"
+        emissive="#7B61FF"
         emissiveIntensity={0.35}
         roughness={0.15}
         metalness={0.92}
@@ -95,7 +95,7 @@ function OrbitalParticles({ count = 50 }: { count?: number }) {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <sphereGeometry args={[1, 8, 8]} />
-      <meshBasicMaterial color="#00E5FF" transparent opacity={0.5} />
+      <meshBasicMaterial color="#7B61FF" transparent opacity={0.5} />
     </instancedMesh>
   );
 }
@@ -115,7 +115,7 @@ function AccentRing() {
   return (
     <mesh ref={ref} scale={3.2}>
       <torusGeometry args={[1, 0.008, 16, 100]} />
-      <meshBasicMaterial color="#FF4500" transparent opacity={0.25} />
+      <meshBasicMaterial color="#DC143C" transparent opacity={0.25} />
     </mesh>
   );
 }
@@ -124,7 +124,7 @@ function LoadingFallback() {
   return (
     <mesh scale={2}>
       <icosahedronGeometry args={[1, 2]} />
-      <meshBasicMaterial color="#FF4500" wireframe />
+      <meshBasicMaterial color="#DC143C" wireframe />
     </mesh>
   );
 }
@@ -145,9 +145,9 @@ export function HeroScene() {
       >
         <ambientLight intensity={0.2} />
         <directionalLight position={[5, 5, 5]} intensity={0.6} color="#FFFFFF" />
-        <pointLight position={[-4, 3, 4]} intensity={0.8} color="#FF4500" distance={12} />
-        <pointLight position={[4, -2, 3]} intensity={0.4} color="#00E5FF" distance={10} />
-        <pointLight position={[0, 0, -3]} intensity={0.2} color="#FF4500" distance={8} />
+        <pointLight position={[-4, 3, 4]} intensity={0.8} color="#DC143C" distance={12} />
+        <pointLight position={[4, -2, 3]} intensity={0.4} color="#7B61FF" distance={10} />
+        <pointLight position={[0, 0, -3]} intensity={0.2} color="#DC143C" distance={8} />
 
         <Suspense fallback={<LoadingFallback />}>
           <PresentationControls
@@ -167,7 +167,7 @@ export function HeroScene() {
             opacity={0.25}
             scale={8}
             blur={3}
-            color="#FF4500"
+            color="#DC143C"
           />
         </Suspense>
       </Canvas>

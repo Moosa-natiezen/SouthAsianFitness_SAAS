@@ -97,7 +97,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-white/8 bg-[#05050A]/80 px-5 py-3 backdrop-blur-xl md:px-8">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF4500] to-[#00E5FF] text-[10px] font-bold text-[#05050A]">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#DC143C] to-[#7B61FF] text-[10px] font-bold text-[#05050A]">
             <span className="relative z-10">SA</span>
           </div>
           <span className="hidden font-serif text-lg font-semibold tracking-tight text-[#FFFFFF] sm:inline">
@@ -111,23 +111,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold tracking-wide uppercase ${
                 isPro
-                  ? "border border-[#FF4500]/30 bg-[#FF4500]/10 text-[#FF6B3D] animate-pulse-glow"
-                  : "border border-white/10 bg-white/4 text-[#64748B]"
+                  ? "border border-[#DC143C]/30 bg-[#DC143C]/10 text-[#FF4060] animate-pulse-glow"
+                  : "border border-white/10 bg-white/4 text-[#5A5A64]"
               }`}
             >
-              <span className={`h-1 w-1 rounded-full ${isPro ? "bg-[#FF4500]" : "bg-[#64748B]"}`} />
+              <span className={`h-1 w-1 rounded-full ${isPro ? "bg-[#DC143C]" : "bg-[#64748B]"}`} />
               {isPro ? "Pro" : "Free"}
             </div>
           )}
 
           {/* User avatar */}
           <div className="hidden items-center gap-2 md:flex">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF4500]/20 to-[#00E5FF]/20 text-[10px] font-semibold text-[#FF6B3D]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#DC143C]/20 to-[#7B61FF]/20 text-[10px] font-semibold text-[#FF4060]">
               {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-full p-1 text-[#64748B] transition-colors hover:bg-white/5 hover:text-[#94A3B8]"
+              className="rounded-full p-1 text-[#5A5A64] transition-colors hover:bg-white/5 hover:text-[#8A8A94]"
               title="Log out"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -158,12 +158,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={isActive ? "page" : undefined}
                 className={`group relative flex flex-col items-center gap-1 rounded-xl px-3 py-2 transition-all duration-300 md:px-4 ${
                   isActive
-                    ? "text-[#FF4500]"
-                    : "text-[#64748B] hover:text-[#94A3B8]"
+                    ? "text-[#DC143C]"
+                    : "text-[#5A5A64] hover:text-[#8A8A94]"
                 }`}
               >
                 {isActive && (
-                  <span className="absolute inset-0 rounded-xl bg-[#FF4500]/10" />
+                  <span className="absolute inset-0 rounded-xl bg-[#DC143C]/10" />
                 )}
                 <span className="relative z-10">{item.icon}</span>
                 <span className="relative z-10 text-[9px] font-medium tracking-wide md:text-[10px]">

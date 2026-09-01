@@ -75,13 +75,13 @@ export function LandingPage() {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-[#05050A]/80 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF4500] to-[#00E5FF] text-sm font-bold text-[#FFFFFF] shadow-lg shadow-[#FF4500]/20">
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#DC143C] to-[#7B61FF] text-sm font-bold text-[#FFFFFF] shadow-lg shadow-[#DC143C]/20">
               <span className="relative z-10">SA</span>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#FF4500] to-[#00E5FF] opacity-50 blur-md" />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#DC143C] to-[#7B61FF] opacity-50 blur-md" />
             </div>
             <p className="text-lg font-semibold text-[#FFFFFF]">South Asian Fitness</p>
           </div>
-          <nav className="hidden items-center gap-8 text-sm font-medium text-[#94A3B8] md:flex">
+          <nav className="hidden items-center gap-8 text-sm font-medium text-[#8A8A94] md:flex">
             <a href="#features" className="transition hover:text-[#FFFFFF]">Features</a>
             <a href="#how-it-works" className="transition hover:text-[#FFFFFF]">How it works</a>
             <a href="#pricing" className="transition hover:text-[#FFFFFF]">Pricing</a>
@@ -89,13 +89,13 @@ export function LandingPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/auth/login"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-[#94A3B8] transition hover:text-[#FFFFFF]"
+              className="rounded-xl px-4 py-2 text-sm font-medium text-[#8A8A94] transition hover:text-[#FFFFFF]"
             >
               Log in
             </Link>
             <Link
               href="/auth/signup"
-              className="rounded-xl bg-gradient-to-r from-[#FF4500] to-[#00E5FF] px-5 py-2.5 text-sm font-semibold text-[#FFFFFF] shadow-lg shadow-[#FF4500]/20 transition-all hover:shadow-[#FF4500]/30 hover:brightness-110"
+              className="rounded-xl bg-gradient-to-r from-[#DC143C] to-[#7B61FF] px-5 py-2.5 text-sm font-semibold text-[#FFFFFF] shadow-lg shadow-[#DC143C]/20 transition-all hover:shadow-[#DC143C]/30 hover:brightness-110"
             >
               Get started
             </Link>
@@ -109,15 +109,15 @@ export function LandingPage() {
         <HeroScene />
 
         {/* Gradient orbs */}
-        <div className="absolute left-[-10%] top-[20%] h-[500px] w-[500px] rounded-full bg-[#FF4500]/5 blur-[150px]" />
-        <div className="absolute bottom-[10%] right-[-5%] h-[400px] w-[400px] rounded-full bg-[#00E5FF]/5 blur-[120px]" />
+        <div className="absolute left-[-10%] top-[20%] h-[500px] w-[500px] rounded-full bg-[#DC143C]/5 blur-[150px]" />
+        <div className="absolute bottom-[10%] right-[-5%] h-[400px] w-[400px] rounded-full bg-[#7B61FF]/5 blur-[120px]" />
 
         {/* Content */}
         <div className="relative z-10 mx-auto max-w-6xl px-6 pt-32 pb-20 md:pt-40">
           <div className="max-w-3xl">
             <AnimateIn delay={0.2} y={20} blur={4}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#FF4500]/20 bg-[#FF4500]/10 px-4 py-1.5 text-sm font-medium text-[#FF6B3D] mb-8">
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#FF4500]" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#DC143C]/20 bg-[#DC143C]/10 px-4 py-1.5 text-sm font-medium text-[#FF4060] mb-8">
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#DC143C]" />
                 AI-powered nutrition for South Asian cuisine
               </div>
             </AnimateIn>
@@ -127,12 +127,12 @@ export function LandingPage() {
                 Fitness that fits{" "}
                 <span className="text-gradient-cardamom">your culture.</span>
                 <br />
-                <span className="text-[#94A3B8]">Powered by AI.</span>
+                <span className="text-[#8A8A94]">Powered by AI.</span>
               </h1>
             </AnimateIn>
 
             <AnimateIn delay={0.6} y={25} blur={4}>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-[#94A3B8] md:text-xl">
+              <p className="mt-8 max-w-xl text-lg leading-relaxed text-[#8A8A94] md:text-xl">
                 Generate personalized, macro-optimized South Asian meal plans in seconds.
                 Stop sacrificing the food you love to hit your goals.
               </p>
@@ -142,14 +142,14 @@ export function LandingPage() {
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
                 <Link
                   href="/onboarding"
-                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#FF4500] to-[#00E5FF] px-8 py-4 text-center text-base font-bold text-white shadow-xl shadow-[#FF4500]/25 transition-all hover:shadow-[#FF4500]/40 hover:brightness-110"
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#DC143C] to-[#7B61FF] px-8 py-4 text-center text-base font-bold text-white shadow-xl shadow-[#DC143C]/25 transition-all hover:shadow-[#DC143C]/40 hover:brightness-110"
                 >
                   <span className="relative z-10">Start Your Journey</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#00E5FF] to-[#FF4500] opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#7B61FF] to-[#DC143C] opacity-0 transition-opacity group-hover:opacity-100" />
                 </Link>
                 <a
                   href="#how-it-works"
-                  className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/4 px-8 py-4 text-base font-medium text-[#CBD5E1] transition-all hover:bg-white/6 hover:text-white"
+                  className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/4 px-8 py-4 text-base font-medium text-[#C4C4CC] transition-all hover:bg-white/6 hover:text-white"
                 >
                   See how it works →
                 </a>
@@ -157,17 +157,17 @@ export function LandingPage() {
             </AnimateIn>
 
             <AnimateIn delay={1.0} y={15} blur={2}>
-              <div className="mt-12 flex flex-wrap gap-6 text-sm text-[#94A3B8]">
+              <div className="mt-12 flex flex-wrap gap-6 text-sm text-[#8A8A94]">
                 <span className="flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-[#FF4500]" />
+                  <span className="h-1 w-1 rounded-full bg-[#DC143C]" />
                   198+ South Asian foods
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-[#00E5FF]" />
+                  <span className="h-1 w-1 rounded-full bg-[#7B61FF]" />
                   Multi-country support
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-[#FF4500]" />
+                  <span className="h-1 w-1 rounded-full bg-[#DC143C]" />
                   Budget-aware plans
                 </span>
               </div>
@@ -181,7 +181,7 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl px-6">
           <AnimateIn>
             <div className="mb-16 text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#FF4500]">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#DC143C]">
                 The problem
               </p>
               <h2 className="mt-4 font-serif text-3xl font-bold text-[#FFFFFF] md:text-5xl">
@@ -194,23 +194,23 @@ export function LandingPage() {
             {/* Old Way */}
             <div className="space-y-4">
               <div className="mb-6 flex items-center gap-3">
-                <span className="rounded-lg bg-[#FF4500]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#FF4500]">
+                <span className="rounded-lg bg-[#DC143C]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#DC143C]">
                   The old way
                 </span>
-                <div className="h-px flex-1 bg-[#FF4500]/10" />
+                <div className="h-px flex-1 bg-[#DC143C]/10" />
               </div>
               <StaggerIn stagger={0.1}>
                 {oldWay.map((item) => (
                   <div
                     key={item.title}
                     data-bento
-                    className="rounded-2xl border border-[#FF4500]/10 bg-[#FF4500]/[0.03] p-5"
+                    className="rounded-2xl border border-[#DC143C]/10 bg-[#DC143C]/[0.03] p-5"
                   >
                     <div className="flex items-start gap-4">
                       <span className="text-2xl">{item.icon}</span>
                       <div>
-                        <h3 className="font-medium text-[#CBD5E1]">{item.title}</h3>
-                        <p className="mt-1 text-sm text-[#94A3B8]">{item.desc}</p>
+                        <h3 className="font-medium text-[#C4C4CC]">{item.title}</h3>
+                        <p className="mt-1 text-sm text-[#8A8A94]">{item.desc}</p>
                       </div>
                     </div>
                   </div>
@@ -221,23 +221,23 @@ export function LandingPage() {
             {/* FlexAI Way */}
             <div className="space-y-4">
               <div className="mb-6 flex items-center gap-3">
-                <span className="rounded-lg bg-[#FF4500]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#FF4500]">
+                <span className="rounded-lg bg-[#DC143C]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#DC143C]">
                   The FlexAI way
                 </span>
-                <div className="h-px flex-1 bg-[#FF4500]/10" />
+                <div className="h-px flex-1 bg-[#DC143C]/10" />
               </div>
               <StaggerIn stagger={0.1} delay={0.2}>
                 {flexAiWay.map((item) => (
                   <div
                     key={item.title}
                     data-bento
-                    className="rounded-2xl border border-[#FF4500]/15 bg-[#FF4500]/[0.04] p-5 transition-all duration-500 hover:border-[#FF4500]/25 hover:bg-[#FF4500]/[0.07]"
+                    className="rounded-2xl border border-[#DC143C]/15 bg-[#DC143C]/[0.04] p-5 transition-all duration-500 hover:border-[#DC143C]/25 hover:bg-[#DC143C]/[0.07]"
                   >
                     <div className="flex items-start gap-4">
                       <span className="text-2xl">{item.icon}</span>
                       <div>
                         <h3 className="font-medium text-[#FFFFFF]">{item.title}</h3>
-                        <p className="mt-1 text-sm text-[#94A3B8]">{item.desc}</p>
+                        <p className="mt-1 text-sm text-[#8A8A94]">{item.desc}</p>
                       </div>
                     </div>
                   </div>
@@ -261,7 +261,7 @@ export function LandingPage() {
       {/* ── Final CTA ───────────────────────────────────────────────────── */}
       <section className="relative py-24 md:py-32">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FF4500]/8 blur-[120px]" />
+          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#DC143C]/8 blur-[120px]" />
         </div>
         <div className="relative mx-auto max-w-3xl px-6 text-center">
           <AnimateIn>
@@ -269,20 +269,20 @@ export function LandingPage() {
               Your goals. Your food.{" "}
               <span className="text-gradient-cardamom">Your plan.</span>
             </h2>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-[#94A3B8]">
+            <p className="mx-auto mt-6 max-w-xl text-lg text-[#8A8A94]">
               Join thousands of people building sustainable fitness habits with the food they love.
               Start your free account today.
             </p>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="/onboarding"
-                className="rounded-2xl bg-gradient-to-r from-[#FF4500] to-[#00E5FF] px-10 py-4 text-base font-bold text-white shadow-xl shadow-[#FF4500]/25 transition-all hover:shadow-[#FF4500]/40 hover:brightness-110"
+                className="rounded-2xl bg-gradient-to-r from-[#DC143C] to-[#7B61FF] px-10 py-4 text-base font-bold text-white shadow-xl shadow-[#DC143C]/25 transition-all hover:shadow-[#DC143C]/40 hover:brightness-110"
               >
                 Start Your Journey
               </Link>
               <Link
                 href="/auth/login"
-                className="rounded-2xl border border-white/10 bg-white/4 px-8 py-4 text-base font-medium text-[#CBD5E1] transition-all hover:bg-white/6 hover:text-white"
+                className="rounded-2xl border border-white/10 bg-white/4 px-8 py-4 text-base font-medium text-[#C4C4CC] transition-all hover:bg-white/6 hover:text-white"
               >
                 I already have an account
               </Link>
@@ -293,13 +293,13 @@ export function LandingPage() {
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="border-t border-white/8 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 text-sm text-[#94A3B8] md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 text-sm text-[#8A8A94] md:flex-row md:items-center md:justify-between">
           <p>© 2026 South Asian Fitness. Built with ❤️ for the diaspora.</p>
           <div className="flex flex-wrap gap-6">
-            <Link href="/auth/login" className="transition hover:text-[#CBD5E1]">Login</Link>
-            <Link href="/auth/signup" className="transition hover:text-[#CBD5E1]">Sign up</Link>
-            <Link href="/privacy" className="transition hover:text-[#CBD5E1]">Privacy</Link>
-            <Link href="/terms" className="transition hover:text-[#CBD5E1]">Terms</Link>
+            <Link href="/auth/login" className="transition hover:text-[#C4C4CC]">Login</Link>
+            <Link href="/auth/signup" className="transition hover:text-[#C4C4CC]">Sign up</Link>
+            <Link href="/privacy" className="transition hover:text-[#C4C4CC]">Privacy</Link>
+            <Link href="/terms" className="transition hover:text-[#C4C4CC]">Terms</Link>
           </div>
         </div>
       </footer>

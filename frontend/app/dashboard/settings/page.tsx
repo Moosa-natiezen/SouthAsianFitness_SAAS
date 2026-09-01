@@ -72,9 +72,9 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-[#94A3B8] outline-none transition-all focus:border-[#FF4500]/50 focus:ring-1 focus:ring-[#FF4500]/30 text-sm";
+  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-[#8A8A94] outline-none transition-all focus:border-[#DC143C]/50 focus:ring-1 focus:ring-[#DC143C]/30 text-sm";
 
-const labelClass = "text-sm font-medium text-[#94A3B8]";
+const labelClass = "text-sm font-medium text-[#8A8A94]";
 
 /* ── Component ─────────────────────────────────────────────────────────── */
 
@@ -914,7 +914,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {upgradePolling && (
-            <p className="rounded-lg bg-[#FF4500]/5 px-4 py-3 text-sm font-medium text-[#FF4500]" role="status">
+            <p className="rounded-lg bg-[#DC143C]/5 px-4 py-3 text-sm font-medium text-[#DC143C]" role="status">
               ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
             </p>
           )}
@@ -924,7 +924,7 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between rounded-lg bg-white/4/[0.04] px-4 py-3">
             <div>
-              <p className="text-sm font-medium text-[#94A3B8]">Current Plan</p>
+              <p className="text-sm font-medium text-[#8A8A94]">Current Plan</p>
               <p className="text-lg font-semibold text-white">
                 {isPro ? "Pro" : "Free"}
               </p>
