@@ -442,6 +442,42 @@ export async function deleteProgressEntry(entryId: string): Promise<void> {
   });
 }
 
+/* ── User Profile API ──────────────────────────────────────────────────── */
+
+export type UserProfileStats = {
+  age_years: number | null;
+  sex: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  activity_level: string | null;
+  fitness_goal: string | null;
+  diet_pattern: string | null;
+};
+
+export type UserProfileTargets = {
+  target_calories: number | null;
+  target_protein_g: number | null;
+  bmr: number | null;
+  tdee: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+};
+
+export type UserProfileResponse = {
+  id: string;
+  email: string;
+  display_name: string;
+  subscription_tier: string;
+  is_onboarded: boolean;
+  created_at: string | null;
+  stats: UserProfileStats | null;
+  targets: UserProfileTargets | null;
+};
+
+export async function getUserProfile(): Promise<UserProfileResponse> {
+  return apiFetch<UserProfileResponse>("/api/auth/profile");
+}
+
 /* ── Meal plan API ─────────────────────────────────────────────────────── */
 
 export async function getTodaysMealPlan(): Promise<MealPlanResponse | null> {

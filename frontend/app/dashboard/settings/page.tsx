@@ -19,12 +19,14 @@ import {
   fetchLocations,
   getCurrentUser,
   getSettings,
+  getUserProfile,
   updateProfile,
   updatePreferences,
   changePassword,
   type AuthUser,
   type CountryData,
   type SettingsResponse,
+  type UserProfileTargets,
 } from "@/lib/api";
 import { setUserState } from "@/lib/user-state";
 
@@ -111,6 +113,9 @@ export default function SettingsPage() {
 
   const searchParams = useSearchParams();
 
+  /* ── Macro targets state ──────────────────────────────────────────── */
+  const [targets, setTargets] = useState<UserProfileTargets | null>(null);
+
   /* ── Billing state ────────────────────────────────────────────────── */
   const [user, setUser] = useState<AuthUser | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
@@ -156,10 +161,11 @@ export default function SettingsPage() {
     let cancelled = false;
     async function load() {
       try {
-        const [settingsData, locationsData, userData] = await Promise.all([
+        const [settingsData, locationsData, userData, profileData] = await Promise.all([
           getSettings(),
           fetchLocations(),
           getCurrentUser(),
+          getUserProfile().catch(() => null),
         ]);
         if (cancelled) return;
 
@@ -167,6 +173,7 @@ export default function SettingsPage() {
         setCountries(locationsData);
         setUser(userData);
         setUserState(userData);
+        if (profileData?.targets) setTargets(profileData.targets);
 
         // Populate profile form
         setDisplayName(settingsData.display_name ?? "");
@@ -297,6 +304,12 @@ export default function SettingsPage() {
         diet_pattern: dietPattern || undefined,
       });
       setProfileMsg({ type: "info", text: "Profile saved successfully." });
+
+      // Refresh macro targets after save
+      try {
+        const refreshed = await getUserProfile();
+        if (refreshed?.targets) setTargets(refreshed.targets);
+      } catch { /* targets will refresh on next page load */ }
     } catch (err) {
       setProfileMsg({
         type: "error",
@@ -434,6 +447,27 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-white">Settings</h2>
+
+      {/* ── Macro Targets Display ─────────────────────────────────────── */}
+      {targets && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[#8A8A94]">
+            Your Daily Targets
+          </h3>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <MacroStat label="Calories" value={targets.target_calories} unit="kcal" color="from-[#DC143C] to-[#FF4060]" />
+            <MacroStat label="Protein" value={targets.target_protein_g} unit="g" color="from-[#FF4500] to-[#FF6B3D]" />
+            <MacroStat label="Carbs" value={targets.carbs_g} unit="g" color="from-[#00E5FF] to-[#00BCD4]" />
+            <MacroStat label="Fat" value={targets.fat_g} unit="g" color="from-[#10B981] to-[#059669]" />
+          </div>
+          {targets.bmr && targets.tdee && (
+            <div className="mt-3 flex gap-4 text-xs text-[#8A8A94]">
+              <span>BMR: <span className="text-white">{Math.round(targets.bmr)}</span> kcal</span>
+              <span>TDEE: <span className="text-white">{Math.round(targets.tdee)}</span> kcal</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Profile & Location Card ──────────────────────────────────── */}
       <Card>
@@ -905,46 +939,70 @@ export default function SettingsPage() {
       </Card>
 
       {/* ── Billing Card ──────────────────────────────────────────────── */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Billing & Subscription</CardTitle>
-          <CardDescription>
-            Manage your subscription and billing.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {upgradePolling && (
-            <p className="rounded-lg bg-[#DC143C]/5 px-4 py-3 text-sm font-medium text-[#DC143C]" role="status">
-              ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
-            </p>
-          )}
-          {billingMsg && (
+      <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#8A8A94]">
+          Subscription & Billing
+        </h3>
+        {upgradePolling && (
+          <p className="mt-3 rounded-lg bg-[#DC143C]/5 px-4 py-3 text-sm font-medium text-[#DC143C]" role="status">
+            ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
+          </p>
+        )}
+        {billingMsg && (
+          <div className="mt-3">
             <AlertBanner variant={billingMsg.type} message={billingMsg.text} />
-          )}
+          </div>
+        )}
 
-          <div className="flex items-center justify-between rounded-lg bg-white/4/[0.04] px-4 py-3">
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
+              isPro
+                ? "bg-gradient-to-br from-[#DC143C] to-[#7B61FF] text-white"
+                : "bg-white/8 text-[#5A5A64]"
+            }`}>
+              {isPro ? "P" : "F"}
+            </div>
             <div>
               <p className="text-sm font-medium text-[#8A8A94]">Current Plan</p>
               <p className="text-lg font-semibold text-white">
-                {isPro ? "Pro" : "Free"}
+                {isPro ? "Pro Member" : "Free Tier"}
               </p>
             </div>
-            {!isPro && (
-              <Button onClick={handleManageBilling} disabled={portalLoading}>
-                {portalLoading ? "Loading..." : "Upgrade to Pro"}
-              </Button>
-            )}
           </div>
+          <Button
+            onClick={handleManageBilling}
+            disabled={portalLoading}
+            className={isPro ? "" : "bg-gradient-to-r from-[#DC143C] to-[#7B61FF] text-white hover:shadow-[0_0_20px_rgba(220,20,60,0.4)]"}
+          >
+            {portalLoading ? "Loading..." : isPro ? "Manage Subscription" : "Upgrade to Pro"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          {isPro && (
-            <div className="flex justify-end">
-              <Button variant="outline" onClick={handleManageBilling} disabled={portalLoading}>
-                {portalLoading ? "Loading..." : "Manage Subscription"}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+/* ── Macro stat card ──────────────────────────────────────────────────── */
+
+function MacroStat({
+  label,
+  value,
+  unit,
+  color,
+}: {
+  label: string;
+  value: number | null | undefined;
+  unit: string;
+  color: string;
+}) {
+  return (
+    <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+      <p className="text-xs font-medium uppercase tracking-wider text-[#8A8A94]">{label}</p>
+      <p className={`mt-1 bg-gradient-to-r ${color} bg-clip-text text-2xl font-bold text-transparent`}>
+        {value != null ? Math.round(value) : "—"}
+      </p>
+      <p className="text-[10px] text-[#5A5A64]">{unit}</p>
     </div>
   );
 }

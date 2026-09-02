@@ -20,6 +20,7 @@ from app.models.geography import Country, Region
 from app.models.tags import CuisineTag
 from app.models.user import User, UserPreferences, UserProfile
 from app.services.auth_service import ensure_dietary_tag
+from app.services.nutrition_service import calculate_nutrition_targets
 
 logger = get_logger(__name__)
 
@@ -205,11 +206,87 @@ def update_user_profile(db: Session, user: User, payload: dict[str, Any]) -> Non
             profile.fitness_goal = payload["fitness_goal"]
         if payload.get("diet_pattern") is not None:
             profile.diet_pattern = payload["diet_pattern"]
+
+        # ── Auto-recalculate TDEE & macros ──────────────────────────────
+        try:
+            sex_val = str(profile.sex.value) if hasattr(profile.sex, 'value') else str(profile.sex)
+            act_val = str(profile.activity_level.value) if hasattr(profile.activity_level, 'value') else str(profile.activity_level)
+            goal_val = str(profile.fitness_goal.value) if hasattr(profile.fitness_goal, 'value') else str(profile.fitness_goal)
+            nutrition = calculate_nutrition_targets(
+                sex=sex_val,
+                age=profile.age_years,
+                height_cm=float(profile.height_cm),
+                weight_kg=float(profile.weight_kg),
+                activity_level=act_val,
+                goal=goal_val,
+            )
+            profile.target_calories = int(nutrition.calorie_target)
+            profile.target_protein_g = nutrition.protein_g
+            logger.info(
+                "TDEE recalculated for user %s: target_cal=%d protein=%.1fg",
+                user.id, profile.target_calories, profile.target_protein_g,
+            )
+        except (TypeError, ValueError, AttributeError):
+            logger.warning("Failed to recalculate TDEE for user %s", user.id)
+
         db.add(profile)
-        db.flush()
+    db.flush()
 
     db.commit()
     logger.info("Profile updated for user %s", user.id)
+
+
+def get_user_profile(db: Session, user: User) -> dict:
+    """Return the user's full profile including calculated TDEE/macros."""
+    profile = user.profile
+    result: dict = {
+        "id": str(user.id),
+        "email": user.email,
+        "display_name": user.display_name,
+        "subscription_tier": user.subscription_tier,
+        "is_onboarded": user.is_onboarded,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+    }
+
+    if profile:
+        nutrition = None
+        try:
+            sex_val = str(profile.sex.value) if hasattr(profile.sex, 'value') else str(profile.sex)
+            act_val = str(profile.activity_level.value) if hasattr(profile.activity_level, 'value') else str(profile.activity_level)
+            goal_val = str(profile.fitness_goal.value) if hasattr(profile.fitness_goal, 'value') else str(profile.fitness_goal)
+            nutrition = calculate_nutrition_targets(
+                sex=sex_val,
+                age=profile.age_years,
+                height_cm=float(profile.height_cm),
+                weight_kg=float(profile.weight_kg),
+                activity_level=act_val,
+                goal=goal_val,
+            )
+        except (TypeError, ValueError, AttributeError):
+            logger.warning("Could not calculate nutrition targets for user %s", user.id)
+
+        result["stats"] = {
+            "age_years": profile.age_years,
+            "sex": profile.sex.value if profile.sex else None,
+            "height_cm": float(profile.height_cm) if profile.height_cm else None,
+            "weight_kg": float(profile.weight_kg) if profile.weight_kg else None,
+            "activity_level": profile.activity_level.value if profile.activity_level else None,
+            "fitness_goal": profile.fitness_goal.value if profile.fitness_goal else None,
+            "diet_pattern": profile.diet_pattern.value if profile.diet_pattern else None,
+        }
+        result["targets"] = {
+            "target_calories": profile.target_calories,
+            "target_protein_g": float(profile.target_protein_g) if profile.target_protein_g else None,
+            "bmr": nutrition.bmr if nutrition else None,
+            "tdee": nutrition.tdee if nutrition else None,
+            "carbs_g": nutrition.carbs_g if nutrition else None,
+            "fat_g": nutrition.fat_g if nutrition else None,
+        }
+    else:
+        result["stats"] = None
+        result["targets"] = None
+
+    return result
 
 
 def update_user_preferences(

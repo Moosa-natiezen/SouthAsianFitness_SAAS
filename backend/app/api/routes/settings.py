@@ -20,6 +20,7 @@ from app.schemas.settings import (
     SettingsResponse,
 )
 from app.services.settings_service import (
+    get_user_profile,
     get_user_settings,
     update_user_preferences,
     update_user_profile,
@@ -36,6 +37,15 @@ def get_settings(
     """Return the authenticated user's current settings."""
     data = get_user_settings(db, user)
     return SettingsResponse(**data)
+
+
+@router.get("/profile")
+def get_profile(
+    user: Annotated[User, Depends(require_auth)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Return the user's full profile with calculated TDEE and macro targets."""
+    return get_user_profile(db, user)
 
 
 @router.patch("/profile")
