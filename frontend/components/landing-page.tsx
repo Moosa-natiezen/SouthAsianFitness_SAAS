@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 
-/* ── Landing Page — Cultural Premium Aesthetic ─────────────────────── */
+/* ── Landing Page — Nutrium-Inspired Clean Whitespace + South Asian Niche ── */
 
 export function LandingPage() {
   return (
     <div className="min-h-screen overflow-hidden bg-[#FAF9F6]">
       {/* ── Nav ──────────────────────────────────────────────────────── */}
-      <header className="fixed inset-x-0 top-0 z-50 bg-[#FAF9F6]/70 backdrop-blur-xl border-b border-stone-200/50">
+      <header className="fixed inset-x-0 top-0 z-50 bg-[#FAF9F6]/80 backdrop-blur-xl border-b border-stone-200/40">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E27B38] text-xs font-bold text-white shadow-sm shadow-[#E27B38]/20">
@@ -35,29 +35,30 @@ export function LandingPage() {
         </div>
       </header>
 
-      {/* ── Hero — Bento Split ─────────────────────────────────────── */}
-      <section className="relative pt-24 pb-12 md:pt-32 md:pb-20">
+      {/* ── Hero — Clean Split with Macro Data Mock ───────────────────── */}
+      <section className="relative pt-24 pb-16 md:pt-32 md:pb-24">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
             {/* Left — Copy & CTA */}
             <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#E27B38]/10 px-4 py-1.5 mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#E27B38]/8 px-4 py-1.5 mb-6">
                 <div className="h-1.5 w-1.5 rounded-full bg-[#E27B38]" />
                 <span className="text-xs font-medium text-[#E27B38] tracking-wide">AI-Powered Nutrition</span>
               </div>
-              <h1 className="font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-stone-900 md:text-5xl lg:text-6xl">
-                The world&apos;s first South Asian nutrition AI.
+              <h1 className="font-serif text-4xl font-semibold leading-[1.08] tracking-tight text-stone-900 md:text-5xl lg:text-[3.5rem]">
+                Track Biryani.{" "}
+                <span className="text-[#E27B38]">Not just calories.</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-stone-500 max-w-lg mx-auto lg:mx-0">
-                Track cultural macros accurately. Hit your goals without sacrificing the food you love.
-                Powered by AI, built for your kitchen.
+                The first nutrition app built for South Asian food. 215+ cultural dishes
+                with precise macros — powered by AI, designed for your kitchen.
               </p>
               <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
                 <Link
                   href="/onboarding"
                   className="inline-flex items-center gap-2.5 rounded-full bg-[#E27B38] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#E27B38]/20 transition-all duration-200 hover:shadow-xl hover:shadow-[#E27B38]/30 hover:bg-[#C4642A] active:scale-[0.97]"
                 >
-                  Start for Free
+                  Start Tracking Free
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                   </svg>
@@ -71,23 +72,46 @@ export function LandingPage() {
               </div>
             </div>
 
-            {/* Right — Floating Food Image */}
+            {/* Right — Floating Macro Data Card */}
             <div className="relative flex justify-center lg:justify-end">
-              {/* Soft ambient glow behind image */}
-              <div className="absolute inset-0 m-auto h-[70%] w-[70%] rounded-full bg-[#E27B38]/5 blur-3xl" />
+              {/* Soft ambient glow */}
+              <div className="absolute inset-0 m-auto h-[60%] w-[60%] rounded-full bg-[#E27B38]/4 blur-3xl" />
               <div className="relative w-full max-w-md">
-                <div className="overflow-hidden rounded-[2.5rem] shadow-2xl shadow-stone-900/10 ring-1 ring-stone-900/5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&h=1000&fit=crop&crop=center"
-                    alt="Vibrant South Asian Chicken Tikka bowl with aromatic spices and fresh herbs"
-                    className="aspect-[4/5] w-full object-cover"
-                  />
-                </div>
-                {/* Floating stat card */}
-                <div className="absolute -bottom-4 -left-4 rounded-2xl bg-white p-4 shadow-xl shadow-stone-900/5 ring-1 ring-stone-900/5">
-                  <div className="text-2xl font-bold text-stone-900 font-serif">215+</div>
-                  <div className="text-xs text-stone-500 mt-0.5">South Asian dishes</div>
+                {/* Main macro card */}
+                <div className="rounded-[2rem] bg-white p-6 shadow-2xl shadow-stone-900/8 ring-1 ring-stone-900/5">
+                  {/* Dish header */}
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E27B38]/10 text-lg">
+                      🍛
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-stone-900">Chicken Biryani</div>
+                      <div className="text-xs text-stone-400">1 standard serving · 520 kcal</div>
+                    </div>
+                  </div>
+                  {/* Macro bars */}
+                  <div className="space-y-3">
+                    <MacroBar label="Protein" value={32} max={50} unit="g" color="#E27B38" />
+                    <MacroBar label="Carbs" value={58} max={80} unit="g" color="#0891B2" />
+                    <MacroBar label="Fat" value={16} max={30} unit="g" color="#7C3AED" />
+                  </div>
+                  {/* Micro info */}
+                  <div className="mt-5 flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3">
+                    <div className="text-center">
+                      <div className="text-xs text-stone-400">Fiber</div>
+                      <div className="text-sm font-semibold text-stone-800">3g</div>
+                    </div>
+                    <div className="h-6 w-px bg-stone-200" />
+                    <div className="text-center">
+                      <div className="text-xs text-stone-400">Sodium</div>
+                      <div className="text-sm font-semibold text-stone-800">680mg</div>
+                    </div>
+                    <div className="h-6 w-px bg-stone-200" />
+                    <div className="text-center">
+                      <div className="text-xs text-stone-400">Servings</div>
+                      <div className="text-sm font-semibold text-stone-800">1.0</div>
+                    </div>
+                  </div>
                 </div>
                 {/* Floating accuracy badge */}
                 <div className="absolute -top-3 -right-3 rounded-2xl bg-white p-3 shadow-xl shadow-stone-900/5 ring-1 ring-stone-900/5">
@@ -103,6 +127,11 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
+                {/* Floating dish count badge */}
+                <div className="absolute -bottom-4 -left-4 rounded-2xl bg-white p-4 shadow-xl shadow-stone-900/5 ring-1 ring-stone-900/5">
+                  <div className="text-2xl font-bold text-stone-900 font-serif">215+</div>
+                  <div className="text-xs text-stone-500 mt-0.5">Seeded dishes</div>
+                </div>
               </div>
             </div>
           </div>
@@ -110,9 +139,8 @@ export function LandingPage() {
       </section>
 
       {/* ── Trust / Social Proof ─────────────────────────────────────── */}
-      <section className="bg-stone-100/60 py-16">
+      <section className="bg-stone-900 py-16">
         <div className="mx-auto max-w-5xl px-6 text-center">
-          {/* Stars */}
           <div className="mb-4 flex justify-center gap-1">
             {[...Array(5)].map((_, i) => (
               <svg key={i} className="h-5 w-5 text-[#E27B38]" fill="currentColor" viewBox="0 0 20 20">
@@ -120,41 +148,39 @@ export function LandingPage() {
               </svg>
             ))}
           </div>
-          <h2 className="text-2xl font-semibold text-stone-900 md:text-3xl font-serif">
-            The Smartest Way to Track Cultural Cuisines.
+          <h2 className="text-2xl font-semibold text-white md:text-3xl font-serif">
+            Built for the South Asian diaspora.
           </h2>
-          <p className="mt-3 text-stone-500">
-            Trusted by 2,000+ South Asians building healthier habits.
+          <p className="mt-3 text-stone-400">
+            The smartest way to track cultural cuisines — from Karachi to Colombo.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            {/* App Store */}
-            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-200 bg-white px-6 py-3 text-left transition-all duration-200 hover:shadow-md hover:border-stone-300 active:scale-[0.97]">
-              <svg className="h-7 w-7 text-stone-800" viewBox="0 0 24 24" fill="currentColor">
+            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-700 bg-stone-800 px-6 py-3 text-left transition-all duration-200 hover:bg-stone-700 hover:border-stone-600 active:scale-[0.97]">
+              <svg className="h-7 w-7 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
               </svg>
               <div>
                 <div className="text-[10px] font-medium uppercase tracking-wide text-stone-400">Download on the</div>
-                <div className="text-sm font-semibold text-stone-800">App Store</div>
+                <div className="text-sm font-semibold text-white">App Store</div>
               </div>
             </button>
-            {/* Google Play */}
-            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-200 bg-white px-6 py-3 text-left transition-all duration-200 hover:shadow-md hover:border-stone-300 active:scale-[0.97]">
-              <svg className="h-7 w-7 text-stone-800" viewBox="0 0 24 24" fill="currentColor">
+            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-700 bg-stone-800 px-6 py-3 text-left transition-all duration-200 hover:bg-stone-700 hover:border-stone-600 active:scale-[0.97]">
+              <svg className="h-7 w-7 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3.609 1.814 13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-1.707 2.173 1.262a1.001 1.001 0 0 1 0 1.74l-2.173 1.262-2.535-2.535 2.535-2.729zM5.864 2.658 16.8 8.99l-2.302 2.302-8.634-8.634z" />
               </svg>
               <div>
                 <div className="text-[10px] font-medium uppercase tracking-wide text-stone-400">Get it on</div>
-                <div className="text-sm font-semibold text-stone-800">Google Play</div>
+                <div className="text-sm font-semibold text-white">Google Play</div>
               </div>
             </button>
           </div>
         </div>
       </section>
 
-      {/* ── Feature Blocks ──────────────────────────────────────────── */}
-      <section id="features" className="bg-[#FAF9F6] py-24">
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="mb-20 text-center">
+      {/* ── Features — 3-Column Bento Grid ──────────────────────────── */}
+      <section id="features" className="py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-16 md:mb-20 text-center">
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-[#E27B38]">Features</p>
             <h2 className="text-3xl font-semibold tracking-tight text-stone-900 md:text-4xl font-serif">
               Nutrition tracking made effortless for our food.
@@ -164,127 +190,123 @@ export function LandingPage() {
             </p>
           </div>
 
-          {/* Feature 1 — AI Coach (Image Left, Text Right) */}
-          <div id="how-it-works" className="mb-16">
-            <div className="glass-warm rounded-3xl p-8 md:p-12 lg:p-16">
-              <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-20">
-                {/* Phone Mockup */}
-                <div className="flex-shrink-0">
-                  <div className="relative mx-auto w-60 overflow-hidden rounded-[2.5rem] border-[3px] border-stone-200/80 bg-white shadow-xl shadow-stone-900/5">
-                    {/* Notch */}
-                    <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-1">
-                      <div className="h-5 w-20 rounded-b-2xl bg-stone-900" />
-                    </div>
-                    {/* Screen content */}
-                    <div className="aspect-[9/16] bg-gradient-to-b from-[#E27B38]/5 to-white p-4 pt-10">
-                      <div className="mb-3 rounded-xl bg-[#E27B38] px-3 py-2 text-xs font-semibold text-white text-center">
-                        AI Workout Streaming
-                      </div>
-                      <div className="space-y-2">
-                        {[
-                          { name: "Barbell Squat", detail: "4 × 8 @ 185lb" },
-                          { name: "Romanian Deadlift", detail: "3 × 10 @ 155lb" },
-                          { name: "Walking Lunges", detail: "3 × 12 @ 40lb" },
-                        ].map((ex) => (
-                          <div key={ex.name} className="rounded-xl bg-stone-50 border border-stone-100 p-2.5">
-                            <div className="text-xs font-semibold text-stone-800">{ex.name}</div>
-                            <div className="text-[10px] text-stone-400 mt-0.5">{ex.detail}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-3 flex items-center gap-1.5">
-                        <div className="h-1.5 w-1.5 rounded-full bg-[#E27B38] animate-pulse" />
-                        <span className="text-[10px] font-medium text-[#E27B38]">Generating your routine...</span>
-                      </div>
+          {/* Bento Grid */}
+          <div className="grid gap-5 md:grid-cols-3">
+            {/* Card 1 — Food Library (Tall) */}
+            <div id="how-it-works" className="md:row-span-2 rounded-3xl bg-white p-8 ring-1 ring-stone-900/5 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
+              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#065F46]/8 text-xl">
+                🍛
+              </div>
+              <h3 className="text-xl font-semibold text-stone-900 font-serif">
+                215+ South Asian dishes
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-stone-500">
+                From Chicken Biryani to Gulab Jamun — every dish pre-loaded
+                with accurate macros per serving. Search, log, track.
+              </p>
+              {/* Mock food list */}
+              <div className="mt-6 space-y-2.5">
+                {[
+                  { name: "Chicken Biryani", cal: 520, p: 32 },
+                  { name: "Butter Chicken", cal: 450, p: 30 },
+                  { name: "Daal Chawal", cal: 420, p: 20 },
+                  { name: "Paneer Tikka", cal: 420, p: 22 },
+                  { name: "Garlic Naan", cal: 260, p: 7 },
+                ].map((d) => (
+                  <div key={d.name} className="flex items-center justify-between rounded-xl bg-stone-50 px-3.5 py-2.5">
+                    <span className="text-xs font-medium text-stone-700">{d.name}</span>
+                    <div className="flex gap-2">
+                      <span className="text-[10px] font-medium text-[#E27B38]">{d.cal} cal</span>
+                      <span className="text-[10px] font-medium text-[#0891B2]">{d.p}g P</span>
                     </div>
                   </div>
-                </div>
+                ))}
+              </div>
+            </div>
 
-                {/* Text */}
-                <div className="max-w-md text-center lg:text-left">
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E27B38]/10 text-xl">
-                    🏋️
+            {/* Card 2 — AI Streaming (Wide) */}
+            <div className="md:col-span-2 rounded-3xl bg-white p-8 ring-1 ring-stone-900/5 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
+              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
+                <div className="flex-1">
+                  <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E27B38]/8 text-xl">
+                    🤖
                   </div>
-                  <h3 className="text-2xl font-semibold text-stone-900 font-serif">
-                    Get a coach in your corner
+                  <h3 className="text-xl font-semibold text-stone-900 font-serif">
+                    Dual-pipeline AI streaming
                   </h3>
-                  <p className="mt-4 text-base leading-relaxed text-stone-500">
-                    Our AI workout streaming engine builds personalized routines in real-time.
-                    Every set, rep, and rest interval is tailored to your goals and experience level.
+                  <p className="mt-3 text-sm leading-relaxed text-stone-500">
+                    Get personalized meal plans AND workout routines generated in real-time.
+                    Watch the AI build your plan line by line — copy, save, or regenerate instantly.
                   </p>
                   <Link
                     href="/onboarding"
-                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#E27B38] hover:text-[#C4642A] transition-colors"
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#E27B38] hover:text-[#C4642A] transition-colors"
                   >
-                    Get started free
+                    Try the AI generator
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
                   </Link>
                 </div>
+                {/* Streaming mock */}
+                <div className="flex-shrink-0 rounded-2xl bg-stone-900 p-5 font-mono text-xs leading-relaxed text-stone-300 lg:w-72">
+                  <div className="mb-2 text-[10px] font-medium text-[#E27B38] uppercase tracking-wider">Streaming</div>
+                  <div className="space-y-1.5">
+                    <div><span className="text-stone-500">##</span> High-Protein Plan</div>
+                    <div><span className="text-stone-500">###</span> Breakfast</div>
+                    <div>- Omelette + Roti</div>
+                    <div>- Greek yogurt bowl</div>
+                    <div><span className="text-stone-500">###</span> Lunch</div>
+                    <div>- Chicken Karahi</div>
+                    <div>- Brown rice (1 cup)</div>
+                    <div className="mt-2 inline-block h-4 w-0.5 animate-pulse bg-[#E27B38]" />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Feature 2 — Food Library (Text Left, Image Right) */}
-          <div>
-            <div className="glass-warm rounded-3xl p-8 md:p-12 lg:p-16">
-              <div className="flex flex-col items-center gap-12 lg:flex-row-reverse lg:gap-20">
-                {/* Phone Mockup */}
-                <div className="flex-shrink-0">
-                  <div className="relative mx-auto w-60 overflow-hidden rounded-[2.5rem] border-[3px] border-stone-200/80 bg-white shadow-xl shadow-stone-900/5">
-                    {/* Notch */}
-                    <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-1">
-                      <div className="h-5 w-20 rounded-b-2xl bg-stone-900" />
+            {/* Card 3 — TDEE Engine (Wide) */}
+            <div className="md:col-span-2 rounded-3xl bg-white p-8 ring-1 ring-stone-900/5 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
+              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
+                {/* Macro targets mock */}
+                <div className="flex-shrink-0 rounded-2xl bg-stone-50 p-5 ring-1 ring-stone-900/5 lg:w-64">
+                  <div className="mb-3 text-[10px] font-medium text-stone-400 uppercase tracking-wider">Your Daily Targets</div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-stone-900/5">
+                      <div className="text-[10px] text-stone-400">Calories</div>
+                      <div className="text-lg font-bold text-stone-900 font-serif">2,350</div>
                     </div>
-                    {/* Screen content */}
-                    <div className="aspect-[9/16] bg-gradient-to-b from-[#065F46]/5 to-white p-4 pt-10">
-                      <div className="mb-3 rounded-xl bg-[#065F46] px-3 py-2 text-xs font-semibold text-white text-center">
-                        Food Library
-                      </div>
-                      <div className="mb-2 rounded-xl bg-stone-50 border border-stone-100 p-2.5">
-                        <div className="text-xs font-semibold text-stone-800">🍛 Chicken Biryani</div>
-                        <div className="mt-1 flex gap-1.5">
-                          <span className="rounded-full bg-[#E27B38]/10 px-2 py-0.5 text-[9px] font-medium text-[#E27B38]">520 cal</span>
-                          <span className="rounded-full bg-[#0891B2]/10 px-2 py-0.5 text-[9px] font-medium text-[#0891B2]">32g P</span>
-                        </div>
-                      </div>
-                      <div className="mb-2 rounded-xl bg-stone-50 border border-stone-100 p-2.5">
-                        <div className="text-xs font-semibold text-stone-800">🥘 Daal Chawal</div>
-                        <div className="mt-1 flex gap-1.5">
-                          <span className="rounded-full bg-[#E27B38]/10 px-2 py-0.5 text-[9px] font-medium text-[#E27B38]">420 cal</span>
-                          <span className="rounded-full bg-[#0891B2]/10 px-2 py-0.5 text-[9px] font-medium text-[#0891B2]">20g P</span>
-                        </div>
-                      </div>
-                      <div className="mb-2 rounded-xl bg-stone-50 border border-stone-100 p-2.5">
-                        <div className="text-xs font-semibold text-stone-800">🫓 Garlic Naan</div>
-                        <div className="mt-1 flex gap-1.5">
-                          <span className="rounded-full bg-[#E27B38]/10 px-2 py-0.5 text-[9px] font-medium text-[#E27B38]">260 cal</span>
-                          <span className="rounded-full bg-[#0891B2]/10 px-2 py-0.5 text-[9px] font-medium text-[#0891B2]">7g P</span>
-                        </div>
-                      </div>
-                      <div className="text-center text-[10px] text-stone-400 mt-1">215+ South Asian dishes</div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-stone-900/5">
+                      <div className="text-[10px] text-stone-400">Protein</div>
+                      <div className="text-lg font-bold text-[#E27B38] font-serif">165g</div>
+                    </div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-stone-900/5">
+                      <div className="text-[10px] text-stone-400">Carbs</div>
+                      <div className="text-lg font-bold text-[#0891B2] font-serif">280g</div>
+                    </div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-stone-900/5">
+                      <div className="text-[10px] text-stone-400">Fat</div>
+                      <div className="text-lg font-bold text-[#7C3AED] font-serif">78g</div>
                     </div>
                   </div>
                 </div>
-
-                {/* Text */}
-                <div className="max-w-md text-center lg:text-left">
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#065F46]/10 text-xl">
-                    🍛
+                <div className="flex-1">
+                  <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7C3AED]/8 text-xl">
+                    📊
                   </div>
-                  <h3 className="text-2xl font-semibold text-stone-900 font-serif">
-                    Log Biryani without the guesswork
+                  <h3 className="text-xl font-semibold text-stone-900 font-serif">
+                    Mifflin-St Jeor TDEE engine
                   </h3>
-                  <p className="mt-4 text-base leading-relaxed text-stone-500">
-                    Over 215+ South Asian dishes pre-loaded with accurate macros.
-                    From Butter Chicken to Gulab Jamun — search, log, and track in seconds.
+                  <p className="mt-3 text-sm leading-relaxed text-stone-500">
+                    Your calorie and macro targets are calculated using the gold-standard
+                    Mifflin-St Jeor equation — personalized to your body, activity level,
+                    and goals. Updated live whenever your stats change.
                   </p>
                   <Link
                     href="/onboarding"
-                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#065F46] hover:text-[#047857] transition-colors"
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors"
                   >
-                    Explore food library
+                    Calculate your TDEE
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
@@ -297,7 +319,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Pricing ──────────────────────────────────────────────────── */}
-      <section id="pricing" className="bg-stone-100/40 py-24">
+      <section id="pricing" className="bg-stone-100/40 py-24 md:py-32">
         <div className="mx-auto max-w-5xl px-6">
           <div className="mb-14 text-center">
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-[#E27B38]">Pricing</p>
@@ -395,6 +417,40 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+/* ── MacroBar — clean linear progress for hero card ─────────────────────── */
+function MacroBar({
+  label,
+  value,
+  max,
+  unit,
+  color,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  unit: string;
+  color: string;
+}) {
+  const pct = Math.min((value / max) * 100, 100);
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="text-xs font-medium text-stone-500">{label}</span>
+        <span className="text-xs font-semibold text-stone-700 tabular-nums">
+          {value}
+          {unit}
+        </span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{ width: `${pct}%`, backgroundColor: color }}
+        />
+      </div>
     </div>
   );
 }
