@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 
 import "./globals.css";
 import { LenisProvider } from "@/components/lenis-provider";
-import { LiquidBackgroundClient } from "@/components/3d/liquid-background-client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#05050A",
+  themeColor: "#0A0A0A",
   width: "device-width",
   initialScale: 1,
 };
@@ -73,14 +72,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-grain">
+      <body className="min-h-full flex flex-col">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg          focus:bg-[#DC143C] focus:px-4 focus:py-2 focus:text-[#05050A] focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-amber-500 focus:px-4 focus:py-2 focus:text-[#0A0A0A] focus:outline-none"
         >
           Skip to content
         </a>
-        <LiquidBackgroundClient />
         <LenisProvider>
           <div id="main-content" className="relative z-10 flex-1 flex flex-col">
             {children}

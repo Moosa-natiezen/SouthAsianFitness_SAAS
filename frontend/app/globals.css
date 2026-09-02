@@ -4,48 +4,51 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LIQUID CHROME & GLASS — Avant-Garde Aesthetic
-   All color comes from the WebGL 3D lighting layer.
-   UI is monochromatic titanium/black with frosted refractive glass.
+   PREMIUM DARK MODE HEALTH — Clean, sophisticated, high-contrast
+   Single warm accent (Saffron). No neon. No purple.
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Core: Pure monochrome — no saturated colors in CSS ──────────── */
-  --void: #05050A;
-  --void-mid: #0A0A12;
-  --void-light: #12121A;
+  /* ── Core ──────────────────────────────────────────────────────────── */
+  --bg: #0A0A0A;
+  --bg-card: #111111;
+  --bg-elevated: #161616;
 
-  --chrome: #E8E8EC;
-  --chrome-dim: #8A8A94;
-  --chrome-muted: #5A5A64;
+  --text-primary: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
 
-  --glass-bg: rgba(10, 10, 18, 0.45);
+  /* ── Single Accent: Warm Saffron ─────────────────────────────────── */
+  --accent: #F59E0B;
+  --accent-hover: #D97706;
+  --accent-light: rgba(245, 158, 11, 0.12);
+  --accent-glow: rgba(245, 158, 11, 0.20);
+
+  /* ── Macro palette (muted, cohesive) ──────────────────────────────── */
+  --macro-protein: #F97316;
+  --macro-carbs: #06B6D4;
+  --macro-fat: #22C55E;
+
+  /* ── Glass ────────────────────────────────────────────────────────── */
+  --glass-bg: rgba(17, 17, 17, 0.80);
   --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-
-  /* Accent — single color source: Deep Crimson from the 3D light */
-  --accent: #DC143C;
-  --accent-glow: rgba(220, 20, 60, 0.25);
-  --accent-violet: #7B61FF;
-  --accent-violet-glow: rgba(123, 97, 255, 0.20);
 
   /* ── Semantic Tokens ─────────────────────────────────────────────── */
-  --background: var(--void);
-  --foreground: var(--chrome);
-  --card: var(--glass-bg);
-  --card-foreground: var(--chrome);
-  --popover: var(--void-mid);
-  --popover-foreground: var(--chrome);
+  --background: var(--bg);
+  --foreground: var(--text-primary);
+  --card: var(--bg-card);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-elevated);
+  --popover-foreground: var(--text-primary);
   --primary: var(--accent);
   --primary-foreground: #FFFFFF;
   --secondary: rgba(255, 255, 255, 0.04);
-  --secondary-foreground: var(--chrome);
+  --secondary-foreground: var(--text-secondary);
   --muted: rgba(255, 255, 255, 0.04);
-  --muted-foreground: var(--chrome-muted);
+  --muted-foreground: var(--text-muted);
   --accent-color: var(--accent);
   --accent-foreground: #FFFFFF;
-  --destructive: #DC143C;
+  --destructive: #EF4444;
   --border: var(--glass-border);
   --input: rgba(255, 255, 255, 0.06);
   --ring: var(--accent);
@@ -53,8 +56,8 @@
 }
 
 .dark {
-  --background: var(--void);
-  --foreground: var(--chrome);
+  --background: var(--bg);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
@@ -84,15 +87,15 @@
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-playfair);
 
-  /* Liquid Chrome palette */
-  --color-void: #05050A;
-  --color-void-mid: #0A0A12;
-  --color-void-light: #12121A;
-  --color-chrome: #E8E8EC;
-  --color-chrome-dim: #8A8A94;
-  --color-chrome-muted: #5A5A64;
-  --color-crimson: #DC143C;
-  --color-violet: #7B61FF;
+  /* Named palette */
+  --color-bg: #0A0A0A;
+  --color-bg-card: #111111;
+  --color-bg-elevated: #161616;
+  --color-saffron: #F59E0B;
+  --color-saffron-dim: #D97706;
+  --color-macro-protein: #F97316;
+  --color-macro-carbs: #06B6D4;
+  --color-macro-fat: #22C55E;
 }
 
 @layer base {
@@ -108,7 +111,7 @@
   }
 
   ::selection {
-    background: rgba(220, 20, 60, 0.35);
+    background: rgba(245, 158, 11, 0.30);
     color: #FFFFFF;
   }
 
@@ -129,149 +132,51 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   REFRACTIVE GLASS UTILITIES
+   UTILITIES — Premium Dark Health
    ═══════════════════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  /* Standard frosted glass card */
+  /* Clean frosted glass card */
   .glass {
     background: var(--glass-bg);
     backdrop-filter: blur(20px) saturate(1.2);
     -webkit-backdrop-filter: blur(20px) saturate(1.2);
     border: 1px solid var(--glass-border);
-    box-shadow:
-      var(--glass-shadow),
-      inset 0 1px 0 0 var(--glass-highlight);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
 
-  /* Heavy refractive glass — for hero elements */
-  .glass-heavy {
-    background: rgba(5, 5, 10, 0.6);
-    backdrop-filter: blur(40px) saturate(1.4);
-    -webkit-backdrop-filter: blur(40px) saturate(1.4);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow:
-      0 16px 64px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 0 rgba(255, 255, 255, 0.02);
-  }
-
-  /* Chrome pill button — shimmering border with crimson light catch */
-  .btn-chrome {
-    position: relative;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      rgba(255, 255, 255, 0.08) 100%
-    );
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    overflow: hidden;
-  }
-
-  .btn-chrome::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: linear-gradient(
-      135deg,
-      rgba(220, 20, 60, 0.4) 0%,
-      rgba(123, 97, 255, 0.3) 50%,
-      rgba(220, 20, 60, 0.4) 100%
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
-  }
-
-  .btn-chrome:hover::before {
-    opacity: 1;
-  }
-
-  .btn-chrome:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      0 4px 20px rgba(220, 20, 60, 0.2),
-      0 0 40px rgba(123, 97, 255, 0.1);
-    border-color: rgba(220, 20, 60, 0.3);
-  }
-
-  .btn-chrome:active {
-    transform: translateY(0) scale(0.98);
-  }
-
-  /* Chrome accent button — solid crimson glow */
-  .btn-chrome-accent {
-    position: relative;
-    background: linear-gradient(135deg, #DC143C, #B01030);
-    border: 1px solid rgba(220, 20, 60, 0.5);
-    color: #FFFFFF;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .btn-chrome-accent:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      0 4px 24px rgba(220, 20, 60, 0.4),
-      0 0 60px rgba(220, 20, 60, 0.15);
-    filter: brightness(1.1);
-  }
-
-  .btn-chrome-accent:active {
-    transform: translateY(0) scale(0.98);
-  }
-
-  /* Glow effects */
-  .glow-crimson {
-    box-shadow: 0 0 20px rgba(220, 20, 60, 0.3), 0 0 60px rgba(220, 20, 60, 0.1);
-  }
-
-  .glow-violet {
-    box-shadow: 0 0 20px rgba(123, 97, 255, 0.25), 0 0 60px rgba(123, 97, 255, 0.08);
-  }
-
-  /* Metallic text shimmer */
-  .text-chrome {
-    background: linear-gradient(
-      135deg,
-      #E8E8EC 0%,
-      #FFFFFF 40%,
-      #8A8A94 60%,
-      #E8E8EC 100%
-    );
+  /* Gradient text — warm saffron */
+  .text-gradient-accent {
+    background: linear-gradient(135deg, #F59E0B, #F97316);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Gradient text — single accent color from 3D light */
-  .text-gradient-cyber {
-    background: linear-gradient(135deg, #DC143C, #7B61FF);
+  /* Keep old name working */
+  .text-gradient-cardamom {
+    background: linear-gradient(135deg, #F59E0B, #F97316);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-saffron {
-    background: linear-gradient(135deg, #DC143C, #FF4060);
+    background: linear-gradient(135deg, #F59E0B, #F97316);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .text-gradient-cardamom {
-    background: linear-gradient(135deg, #DC143C, #FF4060);
+  .text-gradient-cyber {
+    background: linear-gradient(135deg, #F59E0B, #06B6D4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-warm {
-    background: linear-gradient(135deg, #DC143C, #7B61FF);
+    background: linear-gradient(135deg, #F59E0B, #F97316);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -282,7 +187,7 @@
     font-family: var(--font-playfair), "Georgia", serif;
   }
 
-  /* Editorial grid — barely visible, lit by 3D light */
+  /* Subtle grid */
   .bg-grid-editorial {
     background-image:
       linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
@@ -297,7 +202,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ANIMATIONS — Liquid Chrome
+   ANIMATIONS — Premium Dark Health
    ═══════════════════════════════════════════════════════════════════════ */
 
 @keyframes blink {
@@ -307,10 +212,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(220, 20, 60, 0.3), 0 0 16px rgba(220, 20, 60, 0.1);
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.2), 0 0 12px rgba(245, 158, 11, 0.08);
   }
   50% {
-    box-shadow: 0 0 20px rgba(220, 20, 60, 0.5), 0 0 40px rgba(220, 20, 60, 0.15);
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.35), 0 0 28px rgba(245, 158, 11, 0.10);
   }
 }
 
@@ -337,36 +242,6 @@
   }
 }
 
-@keyframes chrome-shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes cyber-glow {
-  0%, 100% {
-    text-shadow: 0 0 6px rgba(220, 20, 60, 0.4);
-  }
-  50% {
-    text-shadow: 0 0 16px rgba(220, 20, 60, 0.7), 0 0 32px rgba(123, 97, 255, 0.3);
-  }
-}
-
-/* AI streaming cursor — glowing crimson orb/slash */
-.streaming-cursor::after {
-  content: "";
-  display: inline-block;
-  width: 2px;
-  height: 1.15em;
-  margin-left: 2px;
-  background: linear-gradient(180deg, #DC143C, #7B61FF);
-  animation: blink 0.75s ease-in-out infinite;
-  box-shadow:
-    0 0 8px rgba(220, 20, 60, 0.7),
-    0 0 20px rgba(123, 97, 255, 0.4);
-  vertical-align: text-bottom;
-  border-radius: 1px;
-}
-
 .animate-pulse-glow {
   animation: pulse-glow 2.5s ease-in-out infinite;
 }
@@ -379,30 +254,35 @@
   animation: text-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.animate-cyber-glow {
-  animation: cyber-glow 3s ease-in-out infinite;
-}
-
-.animate-chrome-shimmer {
-  background-size: 200% auto;
-  animation: chrome-shimmer 3s linear infinite;
+/* AI streaming cursor — warm saffron */
+.streaming-cursor::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  margin-left: 2px;
+  background: linear-gradient(180deg, #F59E0B, #F97316);
+  animation: blink 0.75s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+  vertical-align: text-bottom;
+  border-radius: 1px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   PROSE OVERRIDES — Liquid Chrome
+   PROSE OVERRIDES — Premium Dark Health
    ═══════════════════════════════════════════════════════════════════════ */
 
 .prose {
-  --tw-prose-body: #8A8A94;
-  --tw-prose-headings: #E8E8EC;
+  --tw-prose-body: #A1A1AA;
+  --tw-prose-headings: #FAFAFA;
   --tw-prose-bold: #FFFFFF;
-  --tw-prose-links: #DC143C;
-  --tw-prose-bullets: #5A5A64;
+  --tw-prose-links: #F59E0B;
+  --tw-prose-bullets: #71717A;
   --tw-prose-hr: rgba(255, 255, 255, 0.06);
-  --tw-prose-code: #7B61FF;
-  --tw-prose-pre-bg: #0A0A12;
+  --tw-prose-code: #06B6D4;
+  --tw-prose-pre-bg: #111111;
   --tw-prose-td-borders: rgba(255, 255, 255, 0.06);
-  --tw-prose-th-borders: rgba(255, 255, 255, 0.1);
+  --tw-prose-th-borders: rgba(255, 255, 255, 0.10);
 }
 
 .prose table { border-collapse: collapse; }
@@ -416,6 +296,6 @@
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.875em;
-  color: #7B61FF;
+  color: #06B6D4;
 }
 .prose pre code { background: none; padding: 0; }

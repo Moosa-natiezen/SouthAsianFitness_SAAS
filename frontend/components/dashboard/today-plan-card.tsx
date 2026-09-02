@@ -127,33 +127,32 @@ export function TodayPlanCard() {
 
       {/* Meals */}
       <div className="mt-4 space-y-3">
-        {day.meals.map((meal) => (
-          <div key={meal.meal_type} className="rounded-xl border border-white/10 bg-white/3 p-4">
+        {day.meals.map((meal) => (            <div key={meal.meal_type} className="rounded-xl border border-white/6 bg-white/[0.02] p-4">
             <div className="flex items-center justify-between">
-              <p className="font-medium text-[#E8E8EC]">
+              <p className="font-medium text-[#FAFAFA]">
                 {mealEmoji[meal.meal_type] ?? "🍽️"}{" "}
                 {meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}
               </p>
-              <p className="text-sm text-[#8A8A94]">
+              <p className="text-sm text-[#A1A1AA]">
                 {Math.round(meal.subtotal_calories)} kcal
               </p>
             </div>
             <div className="mt-2 space-y-1">
               {meal.foods.map((food) => (
                 <div key={food.food_id} className="flex items-center justify-between text-sm">
-                  <span className="text-[#C4C4CC]">
+                  <span className="text-[#A1A1AA]">
                     {food.name}{" "}
-                    <span className="text-[#8A8A94]">
+                    <span className="text-[#71717A]">
                       {food.serving_quantity > 0
                         ? `${food.serving_quantity}${food.serving_unit_code}`
                         : `${food.portion_grams}g`}
                     </span>
                   </span>
-                  <span className="text-[#8A8A94]">{Math.round(food.calories)} kcal</span>
+                  <span className="text-[#71717A]">{Math.round(food.calories)} kcal</span>
                 </div>
               ))}
             </div>
-            <div className="mt-2 flex gap-3 text-xs text-[#8A8A94]">
+            <div className="mt-2 flex gap-3 text-xs text-[#71717A]">
               <span>P {Math.round(meal.subtotal_protein_g)}g</span>
               <span>C {Math.round(meal.subtotal_carbs_g)}g</span>
               <span>F {Math.round(meal.subtotal_fat_g)}g</span>
@@ -163,15 +162,15 @@ export function TodayPlanCard() {
       </div>
 
       {/* Daily totals */}
-      <div className="mt-4 rounded-xl border border-white/10 bg-[#12121A]/80 p-4 backdrop-blur-xl">
+      <div className="mt-4 rounded-xl border border-white/6 bg-[#161616] p-4">
         <div className="flex items-center justify-between">
-          <p className="font-medium text-white">Daily Total</p>
-          <p className="font-semibold text-white">{Math.round(day.total_calories)} kcal</p>
+          <p className="font-medium text-[#FAFAFA]">Daily Total</p>
+          <p className="font-semibold text-[#FAFAFA]">{Math.round(day.total_calories)} kcal</p>
         </div>
         <div className="mt-1 flex gap-4 text-sm">
-          <span className="text-[#FF6B3D]">Protein {Math.round(day.total_protein_g)}g</span>
-          <span className="text-[#00E5FF]">Carbs {Math.round(day.total_carbs_g)}g</span>
-          <span className="text-[#34D399]">Fat {Math.round(day.total_fat_g)}g</span>
+          <span className="text-orange-400">Protein {Math.round(day.total_protein_g)}g</span>
+          <span className="text-cyan-400">Carbs {Math.round(day.total_carbs_g)}g</span>
+          <span className="text-green-400">Fat {Math.round(day.total_fat_g)}g</span>
         </div>
         {plan.nutrition && (
           <p className="mt-1 text-xs text-[#8A8A94]">

@@ -102,14 +102,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isPro = user?.subscription_tier === "pro";
 
   return (
-    <div className="dark flex min-h-screen flex-col bg-[#05050A] text-[#FFFFFF]">
+    <div className="dark flex min-h-screen flex-col bg-[#0A0A0A] text-[#FAFAFA]">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-white/8 bg-[#05050A]/80 px-5 py-3 backdrop-blur-xl md:px-8">
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-white/6 bg-[#0A0A0A]/80 px-5 py-3 backdrop-blur-xl md:px-8">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#DC143C] to-[#7B61FF] text-[10px] font-bold text-[#05050A]">
-            <span className="relative z-10">SA</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 text-[10px] font-bold text-[#0A0A0A]">
+            SA
           </div>
-          <span className="hidden font-serif text-lg font-semibold tracking-tight text-[#FFFFFF] sm:inline">
+          <span className="hidden font-serif text-lg font-semibold tracking-tight text-[#FAFAFA] sm:inline">
             South Asian Fitness
           </span>
         </Link>
@@ -120,23 +120,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold tracking-wide uppercase ${
                 isPro
-                  ? "border border-[#DC143C]/30 bg-[#DC143C]/10 text-[#FF4060] animate-pulse-glow"
-                  : "border border-white/10 bg-white/4 text-[#5A5A64]"
+                  ? "border border-amber-500/30 bg-amber-500/10 text-amber-400 animate-pulse-glow"
+                  : "border border-white/8 bg-white/[0.03] text-[#71717A]"
               }`}
             >
-              <span className={`h-1 w-1 rounded-full ${isPro ? "bg-[#DC143C]" : "bg-[#64748B]"}`} />
+              <span className={`h-1 w-1 rounded-full ${isPro ? "bg-amber-500" : "bg-[#71717A]"}`} />
               {isPro ? "Pro" : "Free"}
             </div>
           )}
 
           {/* User avatar */}
           <div className="hidden items-center gap-2 md:flex">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#DC143C]/20 to-[#7B61FF]/20 text-[10px] font-semibold text-[#FF4060]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/20 text-[10px] font-semibold text-amber-400">
               {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-full p-1 text-[#5A5A64] transition-colors hover:bg-white/5 hover:text-[#8A8A94]"
+              className="rounded-full p-1 text-[#71717A] transition-colors hover:bg-white/5 hover:text-[#A1A1AA]"
               title="Log out"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -154,7 +154,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Floating Bottom Dock ─────────────────────────────────────── */}
       <nav className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 md:bottom-6">
-        <div className="flex items-center gap-1 rounded-2xl border border-white/10 bg-[#05050A]/90 px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+        <div className="flex items-center gap-1 rounded-2xl border border-white/8 bg-[#0A0A0A]/90 px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
           {navItems.map((item) => {
             const isActive =
               item.href === "/dashboard"
@@ -167,12 +167,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={isActive ? "page" : undefined}
                 className={`group relative flex flex-col items-center gap-1 rounded-xl px-3 py-2 transition-all duration-300 md:px-4 ${
                   isActive
-                    ? "text-[#DC143C]"
-                    : "text-[#5A5A64] hover:text-[#8A8A94]"
+                    ? "text-amber-500"
+                    : "text-[#71717A] hover:text-[#A1A1AA]"
                 }`}
               >
                 {isActive && (
-                  <span className="absolute inset-0 rounded-xl bg-[#DC143C]/10" />
+                  <span className="absolute inset-0 rounded-xl bg-amber-500/10" />
                 )}
                 <span className="relative z-10">{item.icon}</span>
                 <span className="relative z-10 text-[9px] font-medium tracking-wide md:text-[10px]">
