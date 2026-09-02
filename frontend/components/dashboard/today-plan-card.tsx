@@ -38,7 +38,6 @@ export function TodayPlanCard() {
           setState({ status: "ready", plan: existingPlan, day: existingPlan.days[0] });
           return;
         }
-        // No existing plan — generate a new one
         return generateMealPlan(1, 4).then((result) => {
           if ("success" in result && !result.success) {
             setState({ status: "failure", data: result as MealPlanFailure });
@@ -63,14 +62,12 @@ export function TodayPlanCard() {
 
   if (state.status === "loading") {
     return (
-      <div className="rounded-2xl glass p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
-          Today&apos;s Plan
-        </p>
+      <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <div className="mt-4 space-y-3">
-          <Skeleton className="h-20 w-full rounded-xl bg-white/4" />
-          <Skeleton className="h-20 w-full rounded-xl bg-white/4" />
-          <Skeleton className="h-20 w-full rounded-xl bg-white/4" />
+          <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
+          <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
+          <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
         </div>
       </div>
     );
@@ -78,10 +75,8 @@ export function TodayPlanCard() {
 
   if (state.status === "error") {
     return (
-      <div className="rounded-2xl glass p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
-          Today&apos;s Plan
-        </p>
+      <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
         <Button variant="outline" size="sm" className="mt-3" onClick={fetchPlan}>
           Try again
@@ -92,13 +87,11 @@ export function TodayPlanCard() {
 
   if (state.status === "failure") {
     return (
-      <div className="rounded-2xl glass p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
-          Today&apos;s Plan
-        </p>
+      <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <AlertBanner variant="warning" message={state.data.reason} className="mt-4" />
         {state.data.suggestions.length > 0 && (
-          <ul className="mt-2 list-inside list-disc text-sm text-[#8A8A94]">
+          <ul className="mt-2 list-inside list-disc text-sm text-zinc-400">
             {state.data.suggestions.map((s, i) => (<li key={i}>{s}</li>))}
           </ul>
         )}
@@ -112,47 +105,44 @@ export function TodayPlanCard() {
   const { plan, day } = state;
 
   return (
-    <div className="rounded-2xl glass p-6">
+    <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8A8A94]">
-            Today&apos;s Plan
-          </p>
-          <h2 className="mt-1 text-lg font-semibold text-white">{plan.plan_name}</h2>
-        </div>
-        <Link href="/dashboard/meal-plans">
-          <Button variant="outline" size="sm">View full plan</Button>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
+        <Link href="/dashboard/meal-plans" className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+          View full plan →
         </Link>
       </div>
+      <h2 className="mt-2 text-lg font-semibold">{plan.plan_name}</h2>
 
       {/* Meals */}
-      <div className="mt-4 space-y-3">
-        {day.meals.map((meal) => (            <div key={meal.meal_type} className="rounded-xl border border-white/6 bg-white/[0.02] p-4">
+      <div className="mt-4 space-y-2">
+        {day.meals.map((meal) => (
+          <div key={meal.meal_type} className="rounded-lg border border-white/6 bg-white/[0.02] p-3">
             <div className="flex items-center justify-between">
-              <p className="font-medium text-[#FAFAFA]">
+              <p className="text-sm font-medium text-zinc-200">
                 {mealEmoji[meal.meal_type] ?? "🍽️"}{" "}
                 {meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}
               </p>
-              <p className="text-sm text-[#A1A1AA]">
+              <p className="text-sm text-zinc-400 tabular-nums">
                 {Math.round(meal.subtotal_calories)} kcal
               </p>
             </div>
             <div className="mt-2 space-y-1">
               {meal.foods.map((food) => (
                 <div key={food.food_id} className="flex items-center justify-between text-sm">
-                  <span className="text-[#A1A1AA]">
+                  <span className="text-zinc-300">
                     {food.name}{" "}
-                    <span className="text-[#71717A]">
+                    <span className="text-zinc-500">
                       {food.serving_quantity > 0
                         ? `${food.serving_quantity}${food.serving_unit_code}`
                         : `${food.portion_grams}g`}
                     </span>
                   </span>
-                  <span className="text-[#71717A]">{Math.round(food.calories)} kcal</span>
+                  <span className="text-zinc-500 tabular-nums">{Math.round(food.calories)} kcal</span>
                 </div>
               ))}
             </div>
-            <div className="mt-2 flex gap-3 text-xs text-[#71717A]">
+            <div className="mt-2 flex gap-3 text-xs text-zinc-500">
               <span>P {Math.round(meal.subtotal_protein_g)}g</span>
               <span>C {Math.round(meal.subtotal_carbs_g)}g</span>
               <span>F {Math.round(meal.subtotal_fat_g)}g</span>
@@ -162,40 +152,23 @@ export function TodayPlanCard() {
       </div>
 
       {/* Daily totals */}
-      <div className="mt-4 rounded-xl border border-white/6 bg-[#161616] p-4">
+      <div className="mt-4 rounded-lg border border-white/8 bg-white/[0.02] p-3">
         <div className="flex items-center justify-between">
-          <p className="font-medium text-[#FAFAFA]">Daily Total</p>
-          <p className="font-semibold text-[#FAFAFA]">{Math.round(day.total_calories)} kcal</p>
+          <p className="text-sm font-medium text-zinc-200">Daily Total</p>
+          <p className="text-sm font-semibold tabular-nums">{Math.round(day.total_calories)} kcal</p>
         </div>
-        <div className="mt-1 flex gap-4 text-sm">
-          <span className="text-orange-400">Protein {Math.round(day.total_protein_g)}g</span>
-          <span className="text-cyan-400">Carbs {Math.round(day.total_carbs_g)}g</span>
-          <span className="text-green-400">Fat {Math.round(day.total_fat_g)}g</span>
+        <div className="mt-1 flex gap-4 text-xs text-zinc-400">
+          <span>Protein {Math.round(day.total_protein_g)}g</span>
+          <span>Carbs {Math.round(day.total_carbs_g)}g</span>
+          <span>Fat {Math.round(day.total_fat_g)}g</span>
         </div>
         {plan.nutrition && (
-          <p className="mt-1 text-xs text-[#8A8A94]">
+          <p className="mt-1 text-xs text-zinc-600">
             Target: {Math.round(plan.nutrition.calorie_target)} kcal
             ({Math.round(day.total_calories / plan.nutrition.calorie_target * 100)}%)
           </p>
         )}
       </div>
-
-      {/* Warnings */}
-      {day.warnings.length > 0 && (
-        <div className="mt-3 space-y-1">
-          {day.warnings.map((w, i) => (
-            <p key={i} className="text-xs text-amber-600">⚠ {w}</p>
-          ))}
-        </div>
-      )}
-
-      {plan.warnings.length > 0 && (
-        <div className="mt-3 space-y-1">
-          {plan.warnings.map((w, i) => (
-            <p key={i} className="text-xs text-amber-600">⚠ {w}</p>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

@@ -1,93 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { AnimateIn, StaggerIn } from "@/components/animate-in";
-import { FeatureScroll } from "@/components/landing/feature-scroll";
-import { PricingSection } from "@/components/landing/pricing-section";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 /* ── Data ──────────────────────────────────────────────────────────────── */
 
-const oldWay = [
-  { icon: "🚫", title: "Bland chicken & rice", desc: "Same meals every day. No flavour, no culture." },
-  { icon: "📉", title: "Restrictive diets", desc: "Cut out entire food groups you grew up with." },
-  { icon: "🤷", title: "Guesswork macros", desc: "No idea if you're hitting protein or overeating carbs." },
-  { icon: "💸", title: "Expensive meal plans", desc: "Imported supplements and organic-only shopping lists." },
+const features = [
+  { title: "Your cultural cuisine", desc: "Dal, biryani, tikka, paratha — optimized, not eliminated." },
+  { title: "Precision macros", desc: "Every meal calculated to hit your exact targets." },
+  { title: "AI-powered plans", desc: "Generate personalized plans in seconds, not hours." },
+  { title: "Budget-aware", desc: "Plans that fit your grocery budget and local prices." },
 ];
 
-const flexAiWay = [
-  { icon: "🍛", title: "Your cultural cuisine", desc: "Dal, biryani, tikka, paratha — optimized, not eliminated." },
-  { icon: "🎯", title: "Precision macros", desc: "Every meal calculated to hit your exact targets." },
-  { icon: "🤖", title: "AI-powered plans", desc: "Generate personalized plans in seconds, not hours." },
-  { icon: "💰", title: "Budget-aware", desc: "Plans that fit your grocery budget and local prices." },
+const steps = [
+  { num: "01", title: "Tell us your goals", desc: "Set your calorie target, activity level, and food preferences." },
+  { num: "02", title: "Get your plan", desc: "AI generates a personalized meal plan with South Asian dishes." },
+  { num: "03", title: "Track & adjust", desc: "Log progress, refine your plan, and hit your targets." },
 ];
 
-/* ── Main Landing Page ──────────────────────────────────────────────── */
+/* ── Landing Page ───────────────────────────────────────────────────── */
 
 export function LandingPage() {
-  const bentoRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = bentoRef.current;
-    if (!el) return;
-
-    const ctx = gsap.context(() => {
-      const cards = el.querySelectorAll("[data-bento]");
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 60, filter: "blur(8px)" },
-        {
-          opacity: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 1,
-          stagger: 0.12,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 75%",
-            end: "bottom 25%",
-            toggleActions: "play none none reverse",
-          },
-        },
-      );
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <div className="dark min-h-screen bg-[#0A0A0A] text-[#FAFAFA] overflow-x-hidden">
-      {/* ── Navigation ─────────────────────────────────────────────────── */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/6 bg-[#0A0A0A]/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-sm font-bold text-[#0A0A0A]">
+    <div className="min-h-screen bg-[#09090b] text-[#fafafa]">
+      {/* ── Nav ──────────────────────────────────────────────────────── */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-[#09090b]/80 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xs font-bold text-[#09090b]">
               SA
             </div>
-            <p className="text-lg font-semibold text-[#FAFAFA]">South Asian Fitness</p>
+            <span className="text-sm font-semibold">South Asian Fitness</span>
           </div>
-          <nav className="hidden items-center gap-8 text-sm font-medium text-[#A1A1AA] md:flex">
-            <a href="#features" className="transition hover:text-[#FAFAFA]">Features</a>
-            <a href="#how-it-works" className="transition hover:text-[#FAFAFA]">How it works</a>
-            <a href="#pricing" className="transition hover:text-[#FAFAFA]">Pricing</a>
+          <nav className="hidden items-center gap-6 text-sm text-zinc-400 md:flex">
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
+            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link
-              href="/auth/login"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-[#A1A1AA] transition hover:text-[#FAFAFA]"
-            >
+            <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors">
               Log in
             </Link>
             <Link
               href="/auth/signup"
-              className="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-[#0A0A0A] transition hover:bg-amber-400"
+              className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#09090b] hover:bg-zinc-200 transition-colors"
             >
               Get started
             </Link>
@@ -95,198 +50,150 @@ export function LandingPage() {
         </div>
       </header>
 
-      {/* ── Hero Section — Minimalist ──────────────────────────────────── */}
-      <section className="relative flex min-h-screen items-center overflow-hidden">
-        {/* Subtle radial gradient — no orbs */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(245,158,11,0.06)_0%,_transparent_70%)]" />
-
-        {/* Content */}
-        <div className="relative z-10 mx-auto max-w-6xl px-6 pt-32 pb-20 md:pt-40">
-          <div className="max-w-3xl">
-            <AnimateIn delay={0.2} y={20} blur={4}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-sm font-medium text-amber-400 mb-8">
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-                AI-powered nutrition for South Asian cuisine
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={0.4} y={30} blur={6}>
-              <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl lg:text-8xl">
-                Fitness that fits{" "}
-                <span className="text-gradient-accent">your culture.</span>
-                <br />
-                <span className="text-[#A1A1AA]">Powered by AI.</span>
-              </h1>
-            </AnimateIn>
-
-            <AnimateIn delay={0.6} y={25} blur={4}>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-[#A1A1AA] md:text-xl">
-                Generate personalized, macro-optimized South Asian meal plans in seconds.
-                Stop sacrificing the food you love to hit your goals.
-              </p>
-            </AnimateIn>
-
-            <AnimateIn delay={0.8} y={20} blur={3}>
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <Link
-                  href="/onboarding"
-                  className="rounded-2xl bg-amber-500 px-8 py-4 text-center text-base font-bold text-[#0A0A0A] transition hover:bg-amber-400"
-                >
-                  Start Your Journey
-                </Link>
-                <a
-                  href="#how-it-works"
-                  className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-base font-medium text-[#A1A1AA] transition-all hover:bg-white/[0.06] hover:text-[#FAFAFA]"
-                >
-                  See how it works →
-                </a>
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={1.0} y={15} blur={2}>
-              <div className="mt-12 flex flex-wrap gap-6 text-sm text-[#71717A]">
-                <span className="flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-amber-500" />
-                  215+ South Asian foods
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-amber-500" />
-                  Multi-country support
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-amber-500" />
-                  Budget-aware plans
-                </span>
-              </div>
-            </AnimateIn>
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="flex min-h-screen items-center justify-center px-6">
+        <div className="max-w-2xl text-center">
+          <p className="mb-6 text-xs font-medium uppercase tracking-widest text-zinc-500">
+            AI-powered nutrition for South Asian cuisine
+          </p>
+          <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
+            Fitness that fits{" "}
+            <span className="text-zinc-400">your culture.</span>
+            <br />
+            Powered by AI.
+          </h1>
+          <p className="mt-6 text-lg leading-relaxed text-zinc-400">
+            Generate personalized, macro-optimized South Asian meal plans in seconds.
+            Stop sacrificing the food you love to hit your goals.
+          </p>
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/onboarding"
+              className="rounded-lg bg-white px-6 py-3 text-sm font-medium text-[#09090b] hover:bg-zinc-200 transition-colors"
+            >
+              Start for free
+            </Link>
+            <a
+              href="#how-it-works"
+              className="rounded-lg border border-white/10 px-6 py-3 text-sm font-medium text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
+            >
+              See how it works
+            </a>
           </div>
         </div>
       </section>
 
-      {/* ── Bento Grid: Old Way vs FlexAI ──────────────────────────────── */}
-      <section id="features" className="relative py-24 md:py-32">
-        <div className="mx-auto max-w-6xl px-6">
-          <AnimateIn>
-            <div className="mb-16 text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-amber-500">
-                The problem
-              </p>
-              <h2 className="mt-4 font-serif text-3xl font-bold text-[#FAFAFA] md:text-5xl">
-                The old way doesn&apos;t work.
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div ref={bentoRef} className="grid gap-6 md:grid-cols-2">
-            {/* Old Way */}
-            <div className="space-y-4">
-              <div className="mb-6 flex items-center gap-3">
-                <span className="rounded-lg bg-red-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-400">
-                  The old way
-                </span>
-                <div className="h-px flex-1 bg-red-500/10" />
+      {/* ── Features ─────────────────────────────────────────────────── */}
+      <section id="features" className="border-t border-white/8 py-24">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-3">Features</p>
+          <h2 className="text-2xl font-bold md:text-3xl mb-12">
+            Everything you need to eat right.
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {features.map((f) => (
+              <div key={f.title} className="rounded-xl border border-white/8 bg-[#18181b] p-6">
+                <h3 className="font-medium text-[#fafafa]">{f.title}</h3>
+                <p className="mt-1.5 text-sm text-zinc-400">{f.desc}</p>
               </div>
-              <StaggerIn stagger={0.1}>
-                {oldWay.map((item) => (
-                  <div
-                    key={item.title}
-                    data-bento
-                    className="rounded-2xl border border-white/6 bg-[#111111] p-5"
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className="text-2xl">{item.icon}</span>
-                      <div>
-                        <h3 className="font-medium text-[#A1A1AA]">{item.title}</h3>
-                        <p className="mt-1 text-sm text-[#71717A]">{item.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </StaggerIn>
-            </div>
-
-            {/* FlexAI Way */}
-            <div className="space-y-4">
-              <div className="mb-6 flex items-center gap-3">
-                <span className="rounded-lg bg-amber-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-500">
-                  The FlexAI way
-                </span>
-                <div className="h-px flex-1 bg-amber-500/10" />
-              </div>
-              <StaggerIn stagger={0.1} delay={0.2}>
-                {flexAiWay.map((item) => (
-                  <div
-                    key={item.title}
-                    data-bento
-                    className="rounded-2xl border border-white/6 bg-[#111111] p-5 transition-all duration-300 hover:border-amber-500/15 hover:bg-[#161616]"
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className="text-2xl">{item.icon}</span>
-                      <div>
-                        <h3 className="font-medium text-[#FAFAFA]">{item.title}</h3>
-                        <p className="mt-1 text-sm text-[#71717A]">{item.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </StaggerIn>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Feature Scroll: AI Streaming Demo ───────────────────────────── */}
-      <div id="how-it-works">
-        <FeatureScroll />
-      </div>
-
-      {/* ── Pricing ─────────────────────────────────────────────────────── */}
-      <div id="pricing">
-        <PricingSection />
-      </div>
-
-      {/* ── Final CTA ───────────────────────────────────────────────────── */}
-      <section className="relative py-24 md:py-32">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/[0.04] blur-[120px]" />
+      {/* ── How it works ─────────────────────────────────────────────── */}
+      <section id="how-it-works" className="border-t border-white/8 py-24">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-3">How it works</p>
+          <h2 className="text-2xl font-bold md:text-3xl mb-12">
+            Three steps to your perfect plan.
+          </h2>
+          <div className="grid gap-8 md:grid-cols-3">
+            {steps.map((s) => (
+              <div key={s.num}>
+                <span className="text-xs font-mono text-zinc-600">{s.num}</span>
+                <h3 className="mt-2 font-medium">{s.title}</h3>
+                <p className="mt-1.5 text-sm text-zinc-400">{s.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="relative mx-auto max-w-3xl px-6 text-center">
-          <AnimateIn>
-            <h2 className="font-serif text-3xl font-bold text-[#FAFAFA] md:text-5xl">
-              Your goals. Your food.{" "}
-              <span className="text-gradient-accent">Your plan.</span>
-            </h2>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-[#A1A1AA]">
-              Join thousands of people building sustainable fitness habits with the food they love.
-              Start your free account today.
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      </section>
+
+      {/* ── Pricing ──────────────────────────────────────────────────── */}
+      <section id="pricing" className="border-t border-white/8 py-24">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-3">Pricing</p>
+          <h2 className="text-2xl font-bold md:text-3xl mb-12">
+            Simple, transparent pricing.
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2 max-w-2xl">
+            <div className="rounded-xl border border-white/8 bg-[#18181b] p-8">
+              <p className="text-sm text-zinc-400">Free</p>
+              <p className="mt-2 text-3xl font-bold">$0</p>
+              <p className="mt-1 text-sm text-zinc-500">/month</p>
+              <ul className="mt-6 space-y-3 text-sm text-zinc-400">
+                <li className="flex items-center gap-2"><span className="text-zinc-600">—</span> 3 meal plans / month</li>
+                <li className="flex items-center gap-2"><span className="text-zinc-600">—</span> Food library access</li>
+                <li className="flex items-center gap-2"><span className="text-zinc-600">—</span> Progress tracking</li>
+              </ul>
               <Link
                 href="/onboarding"
-                className="rounded-2xl bg-amber-500 px-10 py-4 text-base font-bold text-[#0A0A0A] transition hover:bg-amber-400"
+                className="mt-8 block w-full rounded-lg border border-white/10 py-2.5 text-center text-sm font-medium text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
               >
-                Start Your Journey
-              </Link>
-              <Link
-                href="/auth/login"
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-base font-medium text-[#A1A1AA] transition-all hover:bg-white/[0.06] hover:text-[#FAFAFA]"
-              >
-                I already have an account
+                Get started
               </Link>
             </div>
-          </AnimateIn>
+            <div className="rounded-xl border border-white/20 bg-[#18181b] p-8 relative">
+              <p className="absolute -top-3 right-6 rounded-full bg-white px-3 py-0.5 text-xs font-medium text-[#09090b]">
+                Popular
+              </p>
+              <p className="text-sm text-zinc-400">Pro</p>
+              <p className="mt-2 text-3xl font-bold">$9</p>
+              <p className="mt-1 text-sm text-zinc-500">/month</p>
+              <ul className="mt-6 space-y-3 text-sm text-zinc-400">
+                <li className="flex items-center gap-2"><span className="text-white">✓</span> Unlimited meal plans</li>
+                <li className="flex items-center gap-2"><span className="text-white">✓</span> AI workout generator</li>
+                <li className="flex items-center gap-2"><span className="text-white">✓</span> Saved plans archive</li>
+                <li className="flex items-center gap-2"><span className="text-white">✓</span> Priority support</li>
+              </ul>
+              <Link
+                href="/onboarding"
+                className="mt-8 block w-full rounded-lg bg-white py-2.5 text-center text-sm font-medium text-[#09090b] hover:bg-zinc-200 transition-colors"
+              >
+                Start free trial
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/6 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 text-sm text-[#71717A] md:flex-row md:items-center md:justify-between">
-          <p>© 2026 South Asian Fitness. Built with ❤️ for the diaspora.</p>
-          <div className="flex flex-wrap gap-6">
-            <Link href="/auth/login" className="transition hover:text-[#A1A1AA]">Login</Link>
-            <Link href="/auth/signup" className="transition hover:text-[#A1A1AA]">Sign up</Link>
-            <Link href="/privacy" className="transition hover:text-[#A1A1AA]">Privacy</Link>
-            <Link href="/terms" className="transition hover:text-[#A1A1AA]">Terms</Link>
+      {/* ── CTA ──────────────────────────────────────────────────────── */}
+      <section className="border-t border-white/8 py-24">
+        <div className="mx-auto max-w-2xl px-6 text-center">
+          <h2 className="text-2xl font-bold md:text-3xl">
+            Your goals. Your food. Your plan.
+          </h2>
+          <p className="mt-4 text-zinc-400">
+            Start building sustainable fitness habits with the food you love.
+          </p>
+          <Link
+            href="/onboarding"
+            className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-sm font-medium text-[#09090b] hover:bg-zinc-200 transition-colors"
+          >
+            Start for free
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <footer className="border-t border-white/8 py-8">
+        <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 text-sm text-zinc-500 md:flex-row md:items-center md:justify-between">
+          <p>© 2026 South Asian Fitness.</p>
+          <div className="flex gap-6">
+            <Link href="/auth/login" className="hover:text-zinc-300 transition-colors">Login</Link>
+            <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>
           </div>
         </div>
       </footer>
