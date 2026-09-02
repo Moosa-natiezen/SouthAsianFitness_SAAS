@@ -102,34 +102,40 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isPro = user?.subscription_tier === "pro";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-[#fafafa]">
+    <div className="min-h-screen bg-[#05050A] text-[#FAFAFA]">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-white/[0.08] bg-[#0a0a0a]/80 backdrop-blur-xl">
-        <div className="flex items-center gap-3 px-5 py-3 md:px-6">
+      <header className="fixed top-0 left-0 right-0 z-40 glass">
+        <div className="flex items-center justify-between px-5 py-3 md:px-6">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-[10px] font-bold text-[#0a0a0a]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-[10px] font-bold text-white shadow-lg shadow-indigo-500/20">
               SA
             </div>
-            <span className="hidden text-sm font-medium sm:inline">South Asian Fitness</span>
+            <span className="hidden text-sm font-semibold text-white sm:inline">South Asian Fitness</span>
           </Link>
-        </div>
 
-        <div className="flex items-center gap-4 px-5 py-3 md:px-6">
-          {user && (
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${isPro ? "bg-white/[0.08] text-zinc-300" : "text-zinc-500"}`}>
-              {isPro ? "Pro" : "Free"}
-            </span>
-          )}
-          <div className="hidden items-center gap-3 md:flex">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-medium text-zinc-400">
-              {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
+          <div className="flex items-center gap-4">
+            {user && (
+              <span
+                className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-all duration-500 ${
+                  isPro
+                    ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 animate-glow-ring"
+                    : "bg-white/[0.06] text-zinc-500 border border-white/[0.06]"
+                }`}
+              >
+                {isPro ? "✦ Pro" : "Free"}
+              </span>
+            )}
+            <div className="hidden items-center gap-3 md:flex">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 text-[10px] font-medium text-zinc-300 border border-white/[0.06]">
+                {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors duration-300"
+              >
+                Log out
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-            >
-              Log out
-            </button>
           </div>
         </div>
       </header>
@@ -140,7 +146,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* ── Bottom Nav (mobile) / Side Nav (desktop) ──────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.08] bg-[#0a0a0a]/95 backdrop-blur-xl md:bottom-auto md:top-[52px] md:left-0 md:right-auto md:h-[calc(100vh-52px)] md:w-[200px] md:border-t-0 md:border-r md:border-white/[0.08] md:bg-[#0a0a0a]">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 glass md:bottom-auto md:top-[52px] md:left-0 md:right-auto md:h-[calc(100vh-52px)] md:w-[200px] md:border-t-0 md:border-r md:border-white/[0.06]">
         <div className="flex items-center justify-around gap-1 px-2 py-2 md:flex-col md:items-stretch md:gap-0.5 md:px-3 md:pt-4">
           {navItems.map((item) => {
             const isActive =
@@ -152,13 +158,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors md:gap-3 ${
+                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-300 md:gap-3 ${
                   isActive
-                    ? "bg-white/[0.06] text-white font-medium"
+                    ? "bg-gradient-to-r from-indigo-500/10 to-violet-500/5 text-white font-medium border border-indigo-500/15 shadow-[0_0_15px_rgba(99,102,241,0.08)]"
                     : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                 }`}
               >
-                <span className="shrink-0">{item.icon}</span>
+                <span className={`shrink-0 transition-colors duration-300 ${isActive ? "text-indigo-400" : ""}`}>
+                  {item.icon}
+                </span>
                 <span className="text-[13px]">{item.label}</span>
               </Link>
             );

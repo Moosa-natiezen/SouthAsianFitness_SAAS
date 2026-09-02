@@ -38,7 +38,7 @@ function HeroArtifact() {
     <mesh ref={meshRef} scale={2.2} position={[0, 0, 0]}>
       <icosahedronGeometry args={[1, 6]} />
       <MeshDistortMaterial
-        color="#DC143C"
+        color="#818CF8"
         emissive="#7B61FF"
         emissiveIntensity={0.35}
         roughness={0.15}
@@ -115,7 +115,7 @@ function AccentRing() {
   return (
     <mesh ref={ref} scale={3.2}>
       <torusGeometry args={[1, 0.008, 16, 100]} />
-      <meshBasicMaterial color="#DC143C" transparent opacity={0.25} />
+      <meshBasicMaterial color="#818CF8" transparent opacity={0.25} />
     </mesh>
   );
 }
@@ -124,7 +124,7 @@ function LoadingFallback() {
   return (
     <mesh scale={2}>
       <icosahedronGeometry args={[1, 2]} />
-      <meshBasicMaterial color="#DC143C" wireframe />
+      <meshBasicMaterial color="#818CF8" wireframe />
     </mesh>
   );
 }
@@ -145,9 +145,9 @@ export function HeroScene() {
       >
         <ambientLight intensity={0.2} />
         <directionalLight position={[5, 5, 5]} intensity={0.6} color="#FFFFFF" />
-        <pointLight position={[-4, 3, 4]} intensity={0.8} color="#DC143C" distance={12} />
+        <pointLight position={[-4, 3, 4]} intensity={0.8} color="#818CF8" distance={12} />
         <pointLight position={[4, -2, 3]} intensity={0.4} color="#7B61FF" distance={10} />
-        <pointLight position={[0, 0, -3]} intensity={0.2} color="#DC143C" distance={8} />
+        <pointLight position={[0, 0, -3]} intensity={0.2} color="#818CF8" distance={8} />
 
         <Suspense fallback={<LoadingFallback />}>
           <PresentationControls
@@ -167,7 +167,7 @@ export function HeroScene() {
             opacity={0.25}
             scale={8}
             blur={3}
-            color="#DC143C"
+            color="#818CF8"
           />
         </Suspense>
       </Canvas>

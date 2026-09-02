@@ -87,7 +87,7 @@ export function FeatureScroll() {
     <section className="relative py-24 md:py-32">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-[120px]" />
+        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.05] blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
@@ -126,7 +126,7 @@ export function FeatureScroll() {
             ].map((item, i) => (
               <div
                 key={item.num}
-                className="group relative rounded-2xl border border-white/[0.08] bg-white/3 p-6 transition-all duration-500 hover:border-white/20 hover:bg-white/5"
+                className="group relative rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05]"
               >
                 <span className="font-serif text-4xl font-bold text-white/20 group-hover:text-white/40 transition-colors">
                   {item.num}
@@ -153,7 +153,7 @@ export function FeatureScroll() {
               </div>
 
               {/* Progress bar */}
-              <div className="h-0.5 bg-white/4">
+              <div className="h-0.5 bg-white/[0.04]">
                 <div
                   ref={progressRef}
                   className="h-full origin-left bg-gradient-to-r from-zinc-700 to-zinc-800"

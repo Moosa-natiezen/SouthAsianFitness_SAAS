@@ -32,7 +32,7 @@ export function PricingSection() {
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute right-1/4 top-0 h-[400px] w-[400px] rounded-full bg-zinc-700/5 blur-[100px]" />
-        <div className="absolute bottom-0 left-1/4 h-[300px] w-[300px] rounded-full bg-white/5 blur-[80px]" />
+        <div className="absolute bottom-0 left-1/4 h-[300px] w-[300px] rounded-full bg-white/[0.05] blur-[80px]" />
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6">
@@ -52,7 +52,7 @@ export function PricingSection() {
         {/* Cards */}
         <div className="grid gap-6 md:grid-cols-2 md:items-start">
           {/* Free Card */}
-          <div className="relative rounded-3xl border border-white/10 bg-white/3 p-8 transition-all duration-500 hover:bg-white/5">
+          <div className="relative rounded-3xl border border-white/10 bg-white/[0.04] p-8 transition-all duration-500 hover:bg-white/[0.05]">
             <div className="mb-6">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-400">Free</p>
               <div className="mt-3 flex items-baseline gap-1">
@@ -67,7 +67,7 @@ export function PricingSection() {
             <ul className="mb-8 space-y-3">
               {freeFeatures.map((f) => (
                 <li key={f} className="flex items-start gap-3 text-sm text-zinc-300">
-                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-white/6 flex items-center justify-center text-[10px] text-zinc-400">
+                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-white/[0.06] flex items-center justify-center text-[10px] text-zinc-400">
                     ✓
                   </span>
                   {f}
@@ -77,7 +77,7 @@ export function PricingSection() {
 
             <Link
               href="/auth/signup"
-              className="block w-full rounded-xl border border-white/10 bg-white/5 py-3 text-center text-sm font-semibold text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
+              className="block w-full rounded-xl border border-white/10 bg-white/[0.05] py-3 text-center text-sm font-semibold text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
             >
               Get started free
             </Link>

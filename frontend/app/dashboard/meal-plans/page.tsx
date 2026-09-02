@@ -156,7 +156,7 @@ export default function MealPlansPage() {
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "optimizer"
                 ? "border-white/30 bg-white/10 text-zinc-300"
-                : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
+                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.06]"
             }`}
           >
             Deterministic Optimizer
@@ -166,7 +166,7 @@ export default function MealPlansPage() {
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "ai"
                 ? "border-white/30 bg-white/10 text-zinc-300"
-                : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
+                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.06]"
             }`}
           >
             AI Generator ✨
@@ -204,7 +204,7 @@ export default function MealPlansPage() {
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     planDays === d
                       ? "border-white/30 bg-white/10 text-zinc-300"
-                      : "border-white/10 bg-white/4 text-zinc-300 hover:bg-white/6"
+                      : "border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.06]"
                   }`}
                   aria-pressed={planDays === d}
                 >
@@ -226,7 +226,7 @@ export default function MealPlansPage() {
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     mealCount === m
                       ? "border-white/30 bg-white/10 text-zinc-300"
-                      : "border-white/10 bg-white/4 text-zinc-300 hover:bg-white/6"
+                      : "border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.06]"
                   }`}
                   aria-pressed={mealCount === m}
                 >
@@ -299,7 +299,7 @@ export default function MealPlansPage() {
 
       {/* Paywall / Upgrade */}
       {showPaywall && (
-        <div className="rounded-2xl border border-white/20 bg-white/5 p-8 text-center shadow-sm">
+        <div className="rounded-2xl border border-white/20 bg-white/[0.05] p-8 text-center shadow-sm">
           <p className="text-lg font-semibold text-white">
             You've reached your limit
           </p>

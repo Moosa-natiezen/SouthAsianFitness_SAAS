@@ -379,7 +379,7 @@ export function OnboardingWizard() {
   /* ── Step content ───────────────────────────────────────────────────── */
 
   const selectClass =
-    "w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30";
+    "w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30";
 
   const renderStep = () => {
     // ─── Step 0: Goal Selection ────────────────────────────────────────
@@ -395,7 +395,7 @@ export function OnboardingWizard() {
                 className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-300 ${
                   form.fitness_goal === g.value
                     ? "border-white/60 bg-white/10 shadow-[0_0_30px_rgba(220,20,60,0.15)]"
-                    : "border-white/10 bg-white/4 hover:border-white/[0.12] hover:bg-white/6"
+                    : "border-white/10 bg-white/[0.04] hover:border-white/[0.12] hover:bg-white/[0.06]"
                 }`}
               >
                 {form.fitness_goal === g.value && (
@@ -406,7 +406,7 @@ export function OnboardingWizard() {
                   <h3 className="text-lg font-semibold text-white">{g.label}</h3>
                   <p className="mt-1 text-sm text-zinc-400">{g.tagline}</p>
                   <div className="mt-3 flex items-center gap-2">
-                    <span className="rounded-md bg-white/6 px-2 py-0.5 text-xs font-medium text-zinc-400">
+                    <span className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-medium text-zinc-400">
                       {g.calAdj}
                     </span>
                     <span className="text-xs text-zinc-400">{g.desc}</span>
@@ -433,7 +433,7 @@ export function OnboardingWizard() {
                   max={120}
                   value={form.age_years}
                   onChange={(e) => updateField("age_years", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
               <div className="space-y-2">
@@ -442,7 +442,7 @@ export function OnboardingWizard() {
                   type="number"
                   value={form.height_cm}
                   onChange={(e) => updateField("height_cm", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
               <div className="space-y-2">
@@ -451,7 +451,7 @@ export function OnboardingWizard() {
                   type="number"
                   value={form.weight_kg}
                   onChange={(e) => updateField("weight_kg", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
             </div>
@@ -466,7 +466,7 @@ export function OnboardingWizard() {
                     className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
                       form.sex === s
                         ? "border-white/60 bg-white/10 text-white"
-                        : "border-white/10 bg-white/4 text-zinc-400 hover:border-white/[0.12]"
+                        : "border-white/10 bg-white/[0.04] text-zinc-400 hover:border-white/[0.12]"
                     }`}
                   >
                     {s.charAt(0).toUpperCase() + s.slice(1).replace("_", " ")}
@@ -476,7 +476,7 @@ export function OnboardingWizard() {
             </div>
 
             {/* Live TDEE Preview */}
-            <div className="rounded-xl border border-white/10 bg-white/3 p-4">
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
               <p className="text-xs font-medium uppercase tracking-wider text-zinc-400 mb-3">
                 Live Preview
               </p>
@@ -517,7 +517,7 @@ export function OnboardingWizard() {
                 className={`w-full rounded-xl border p-4 text-left transition-all duration-200 ${
                   form.activity_level === a.value
                     ? "border-white/60 bg-white/10"
-                    : "border-white/10 bg-white/4 hover:border-white/[0.12] hover:bg-white/6"
+                    : "border-white/10 bg-white/[0.04] hover:border-white/[0.12] hover:bg-white/[0.06]"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -525,7 +525,7 @@ export function OnboardingWizard() {
                     <p className="font-medium text-white">{a.label}</p>
                     <p className="text-sm text-zinc-400">{a.desc}</p>
                   </div>
-                  <span className="rounded-lg bg-white/6 px-2.5 py-1 text-xs font-mono text-zinc-400">
+                  <span className="rounded-lg bg-white/[0.06] px-2.5 py-1 text-xs font-mono text-zinc-400">
                     {a.multiplier}
                   </span>
                 </div>
@@ -628,7 +628,7 @@ export function OnboardingWizard() {
                 className={`rounded-xl border p-4 text-left transition-all duration-200 ${
                   form.diet_pattern === d.value
                     ? "border-white/60 bg-white/10"
-                    : "border-white/10 bg-white/4 hover:border-white/[0.12] hover:bg-white/6"
+                    : "border-white/10 bg-white/[0.04] hover:border-white/[0.12] hover:bg-white/[0.06]"
                 }`}
               >
                 <p className="font-medium text-white">{d.label}</p>
@@ -737,11 +737,11 @@ export function OnboardingWizard() {
           <div className="mb-6 text-5xl">🎯</div>
           <h2 className="font-serif text-4xl font-bold text-white">Your targets are set</h2>
           <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
-            <div className="rounded-2xl border border-white/20 bg-white/5 p-5">
+            <div className="rounded-2xl border border-white/20 bg-white/[0.05] p-5">
               <p className="text-3xl font-bold text-white">{result.target_calories}</p>
               <p className="mt-1 text-xs text-zinc-400">kcal / day</p>
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/5 p-5">
+            <div className="rounded-2xl border border-white/20 bg-white/[0.05] p-5">
               <p className="text-3xl font-bold text-white">{result.target_protein_g}g</p>
               <p className="mt-1 text-xs text-zinc-400">protein / day</p>
             </div>
@@ -783,7 +783,7 @@ export function OnboardingWizard() {
             <div
               key={i}
               className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                i <= stepIndex ? "bg-white" : "bg-white/6"
+                i <= stepIndex ? "bg-white" : "bg-white/[0.06]"
               }`}
             />
           ))}
@@ -807,7 +807,7 @@ export function OnboardingWizard() {
             type="button"
             onClick={handleBack}
             disabled={!canGoBack || loading}
-            className="rounded-xl border border-white/10 bg-white/4 px-6 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/6 disabled:opacity-30"
+            className="rounded-xl border border-white/10 bg-white/[0.04] px-6 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/[0.06] disabled:opacity-30"
           >
             Back
           </button>

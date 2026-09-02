@@ -84,7 +84,7 @@ export default function WorkoutsPage() {
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "generator"
                 ? "border-white/20 bg-white/8 text-white"
-                : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
             }`}
           >
             Generator
@@ -94,7 +94,7 @@ export default function WorkoutsPage() {
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "archive"
                 ? "border-white/20 bg-white/8 text-white"
-                : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
             }`}
           >
             Archive {archive && archive.total > 0 && (
@@ -139,7 +139,7 @@ export default function WorkoutsPage() {
               {archive.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/3 p-4 transition hover:bg-white/5"
+                  className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 transition hover:bg-white/[0.05]"
                 >
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-sm font-semibold text-white">
@@ -147,17 +147,17 @@ export default function WorkoutsPage() {
                     </h3>
                     <div className="mt-1 flex flex-wrap gap-2 text-xs text-zinc-400">
                       {item.goal && (
-                        <span className="rounded bg-white/5 px-1.5 py-0.5">
+                        <span className="rounded bg-white/[0.05] px-1.5 py-0.5">
                           {goalLabels[item.goal] ?? item.goal}
                         </span>
                       )}
                       {item.split && (
-                        <span className="rounded bg-white/5 px-1.5 py-0.5">
+                        <span className="rounded bg-white/[0.05] px-1.5 py-0.5">
                           {splitLabels[item.split] ?? item.split}
                         </span>
                       )}
                       {item.equipment && (
-                        <span className="rounded bg-white/5 px-1.5 py-0.5 capitalize">
+                        <span className="rounded bg-white/[0.05] px-1.5 py-0.5 capitalize">
                           {item.equipment}
                         </span>
                       )}
@@ -174,7 +174,7 @@ export default function WorkoutsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-white/10 bg-white/3"
+                      className="border-white/10 bg-white/[0.04]"
                       onClick={() => setViewing(item)}
                     >
                       View
@@ -209,7 +209,7 @@ export default function WorkoutsPage() {
               <h2 className="text-lg font-semibold text-white">{viewing.title}</h2>
               <button
                 onClick={() => setViewing(null)}
-                className="rounded-lg p-1 text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                className="rounded-lg p-1 text-zinc-400 transition hover:bg-white/[0.05] hover:text-white"
               >
                 ✕
               </button>

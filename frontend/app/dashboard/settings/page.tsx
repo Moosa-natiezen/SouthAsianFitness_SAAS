@@ -74,7 +74,7 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30 text-sm";
+  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30 text-sm";
 
 const labelClass = "text-sm font-medium text-zinc-400";
 
@@ -944,7 +944,7 @@ export default function SettingsPage() {
           Subscription & Billing
         </h3>
         {upgradePolling && (
-          <p className="mt-3 rounded-lg bg-white/5 px-4 py-3 text-sm font-medium text-white" role="status">
+          <p className="mt-3 rounded-lg bg-white/[0.05] px-4 py-3 text-sm font-medium text-white" role="status">
             ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
           </p>
         )}

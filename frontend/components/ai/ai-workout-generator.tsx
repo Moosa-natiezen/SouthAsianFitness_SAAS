@@ -93,7 +93,7 @@ export function AiWorkoutGenerator() {
   return (
     <div className="space-y-6">
       {/* Form Card */}
-      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
+      <div className="glass rounded-2xl p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-zinc-400">
           AI Workout Generator
         </p>
@@ -115,7 +115,7 @@ export function AiWorkoutGenerator() {
                 className={`rounded-xl border p-3 text-left transition-all ${
                   goal === g.value
                     ? "border-white/40 bg-white/10 text-white"
-                    : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                    : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
                 }`}
               >
                 <span className="text-lg">{g.icon}</span>
@@ -137,8 +137,8 @@ export function AiWorkoutGenerator() {
                   onClick={() => setExperience(e.value)}
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     experience === e.value
-                      ? "border-white/20 bg-white/8 text-white"
-                      : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                      ? "border-white/20 bg-white/[0.08] text-white"
+                      : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
                   }`}
                 >
                   {e.label}{" "}
@@ -157,8 +157,8 @@ export function AiWorkoutGenerator() {
                   onClick={() => setSplit(s.value)}
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     split === s.value
-                      ? "border-white/20 bg-white/8 text-white"
-                      : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                      ? "border-white/20 bg-white/[0.08] text-white"
+                      : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
                   }`}
                 >
                   {s.label}
@@ -176,8 +176,8 @@ export function AiWorkoutGenerator() {
                   onClick={() => setEquipment(eq.value)}
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     equipment === eq.value
-                      ? "border-white/20 bg-white/8 text-white"
-                      : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                      ? "border-white/20 bg-white/[0.08] text-white"
+                      : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
                   }`}
                 >
                   <span className="mr-1.5">{eq.icon}</span>
@@ -194,7 +194,7 @@ export function AiWorkoutGenerator() {
             <Button
               onClick={abort}
               variant="outline"
-              className="border-white/20 bg-white/5"
+              className="border-white/20 bg-white/[0.05]"
             >
               Stop Generation
             </Button>
@@ -218,14 +218,14 @@ export function AiWorkoutGenerator() {
 
       {/* Error */}
       {error && !isSandbox && (
-        <div className="rounded-2xl border border-white/20 bg-white/5 p-4 text-sm text-[#FF6B3D]">
+        <div className="rounded-2xl border border-white/20 bg-white/[0.05] p-4 text-sm text-red-300">
           {error}
         </div>
       )}
 
       {/* Streaming Output */}
       {(hasContent || isStreaming) && (
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-xl">
+        <div className="glass rounded-2xl">
           {/* Terminal header */}
           <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-3">
             <div className="flex items-center gap-2">
@@ -269,10 +269,10 @@ export function AiWorkoutGenerator() {
               >
                 {saving ? "Saving..." : "Save to Archive"}
               </Button>
-              <Button onClick={handleCopy} variant="outline" size="sm" className="border-white/10 bg-white/3">
+              <Button onClick={handleCopy} variant="outline" size="sm" className="border-white/10 bg-white/[0.04]">
                 Copy Markdown
               </Button>
-              <Button onClick={reset} variant="outline" size="sm" className="border-white/10 bg-white/3">
+              <Button onClick={reset} variant="outline" size="sm" className="border-white/10 bg-white/[0.04]">
                 Regenerate
               </Button>
               {saveMsg && (

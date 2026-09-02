@@ -36,7 +36,7 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
 
       {/* Day selector for multi-day plans */}
       {hasMultipleDays && (
-        <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
           <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Select day">
             {plan.days.map((d, i) => (
               <button
@@ -47,7 +47,7 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
                 className={`flex-shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                   i === selectedDay
                     ? "border-white/20 bg-white/8 text-white"
-                    : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
+                    : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
                 }`}
               >
                 <span className="block">Day {i + 1}</span>

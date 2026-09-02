@@ -21,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#05050A",
   width: "device-width",
   initialScale: 1,
 };
@@ -58,16 +58,24 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full bg-[#0a0a0a] text-[#fafafa]">
+      <body className="min-h-full bg-[#05050A] text-[#FAFAFA]">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[#0a0a0a] focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[#05050A] focus:outline-none"
         >
           Skip to content
         </a>
         <LenisProvider>
-          <div id="main-content" className="flex-1 flex flex-col">
-            {children}
+          <div id="main-content" className="flex-1 flex flex-col relative">
+            {/* Ambient background glow orbs */}
+            <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+              <div className="glow-orb-indigo absolute -top-40 -left-40 h-[500px] w-[500px]" />
+              <div className="glow-orb-violet absolute top-1/3 -right-32 h-[400px] w-[400px]" />
+              <div className="glow-orb-rose absolute bottom-0 left-1/3 h-[350px] w-[350px]" />
+            </div>
+            <div className="relative z-10">
+              {children}
+            </div>
           </div>
         </LenisProvider>
       </body>

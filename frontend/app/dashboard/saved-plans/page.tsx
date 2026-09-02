@@ -82,7 +82,7 @@ export default function SavedPlansPage() {
       {state.status === "loading" && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-48 rounded-2xl bg-white/4" />
+            <Skeleton key={i} className="h-48 rounded-2xl bg-white/[0.04]" />
           ))}
         </div>
       )}
@@ -160,12 +160,12 @@ function PlanCard({
         {/* Meta pills */}
         <div className="mt-2 flex flex-wrap gap-1.5">
           {plan.target_calories && (
-            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-zinc-400">
+            <span className="rounded-md bg-white/[0.05] px-2 py-0.5 text-[10px] text-zinc-400">
               {plan.target_calories} kcal
             </span>
           )}
           {plan.protein_g && (
-            <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-zinc-400">
+            <span className="rounded-md bg-white/[0.05] px-2 py-0.5 text-[10px] text-zinc-400">
               {plan.protein_g}g protein
             </span>
           )}
@@ -189,7 +189,7 @@ function PlanCard({
             <button
               onClick={() => onDelete(plan.id)}
               disabled={deleting}
-              className="rounded-lg border border-white/10 bg-white/3 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-all hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50"
+              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-all hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50"
             >
               {deleting ? "..." : "Delete"}
             </button>
@@ -227,7 +227,7 @@ function PlanModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/6 hover:text-zinc-300"
+            className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-300"
             aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

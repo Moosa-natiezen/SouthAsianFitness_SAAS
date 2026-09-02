@@ -109,7 +109,7 @@ function LoadingFallback() {
   return (
     <mesh scale={1.5}>
       <sphereGeometry args={[1, 16, 16]} />
-      <meshBasicMaterial color="#DC143C" wireframe />
+      <meshBasicMaterial color="#818CF8" wireframe />
     </mesh>
   );
 }
@@ -129,7 +129,7 @@ export function MacroSphere({ proteinProgress, calorieProgress }: MacroSpherePro
         <ambientLight intensity={0.3} />
         <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFFFFF" />
         <pointLight position={[-3, 2, 4]} intensity={0.5} color="#7B61FF" />
-        <pointLight position={[3, -2, 3]} intensity={0.3} color="#DC143C" />
+        <pointLight position={[3, -2, 3]} intensity={0.3} color="#818CF8" />
 
         <Suspense fallback={<LoadingFallback />}>
           <PresentationControls
@@ -151,7 +151,7 @@ export function MacroSphere({ proteinProgress, calorieProgress }: MacroSpherePro
             opacity={0.3}
             scale={5}
             blur={2.5}
-            color="#DC143C"
+            color="#818CF8"
           />
         </Suspense>
       </Canvas>

@@ -64,44 +64,65 @@ export default function DashboardPage() {
     ? `Welcome back, ${user.display_name}`
     : "Welcome back";
 
+  const isPro = user?.subscription_tier === "pro";
+
   return (
     <div className="space-y-6">
       {/* Upgrade banner */}
       {showUpgradeBanner && !upgradeDismissed && (
-        <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm">
-          <span className="text-zinc-300">🎉 Welcome to Pro! Your account has been upgraded.</span>
-          <button
-            type="button"
-            onClick={() => setUpgradeDismissed(true)}
-            className="ml-4 text-zinc-500 hover:text-zinc-300 transition-colors"
-          >
-            Dismiss
-          </button>
+        <div className="glass rounded-xl px-5 py-4 text-sm animate-fade-in-up">
+          <div className="flex items-center justify-between">
+            <span className="text-indigo-300">
+              <span className="mr-2">🎉</span>Welcome to Pro! Your account has been upgraded.
+            </span>
+            <button
+              type="button"
+              onClick={() => setUpgradeDismissed(true)}
+              className="ml-4 text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
       )}
 
       {/* Hero */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{greeting}</h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          Your personalized nutrition targets and today&apos;s meal plan.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
+      <div className="glass rounded-2xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-white">{greeting}</h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              Your personalized nutrition targets and today&apos;s meal plan.
+            </p>
+          </div>
+          {user && (
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${
+                isPro
+                  ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 animate-glow-ring"
+                  : "bg-white/[0.06] text-zinc-400 border border-white/[0.08]"
+              }`}
+            >
+              {isPro ? "✦ Pro" : "Free"}
+            </span>
+          )}
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
           <Link
             href="/dashboard/meal-plans"
-            className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#09090b] hover:bg-zinc-200 transition-colors"
+            className="btn-chrome-accent rounded-xl px-5 py-2.5 text-sm font-semibold"
           >
             AI Meal Generator
           </Link>
           <Link
             href="/dashboard/food"
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
+            className="btn-chrome rounded-xl px-5 py-2.5 text-sm font-medium text-zinc-300"
           >
             Browse Foods
           </Link>
           <Link
             href="/dashboard/progress"
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
+            className="btn-chrome rounded-xl px-5 py-2.5 text-sm font-medium text-zinc-300"
           >
             Track Progress
           </Link>
@@ -110,27 +131,28 @@ export default function DashboardPage() {
 
       {/* Loading */}
       {state.status === "loading" && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-40 rounded-lg bg-white/[0.04]" />
-          <Skeleton className="h-40 rounded-lg bg-white/[0.04]" />
+        <div className="grid gap-5 md:grid-cols-2">
+          <Skeleton className="h-48 rounded-2xl bg-white/[0.03]" />
+          <Skeleton className="h-48 rounded-2xl bg-white/[0.03]" />
         </div>
       )}
 
       {/* Error */}
       {state.status === "error" && (
-        <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-4 text-sm text-zinc-400">
+        <div className="glass rounded-2xl p-5 text-sm text-zinc-400">
           {state.message}
         </div>
       )}
 
       {/* Stats */}
       {state.status === "ready" && (
-        <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-5">
+          <div className="grid gap-5 md:grid-cols-2">
             <NutritionCard data={state.data} />
             <BudgetCard data={state.data} />
           </div>
           <TodayPlanCard />
+          <AchievementsSection />
         </div>
       )}
     </div>
@@ -148,28 +170,59 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
     general_fitness: "General Fitness",
   };
 
+  const totalMacro = n.protein_g + n.carbs_g + n.fat_g;
+  const proteinPct = totalMacro > 0 ? (n.protein_g / totalMacro) * 100 : 0;
+  const carbsPct = totalMacro > 0 ? (n.carbs_g / totalMacro) * 100 : 0;
+  const fatPct = totalMacro > 0 ? (n.fat_g / totalMacro) * 100 : 0;
+
   return (
-    <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-indigo-500/15">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">
         Nutrition Targets
       </p>
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-3xl font-bold tabular-nums">
+      <div className="mt-4 flex items-end gap-3">
+        <span className="text-3xl font-bold text-white tabular-nums">
           {Math.round(n.calorie_target).toLocaleString()}
         </span>
-        <span className="text-sm text-zinc-500">kcal / day</span>
+        <span className="text-sm text-zinc-500 mb-1">kcal / day</span>
       </div>
       <p className="mt-1 text-sm text-zinc-400">{goalLabel[n.goal] ?? n.goal}</p>
 
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        <StatBlock label="Protein" value={`${Math.round(n.protein_g)}g`} />
-        <StatBlock label="Carbs" value={`${Math.round(n.carbs_g)}g`} />
-        <StatBlock label="Fat" value={`${Math.round(n.fat_g)}g`} />
+      {/* Macro progress bars */}
+      <div className="mt-5 space-y-3">
+        <MacroBar label="Protein" value={Math.round(n.protein_g)} unit="g" pct={proteinPct} color="var(--macro-protein)" />
+        <MacroBar label="Carbs" value={Math.round(n.carbs_g)} unit="g" pct={carbsPct} color="var(--macro-carbs)" />
+        <MacroBar label="Fat" value={Math.round(n.fat_g)} unit="g" pct={fatPct} color="var(--macro-fat)" />
       </div>
 
-      <p className="mt-3 text-xs text-zinc-600">
+      <p className="mt-4 text-xs text-zinc-600">
         BMR {Math.round(n.bmr)} · TDEE {Math.round(n.tdee)}
       </p>
+    </div>
+  );
+}
+
+/* ── Macro Bar ──────────────────────────────────────────────────────── */
+
+function MacroBar({ label, value, unit, pct, color }: {
+  label: string;
+  value: number;
+  unit: string;
+  pct: number;
+  color: string;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between text-sm mb-1.5">
+        <span className="text-zinc-400">{label}</span>
+        <span className="text-zinc-300 tabular-nums font-medium">{value}{unit}</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: color }}
+        />
+      </div>
     </div>
   );
 }
@@ -181,35 +234,35 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   const hasBudget = b.daily_budget !== null;
 
   return (
-    <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-violet-500/15">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-violet-400/70">
         Budget
       </p>
       {hasBudget ? (
         <>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold tabular-nums">
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-white tabular-nums">
               {Number(b.daily_budget).toLocaleString()}
             </span>
             <span className="text-sm text-zinc-500">{b.currency_code} / day</span>
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
+          <div className="mt-5 space-y-3">
+            <div className="flex items-center justify-between text-sm glass rounded-lg px-4 py-2.5">
               <span className="text-zinc-500">Weekly</span>
-              <span className="font-medium text-zinc-300 tabular-nums">
+              <span className="font-medium text-zinc-200 tabular-nums">
                 {b.currency_code} {Number(b.weekly_budget).toLocaleString()}
               </span>
             </div>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm glass rounded-lg px-4 py-2.5">
               <span className="text-zinc-500">Monthly</span>
-              <span className="font-medium text-zinc-300 tabular-nums">
+              <span className="font-medium text-zinc-200 tabular-nums">
                 {b.currency_code} {Number(b.monthly_budget).toLocaleString()}
               </span>
             </div>
           </div>
         </>
       ) : (
-        <p className="mt-3 text-sm text-zinc-500">
+        <p className="mt-4 text-sm text-zinc-500">
           No budget set. Add one in your profile settings.
         </p>
       )}
@@ -217,13 +270,34 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   );
 }
 
-/* ── Stat Block ─────────────────────────────────────────────────────── */
+/* ── Achievements Section ───────────────────────────────────────────── */
 
-function StatBlock({ label, value }: { label: string; value: string }) {
+function AchievementsSection() {
+  const badges = [
+    { icon: "🔥", label: "7-Day Streak", desc: "Logged in for 7 days straight", glow: "from-orange-500/20 to-amber-500/10" },
+    { icon: "📊", label: "First Entry", desc: "Logged your first progress entry", glow: "from-indigo-500/20 to-violet-500/10" },
+    { icon: "🎯", label: "Goal Setter", desc: "Set your nutrition targets", glow: "from-emerald-500/20 to-teal-500/10" },
+  ];
+
   return (
-    <div className="rounded-lg bg-white/[0.03] px-3 py-2.5">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{label}</p>
-      <p className="mt-0.5 text-lg font-bold tabular-nums">{value}</p>
+    <div>
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-500 mb-4">
+        Your Progress Badges
+      </p>
+      <div className="grid grid-cols-3 gap-4">
+        {badges.map((badge) => (
+          <div
+            key={badge.label}
+            className="glass rounded-2xl p-5 text-center transition-all duration-300 hover:bg-white/[0.06] hover:border-violet-500/20 hover:shadow-[0_0_25px_rgba(139,92,246,0.1)] group cursor-default"
+          >
+            <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${badge.glow} text-2xl transition-transform duration-300 group-hover:scale-110`}>
+              {badge.icon}
+            </div>
+            <p className="mt-3 text-sm font-medium text-white">{badge.label}</p>
+            <p className="mt-1 text-xs text-zinc-500 leading-relaxed">{badge.desc}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

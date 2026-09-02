@@ -62,12 +62,12 @@ export function TodayPlanCard() {
 
   if (state.status === "loading") {
     return (
-      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
+      <div className="glass rounded-2xl p-6">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
         <div className="mt-4 space-y-3">
-          <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
-          <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
-          <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
+          <Skeleton className="h-20 w-full rounded-xl bg-white/[0.03]" />
+          <Skeleton className="h-20 w-full rounded-xl bg-white/[0.03]" />
+          <Skeleton className="h-20 w-full rounded-xl bg-white/[0.03]" />
         </div>
       </div>
     );
@@ -75,8 +75,8 @@ export function TodayPlanCard() {
 
   if (state.status === "error") {
     return (
-      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
+      <div className="glass rounded-2xl p-6">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
         <Button variant="outline" size="sm" className="mt-3" onClick={fetchPlan}>
           Try again
@@ -87,8 +87,8 @@ export function TodayPlanCard() {
 
   if (state.status === "failure") {
     return (
-      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
+      <div className="glass rounded-2xl p-6">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
         <AlertBanner variant="warning" message={state.data.reason} className="mt-4" />
         {state.data.suggestions.length > 0 && (
           <ul className="mt-2 list-inside list-disc text-sm text-zinc-400">
@@ -105,19 +105,19 @@ export function TodayPlanCard() {
   const { plan, day } = state;
 
   return (
-    <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-indigo-500/10">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
-        <Link href="/dashboard/meal-plans" className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
+        <Link href="/dashboard/meal-plans" className="text-xs text-zinc-500 hover:text-indigo-400 transition-colors duration-300">
           View full plan →
         </Link>
       </div>
-      <h2 className="mt-2 text-lg font-semibold">{plan.plan_name}</h2>
+      <h2 className="mt-2 text-lg font-semibold text-white">{plan.plan_name}</h2>
 
       {/* Meals */}
       <div className="mt-4 space-y-2">
         {day.meals.map((meal) => (
-          <div key={meal.meal_type} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+          <div key={meal.meal_type} className="glass rounded-xl p-4 transition-all duration-300 hover:bg-white/[0.04]">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-zinc-200">
                 {mealEmoji[meal.meal_type] ?? "🍽️"}{" "}
@@ -127,7 +127,7 @@ export function TodayPlanCard() {
                 {Math.round(meal.subtotal_calories)} kcal
               </p>
             </div>
-            <div className="mt-2 space-y-1">
+            <div className="mt-2.5 space-y-1">
               {meal.foods.map((food) => (
                 <div key={food.food_id} className="flex items-center justify-between text-sm">
                   <span className="text-zinc-300">
@@ -142,28 +142,28 @@ export function TodayPlanCard() {
                 </div>
               ))}
             </div>
-            <div className="mt-2 flex gap-3 text-xs text-zinc-500">
-              <span>P {Math.round(meal.subtotal_protein_g)}g</span>
-              <span>C {Math.round(meal.subtotal_carbs_g)}g</span>
-              <span>F {Math.round(meal.subtotal_fat_g)}g</span>
+            <div className="mt-2.5 flex gap-3 text-xs">
+              <span className="text-orange-400/80">P {Math.round(meal.subtotal_protein_g)}g</span>
+              <span className="text-cyan-400/80">C {Math.round(meal.subtotal_carbs_g)}g</span>
+              <span className="text-violet-400/80">F {Math.round(meal.subtotal_fat_g)}g</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Daily totals */}
-      <div className="mt-4 rounded-lg border border-white/[0.08] bg-white/[0.02] p-3">
+      <div className="mt-4 glass rounded-xl p-4">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-zinc-200">Daily Total</p>
-          <p className="text-sm font-semibold tabular-nums">{Math.round(day.total_calories)} kcal</p>
+          <p className="text-sm font-semibold tabular-nums text-white">{Math.round(day.total_calories)} kcal</p>
         </div>
-        <div className="mt-1 flex gap-4 text-xs text-zinc-400">
-          <span>Protein {Math.round(day.total_protein_g)}g</span>
-          <span>Carbs {Math.round(day.total_carbs_g)}g</span>
-          <span>Fat {Math.round(day.total_fat_g)}g</span>
+        <div className="mt-2 flex gap-4 text-xs">
+          <span className="text-orange-400/80 tabular-nums">Protein {Math.round(day.total_protein_g)}g</span>
+          <span className="text-cyan-400/80 tabular-nums">Carbs {Math.round(day.total_carbs_g)}g</span>
+          <span className="text-violet-400/80 tabular-nums">Fat {Math.round(day.total_fat_g)}g</span>
         </div>
         {plan.nutrition && (
-          <p className="mt-1 text-xs text-zinc-600">
+          <p className="mt-2 text-xs text-zinc-600">
             Target: {Math.round(plan.nutrition.calorie_target)} kcal
             ({Math.round(day.total_calories / plan.nutrition.calorie_target * 100)}%)
           </p>

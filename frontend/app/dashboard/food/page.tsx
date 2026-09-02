@@ -19,7 +19,7 @@ import {
 const PAGE_SIZE = 20;
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-[#DC143C]/30";
+  "w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
@@ -113,7 +113,7 @@ function NutrientPill({
   unit: string;
 }) {
   return (
-    <div className="rounded-md bg-white/5 px-2 py-1 text-center">
+    <div className="rounded-md bg-white/[0.05] px-2 py-1 text-center">
       <p className="text-[10px] font-medium uppercase text-zinc-400">{label}</p>
       <p className="text-sm font-semibold text-zinc-100">
         {value}
@@ -293,7 +293,7 @@ export default function FoodLibraryPage() {
             className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               selectedCategory === null
                 ? "border-white bg-white text-white"
-                : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
+                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.06]"
             }`}
             role="tab"
             aria-selected={selectedCategory === null}
@@ -307,7 +307,7 @@ export default function FoodLibraryPage() {
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 selectedCategory === cat.slug
                   ? "border-white bg-white text-white"
-                  : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
+                  : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.06]"
               }`}
               role="tab"
               aria-selected={selectedCategory === cat.slug}
