@@ -1,0 +1,83 @@
+# Render Infrastructure as Code
+# https://docs.render.com/render-blueprints
+#
+# Connect this repo to Render and it will auto-configure:
+# 1. A PostgreSQL database
+# 2. A Python web service for the FastAPI backend
+# 3. An automatic deploy pipeline
+#
+# After connecting, set the following secrets in the Render dashboard:
+#   DATABASE_URL, SECRET_KEY, CSRF_SECRET_KEY, OPENAI_API_KEY,
+#   LEMON_SQUEEZY_API_KEY, LEMON_SQUEEZY_WEBHOOK_SECRET, etc.
+
+services:
+  # ── FastAPI Backend ──────────────────────────────────────────────────────
+  - type: web
+    name: south-asian-fitness-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: >
+      pip install uv &&
+      uv sync --no-dev --frozen
+    startCommand: >
+      alembic upgrade head &&
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    healthCheckPolicy:
+      responseTimeoutSeconds: 30
+    envVars:
+      # ── Runtime ────────────────────────────────────────────────────────
+      - key: ENVIRONMENT
+        value: production
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: PORT
+        value: 10000
+
+      # ── Database (auto-linked from the database service below) ─────────
+      - key: DATABASE_URL
+        fromDatabase:
+          name: south-asian-fitness-db
+          property: connectionString
+
+      # ── Security (set these as secrets in the Render dashboard) ────────
+      - key: SECRET_KEY
+        sync: false
+      - key: CSRF_SECRET_KEY
+        sync: false
+
+      # ── CORS / Frontend URL ────────────────────────────────────────────
+      - key: CORS_ORIGINS
+        fromService:
+          name: south-asian-fitness-web
+          property: url
+      - key: FRONTEND_URL
+        fromService:
+          name: south-asian-fitness-web
+          property: url
+
+      # ── OpenAI (set as secret) ─────────────────────────────────────────
+      - key: OPENAI_API_KEY
+        sync: false
+
+      # ── Lemon Squeezy (set as secrets) ─────────────────────────────────
+      - key: LEMON_SQUEEZY_API_KEY
+        sync: false
+      - key: LEMON_SQUEEZY_WEBHOOK_SECRET
+        sync: false
+      - key: LEMON_SQUEEZY_STORE_ID
+        sync: false
+      - key: LEMON_SQUEEZY_VARIANT_ID
+        sync: false
+
+      # ── Deployment behavior ────────────────────────────────────────────
+      - key: PREVENT_AUTO_MIGRATIONS
+        value: "false"
+
+  # ── PostgreSQL Database ──────────────────────────────────────────────────
+  - type: postgresql
+    name: south-asian-fitness-db
+    plan: free
+    databaseName: southasianfitness
+    ipAllowList: []
