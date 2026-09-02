@@ -303,7 +303,7 @@ def test_ai_generate_empty_request():
 
 
 def test_ai_generate_openai_failure():
-    """Verify graceful handling when OpenAI API call fails."""
+    """Verify graceful fallback to sandbox when OpenAI API call fails."""
     client = setup_pro_client()
 
     mock_client = MagicMock()
@@ -318,18 +318,19 @@ def test_ai_generate_openai_failure():
         )
 
     assert resp.status_code == 200
-    # Should still return SSE with error chunk
     lines = resp.text.strip().split("\n")
     data_lines = [l for l in lines if l.startswith("data: ")]
     assert len(data_lines) >= 2
 
-    error_chunk = json.loads(data_lines[0].removeprefix("data: "))
-    assert "error" in error_chunk
-    assert "DONE" in data_lines[-1]
+    # First chunk should carry the sandbox flag
+    first_chunk = json.loads(data_lines[0].removeprefix("data: "))
+    assert first_chunk.get("sandbox") is True
+    # Must end with [DONE]
+    assert data_lines[-1] == "data: [DONE]"
 
 
 def test_ai_generate_no_api_key():
-    """Verify graceful handling when OPENAI_API_KEY is not set."""
+    """Verify graceful fallback to sandbox when OPENAI_API_KEY is not set."""
     client = setup_pro_client()
 
     # Clear the key from settings
@@ -346,9 +347,10 @@ def test_ai_generate_no_api_key():
         assert resp.status_code == 200
         lines = resp.text.strip().split("\n")
         data_lines = [l for l in lines if l.startswith("data: ")]
-        error_chunk = json.loads(data_lines[0].removeprefix("data: "))
-        assert "error" in error_chunk
-        assert "DONE" in data_lines[-1]
+        # Should stream sandbox content, not an error
+        first_chunk = json.loads(data_lines[0].removeprefix("data: "))
+        assert first_chunk.get("sandbox") is True
+        assert data_lines[-1] == "data: [DONE]"
     finally:
         settings.openai_api_key = original_key
 

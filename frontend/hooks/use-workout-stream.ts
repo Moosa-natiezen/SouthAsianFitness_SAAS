@@ -8,6 +8,7 @@ type WorkoutStreamState = {
   content: string;
   isStreaming: boolean;
   error: string | null;
+  isSandbox: boolean;
 };
 
 type WorkoutStreamReturn = WorkoutStreamState & {
@@ -30,6 +31,7 @@ export function useWorkoutStream(): WorkoutStreamReturn {
     content: "",
     isStreaming: false,
     error: null,
+    isSandbox: false,
   });
 
   const abortRef = useRef<AbortController | null>(null);
@@ -47,7 +49,7 @@ export function useWorkoutStream(): WorkoutStreamReturn {
       const controller = new AbortController();
       abortRef.current = controller;
 
-      setState({ content: "", isStreaming: true, error: null });
+      setState({ content: "", isStreaming: true, error: null, isSandbox: false });
 
       try {
         const response = await fetch(`${apiBaseUrl}/api/ai/workout/generate`, {
@@ -110,7 +112,11 @@ export function useWorkoutStream(): WorkoutStreamReturn {
             }
 
             try {
-              const parsed = JSON.parse(data) as { text?: string; error?: string };
+              const parsed = JSON.parse(data) as {
+                text?: string;
+                error?: string;
+                sandbox?: boolean;
+              };
               if (parsed.error) {
                 setState((prev) => ({
                   ...prev,
@@ -118,6 +124,9 @@ export function useWorkoutStream(): WorkoutStreamReturn {
                   error: parsed.error!,
                 }));
                 return;
+              }
+              if (parsed.sandbox) {
+                setState((prev) => ({ ...prev, isSandbox: true }));
               }
               if (parsed.text) {
                 setState((prev) => ({
@@ -163,7 +172,7 @@ export function useWorkoutStream(): WorkoutStreamReturn {
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setState({ content: "", isStreaming: false, error: null });
+    setState({ content: "", isStreaming: false, error: null, isSandbox: false });
   }, []);
 
   return { ...state, generate, abort, reset };

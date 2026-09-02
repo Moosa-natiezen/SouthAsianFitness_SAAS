@@ -38,7 +38,7 @@ const equipmentOptions = [
 /* ── Component ─────────────────────────────────────────────────────────── */
 
 export function AiWorkoutGenerator() {
-  const { content, isStreaming, error, generate, abort, reset } =
+  const { content, isStreaming, error, isSandbox, generate, abort, reset } =
     useWorkoutStream();
 
   const [goal, setGoal] = useState<string>("hypertrophy");
@@ -206,8 +206,18 @@ export function AiWorkoutGenerator() {
         </div>
       </div>
 
+      {/* Sandbox banner */}
+      {isSandbox && (
+        <div className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-medium text-[#F59E0B]">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
+            Using offline AI model (Sandbox mode) — add OPENAI_API_KEY for live generation
+          </p>
+        </div>
+      )}
+
       {/* Error */}
-      {error && (
+      {error && !isSandbox && (
         <div className="rounded-2xl border border-[#DC143C]/20 bg-[#DC143C]/5 p-4 text-sm text-[#FF6B3D]">
           {error}
         </div>

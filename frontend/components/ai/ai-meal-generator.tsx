@@ -14,7 +14,7 @@ import { saveAiMealPlan } from "@/lib/api";
  * Dark luxury glass aesthetic with glowing cursor animation.
  */
 export function AiMealGenerator() {
-  const { content, isStreaming, error, generate, reset } =
+  const { content, isStreaming, error, isSandbox, generate, reset } =
     useMealPlanStream();
 
   const [targetCalories, setTargetCalories] = useState("");
@@ -148,8 +148,18 @@ export function AiMealGenerator() {
         </div>
       </div>
 
+      {/* ── Sandbox Banner ──────────────────────────────────────────────── */}
+      {isSandbox && (
+        <div className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-medium text-[#F59E0B]">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
+            Using offline AI model (Sandbox mode) — add OPENAI_API_KEY for live generation
+          </p>
+        </div>
+      )}
+
       {/* ── Error ─────────────────────────────────────────────────────── */}
-      {error && (
+      {error && !isSandbox && (
         <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
           <p className="text-sm font-medium text-red-300">{error}</p>
         </div>

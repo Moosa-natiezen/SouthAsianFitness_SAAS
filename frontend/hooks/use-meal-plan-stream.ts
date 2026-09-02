@@ -16,6 +16,7 @@ type MealPlanStreamState = {
   content: string;
   isStreaming: boolean;
   error: string | null;
+  isSandbox: boolean;
 };
 
 /**
@@ -23,7 +24,7 @@ type MealPlanStreamState = {
  *
  * Usage:
  * ```ts
- * const { content, isStreaming, error, generate } = useMealPlanStream();
+ * const { content, isStreaming, error, isSandbox, generate } = useMealPlanStream();
  * await generate({ target_calories: 2000, cuisine_type: "South Asian" });
  * ```
  */
@@ -32,6 +33,7 @@ export function useMealPlanStream() {
     content: "",
     isStreaming: false,
     error: null,
+    isSandbox: false,
   });
   const abortRef = useRef<AbortController | null>(null);
 
@@ -41,7 +43,7 @@ export function useMealPlanStream() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setState({ content: "", isStreaming: true, error: null });
+    setState({ content: "", isStreaming: true, error: null, isSandbox: false });
 
     try {
       const response = await fetch(`${apiBaseUrl}/api/ai/meal-plans/generate`, {
@@ -68,6 +70,7 @@ export function useMealPlanStream() {
             content: "",
             isStreaming: false,
             error: "This feature requires a Pro subscription.",
+            isSandbox: false,
           });
           return;
         }
@@ -76,6 +79,7 @@ export function useMealPlanStream() {
           content: "",
           isStreaming: false,
           error: `Access denied (${response.status}).`,
+          isSandbox: false,
         });
         return;
       }
@@ -85,6 +89,7 @@ export function useMealPlanStream() {
           content: "",
           isStreaming: false,
           error: `Request failed with status ${response.status}`,
+          isSandbox: false,
         });
         return;
       }
@@ -96,6 +101,7 @@ export function useMealPlanStream() {
           content: "",
           isStreaming: false,
           error: "Response body is not readable.",
+          isSandbox: false,
         });
         return;
       }
@@ -127,7 +133,11 @@ export function useMealPlanStream() {
             }
 
             try {
-              const parsed = JSON.parse(data) as { text?: string; error?: string };
+              const parsed = JSON.parse(data) as {
+                text?: string;
+                error?: string;
+                sandbox?: boolean;
+              };
               if (parsed.error) {
                 setState((prev) => ({
                   ...prev,
@@ -135,6 +145,9 @@ export function useMealPlanStream() {
                   error: parsed.error!,
                 }));
                 return;
+              }
+              if (parsed.sandbox) {
+                setState((prev) => ({ ...prev, isSandbox: true }));
               }
               if (parsed.text) {
                 setState((prev) => ({
@@ -160,6 +173,7 @@ export function useMealPlanStream() {
         content: "",
         isStreaming: false,
         error: err instanceof Error ? err.message : "Stream failed.",
+        isSandbox: false,
       });
     }
   }, []);
@@ -171,7 +185,7 @@ export function useMealPlanStream() {
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setState({ content: "", isStreaming: false, error: null });
+    setState({ content: "", isStreaming: false, error: null, isSandbox: false });
   }, []);
 
   return { ...state, generate, abort, reset };
