@@ -118,7 +118,7 @@ export default function DashboardPage() {
 
       {/* Error */}
       {state.status === "error" && (
-        <div className="rounded-lg border border-white/8 bg-[#18181b] p-4 text-sm text-zinc-400">
+        <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-4 text-sm text-zinc-400">
           {state.message}
         </div>
       )}
@@ -149,7 +149,7 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
   };
 
   return (
-    <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+    <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
       <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
         Nutrition Targets
       </p>
@@ -181,7 +181,7 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   const hasBudget = b.daily_budget !== null;
 
   return (
-    <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+    <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
       <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
         Budget
       </p>

@@ -93,20 +93,20 @@ export function AiWorkoutGenerator() {
   return (
     <div className="space-y-6">
       {/* Form Card */}
-      <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 p-6 backdrop-blur-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
+      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-zinc-400">
           AI Workout Generator
         </p>
         <h1 className="mt-2 text-xl font-semibold text-white">
           Build Your Program
         </h1>
-        <p className="mt-2 text-[#8A8A94]">
+        <p className="mt-2 text-zinc-400">
           Generate a structured, progressive workout routine tailored to your goals.
         </p>
 
         {/* Goal selector */}
         <div className="mt-6 space-y-2">
-          <label className="text-sm font-medium text-[#C4C4CC]">Goal</label>
+          <label className="text-sm font-medium text-zinc-300">Goal</label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {goals.map((g) => (
               <button
@@ -114,13 +114,13 @@ export function AiWorkoutGenerator() {
                 onClick={() => setGoal(g.value)}
                 className={`rounded-xl border p-3 text-left transition-all ${
                   goal === g.value
-                    ? "border-[#DC143C]/40 bg-[#DC143C]/10 text-white"
-                    : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
+                    ? "border-white/40 bg-white/10 text-white"
+                    : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
                 }`}
               >
                 <span className="text-lg">{g.icon}</span>
                 <p className="mt-1 text-sm font-medium">{g.label}</p>
-                <p className="text-xs text-[#5A5A64]">{g.desc}</p>
+                <p className="text-xs text-zinc-600">{g.desc}</p>
               </button>
             ))}
           </div>
@@ -129,7 +129,7 @@ export function AiWorkoutGenerator() {
         {/* Experience + Split + Equipment row */}
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#C4C4CC]">Experience</label>
+            <label className="text-sm font-medium text-zinc-300">Experience</label>
             <div className="space-y-1.5">
               {experienceLevels.map((e) => (
                 <button
@@ -138,18 +138,18 @@ export function AiWorkoutGenerator() {
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     experience === e.value
                       ? "border-white/20 bg-white/8 text-white"
-                      : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
+                      : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
                   }`}
                 >
                   {e.label}{" "}
-                  <span className="text-[#5A5A64]">· {e.desc}</span>
+                  <span className="text-zinc-600">· {e.desc}</span>
                 </button>
               ))}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#C4C4CC]">Split</label>
+            <label className="text-sm font-medium text-zinc-300">Split</label>
             <div className="space-y-1.5">
               {splits.map((s) => (
                 <button
@@ -158,7 +158,7 @@ export function AiWorkoutGenerator() {
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     split === s.value
                       ? "border-white/20 bg-white/8 text-white"
-                      : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
+                      : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
                   }`}
                 >
                   {s.label}
@@ -168,7 +168,7 @@ export function AiWorkoutGenerator() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#C4C4CC]">Equipment</label>
+            <label className="text-sm font-medium text-zinc-300">Equipment</label>
             <div className="space-y-1.5">
               {equipmentOptions.map((eq) => (
                 <button
@@ -177,7 +177,7 @@ export function AiWorkoutGenerator() {
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     equipment === eq.value
                       ? "border-white/20 bg-white/8 text-white"
-                      : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
+                      : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
                   }`}
                 >
                   <span className="mr-1.5">{eq.icon}</span>
@@ -218,26 +218,26 @@ export function AiWorkoutGenerator() {
 
       {/* Error */}
       {error && !isSandbox && (
-        <div className="rounded-2xl border border-[#DC143C]/20 bg-[#DC143C]/5 p-4 text-sm text-[#FF6B3D]">
+        <div className="rounded-2xl border border-white/20 bg-white/5 p-4 text-sm text-[#FF6B3D]">
           {error}
         </div>
       )}
 
       {/* Streaming Output */}
       {(hasContent || isStreaming) && (
-        <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-xl">
           {/* Terminal header */}
-          <div className="flex items-center justify-between border-b border-white/8 px-5 py-3">
+          <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-3">
             <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-[#DC143C]/60" />
+              <div className="h-2.5 w-2.5 rounded-full bg-white/60" />
               <div className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]/60" />
               <div className="h-2.5 w-2.5 rounded-full bg-[#10B981]/60" />
-              <span className="ml-2 text-xs text-[#5A5A64]">AI Workout Generator</span>
+              <span className="ml-2 text-xs text-zinc-600">AI Workout Generator</span>
             </div>
             <div className="flex items-center gap-2">
               {isStreaming && (
-                <span className="flex items-center gap-1.5 text-xs text-[#DC143C]">
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#DC143C]" />
+                <span className="flex items-center gap-1.5 text-xs text-white">
+                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
                   streaming
                 </span>
               )}
@@ -247,7 +247,7 @@ export function AiWorkoutGenerator() {
           {/* Content */}
           <div className="max-h-[600px] overflow-y-auto p-6">
             {isStreaming && !hasContent && (
-              <p className="text-sm text-[#8A8A94]">Generating your workout program...</p>
+              <p className="text-sm text-zinc-400">Generating your workout program...</p>
             )}
             {hasContent && (
               <div className="prose prose-invert max-w-none">
@@ -260,7 +260,7 @@ export function AiWorkoutGenerator() {
 
           {/* Action toolbar */}
           {hasContent && !isStreaming && (
-            <div className="flex items-center gap-3 border-t border-white/8 px-5 py-3">
+            <div className="flex items-center gap-3 border-t border-white/[0.08] px-5 py-3">
               <Button
                 onClick={handleSave}
                 disabled={saving}
@@ -276,7 +276,7 @@ export function AiWorkoutGenerator() {
                 Regenerate
               </Button>
               {saveMsg && (
-                <span className="ml-auto text-xs text-[#8A8A94]">{saveMsg}</span>
+                <span className="ml-auto text-xs text-zinc-400">{saveMsg}</span>
               )}
             </div>
           )}

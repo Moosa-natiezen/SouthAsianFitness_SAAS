@@ -63,17 +63,17 @@ export function AiMealGenerator() {
     <div className="space-y-5">
       {/* ── Form ─────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl glass p-6">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#DC143C]/50/5 blur-[40px]" />
-        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-[#7B61FF]/5 blur-[40px]" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/50/5 blur-[40px]" />
+        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-zinc-700/5 blur-[40px]" />
 
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-300">
             AI Meal Plan Studio
           </p>
           <h3 className="mt-2 text-lg font-semibold text-white">
             Generate with AI
           </h3>
-          <p className="mt-1 text-sm text-[#8A8A94]">
+          <p className="mt-1 text-sm text-zinc-400">
             Set your targets and let AI create a personalized meal plan.
           </p>
 
@@ -116,7 +116,7 @@ export function AiMealGenerator() {
               <button
                 type="submit"
                 disabled={isStreaming}
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-[#DC143C] to-[#7B61FF] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#DC143C]/20 transition-all hover:shadow-[#DC143C]/30 hover:brightness-110 disabled:opacity-50"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-700 to-zinc-800 px-6 py-3 text-sm font-semibold text-white shadow-lg  transition-all hover: hover:brightness-110 disabled:opacity-50"
               >
                 {isStreaming ? (
                   <span className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export function AiMealGenerator() {
                   type="button"
                   onClick={reset}
                   disabled={isStreaming}
-                  className="rounded-xl border border-white/10 bg-white/4 px-5 py-3 text-sm font-medium text-[#8A8A94] transition-all hover:bg-white/6 hover:text-[#E8E8EC] disabled:opacity-50"
+                  className="rounded-xl border border-white/10 bg-white/4 px-5 py-3 text-sm font-medium text-zinc-400 transition-all hover:bg-white/6 hover:text-zinc-100 disabled:opacity-50"
                 >
                   Clear
                 </button>
@@ -168,17 +168,17 @@ export function AiMealGenerator() {
       {/* ── Streaming Output ──────────────────────────────────────────── */}
       {(content || isStreaming) && (
         <div className="relative overflow-hidden rounded-2xl glass p-6">
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#DC143C]/50/5 blur-[40px]" />
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/50/5 blur-[40px]" />
 
           <div className="relative">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF4060]">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-300">
                   AI Generated Plan
                 </p>
                 {isStreaming && (
-                  <span className="flex items-center gap-1.5 rounded-full bg-[#DC143C]/10 px-2.5 py-1 text-[10px] font-semibold text-[#FF4060]">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#DC143C] shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+                  <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-zinc-300">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
                     Streaming
                   </span>
                 )}
@@ -195,9 +195,9 @@ export function AiMealGenerator() {
             {/* Loading dots */}
             {isStreaming && (
               <div className="mt-4 flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#DC143C] [animation-delay:0ms]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#DC143C] [animation-delay:150ms]" />
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#DC143C] [animation-delay:300ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:0ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white [animation-delay:300ms]" />
               </div>
             )}
 
@@ -207,7 +207,7 @@ export function AiMealGenerator() {
                 <button
                   onClick={handleSave}
                   disabled={saveLoading}
-                  className="flex items-center gap-2 rounded-xl bg-[#DC143C]/10 border border-[#DC143C]/20 px-4 py-2.5 text-sm font-medium text-[#FF4060] transition-all hover:bg-[#DC143C]/50/20 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl bg-white/10 border border-white/20 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:bg-white/50/20 disabled:opacity-50"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
@@ -219,7 +219,7 @@ export function AiMealGenerator() {
                   onClick={() => {
                     navigator.clipboard.writeText(content);
                   }}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-[#8A8A94] transition-all hover:bg-white/6 hover:text-[#E8E8EC]"
+                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/6 hover:text-zinc-100"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
@@ -236,7 +236,7 @@ export function AiMealGenerator() {
                       cuisine_type: cuisineType || undefined,
                     });
                   }}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-[#8A8A94] transition-all hover:bg-white/6 hover:text-[#E8E8EC]"
+                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-white/6 hover:text-zinc-100"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
@@ -257,12 +257,12 @@ export function AiMealGenerator() {
       {/* ── Empty State ───────────────────────────────────────────────── */}
       {!content && !isStreaming && !error && (
         <div className="rounded-2xl border border-dashed border-white/10 bg-white/2 p-10 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#DC143C]/10">
-            <svg className="h-6 w-6 text-[#FF4060]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
+            <svg className="h-6 w-6 text-zinc-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
             </svg>
           </div>
-          <p className="mt-4 text-sm text-[#8A8A94]">
+          <p className="mt-4 text-sm text-zinc-400">
             Set your preferences above and click &quot;Generate AI Plan&quot; to get a
             personalized plan powered by AI.
           </p>
@@ -297,7 +297,7 @@ function InputField({
 }) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="text-xs font-medium text-[#8A8A94]">
+      <label htmlFor={id} className="text-xs font-medium text-zinc-400">
         {label}
       </label>
       <input
@@ -309,7 +309,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-[#8A8A94] transition-all focus:border-[#DC143C]/50 focus:outline-none focus:ring-1 focus:ring-[#DC143C]/30 disabled:opacity-50"
+        className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-[#DC143C]/30 disabled:opacity-50"
       />
     </div>
   );

@@ -74,9 +74,9 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-[#8A8A94] outline-none transition-all focus:border-[#DC143C]/50 focus:ring-1 focus:ring-[#DC143C]/30 text-sm";
+  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30 text-sm";
 
-const labelClass = "text-sm font-medium text-[#8A8A94]";
+const labelClass = "text-sm font-medium text-zinc-400";
 
 /* ── Component ─────────────────────────────────────────────────────────── */
 
@@ -451,17 +451,17 @@ export default function SettingsPage() {
       {/* ── Macro Targets Display ─────────────────────────────────────── */}
       {targets && (
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[#8A8A94]">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-400">
             Your Daily Targets
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <MacroStat label="Calories" value={targets.target_calories} unit="kcal" color="from-[#DC143C] to-[#FF4060]" />
+            <MacroStat label="Calories" value={targets.target_calories} unit="kcal" color="from-zinc-700 to-zinc-400" />
             <MacroStat label="Protein" value={targets.target_protein_g} unit="g" color="from-[#FF4500] to-[#FF6B3D]" />
             <MacroStat label="Carbs" value={targets.carbs_g} unit="g" color="from-[#00E5FF] to-[#00BCD4]" />
             <MacroStat label="Fat" value={targets.fat_g} unit="g" color="from-[#10B981] to-[#059669]" />
           </div>
           {targets.bmr && targets.tdee && (
-            <div className="mt-3 flex gap-4 text-xs text-[#8A8A94]">
+            <div className="mt-3 flex gap-4 text-xs text-zinc-400">
               <span>BMR: <span className="text-white">{Math.round(targets.bmr)}</span> kcal</span>
               <span>TDEE: <span className="text-white">{Math.round(targets.tdee)}</span> kcal</span>
             </div>
@@ -940,11 +940,11 @@ export default function SettingsPage() {
 
       {/* ── Billing Card ──────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#8A8A94]">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
           Subscription & Billing
         </h3>
         {upgradePolling && (
-          <p className="mt-3 rounded-lg bg-[#DC143C]/5 px-4 py-3 text-sm font-medium text-[#DC143C]" role="status">
+          <p className="mt-3 rounded-lg bg-white/5 px-4 py-3 text-sm font-medium text-white" role="status">
             ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
           </p>
         )}
@@ -958,13 +958,13 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3">
             <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
               isPro
-                ? "bg-gradient-to-br from-[#DC143C] to-[#7B61FF] text-white"
-                : "bg-white/8 text-[#5A5A64]"
+                ? "bg-gradient-to-br from-zinc-700 to-zinc-800 text-white"
+                : "bg-white/8 text-zinc-600"
             }`}>
               {isPro ? "P" : "F"}
             </div>
             <div>
-              <p className="text-sm font-medium text-[#8A8A94]">Current Plan</p>
+              <p className="text-sm font-medium text-zinc-400">Current Plan</p>
               <p className="text-lg font-semibold text-white">
                 {isPro ? "Pro Member" : "Free Tier"}
               </p>
@@ -973,7 +973,7 @@ export default function SettingsPage() {
           <Button
             onClick={handleManageBilling}
             disabled={portalLoading}
-            className={isPro ? "" : "bg-gradient-to-r from-[#DC143C] to-[#7B61FF] text-white hover:shadow-[0_0_20px_rgba(220,20,60,0.4)]"}
+            className={isPro ? "" : "bg-gradient-to-r from-zinc-700 to-zinc-800 text-white hover:shadow-[0_0_20px_rgba(220,20,60,0.4)]"}
           >
             {portalLoading ? "Loading..." : isPro ? "Manage Subscription" : "Upgrade to Pro"}
           </Button>
@@ -998,11 +998,11 @@ function MacroStat({
 }) {
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-      <p className="text-xs font-medium uppercase tracking-wider text-[#8A8A94]">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
       <p className={`mt-1 bg-gradient-to-r ${color} bg-clip-text text-2xl font-bold text-transparent`}>
         {value != null ? Math.round(value) : "—"}
       </p>
-      <p className="text-[10px] text-[#5A5A64]">{unit}</p>
+      <p className="text-[10px] text-zinc-600">{unit}</p>
     </div>
   );
 }

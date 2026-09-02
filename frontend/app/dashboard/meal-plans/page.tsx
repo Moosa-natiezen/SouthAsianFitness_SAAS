@@ -140,13 +140,13 @@ export default function MealPlansPage() {
     <div className="space-y-6">
       {/* Tab switcher */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#DC143C]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-white">
           Meal Plans
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-white">
           Generate Your Plan
         </h1>
-        <p className="mt-2 text-[#8A8A94]">
+        <p className="mt-2 text-zinc-400">
           Create a personalized meal plan using our optimizer or AI assistant.
         </p>
 
@@ -155,8 +155,8 @@ export default function MealPlansPage() {
             onClick={() => setActiveTab("optimizer")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "optimizer"
-                ? "border-[#DC143C]/30 bg-[#DC143C]/10 text-[#FF4060]"
-                : "border-white/10 bg-white/4 text-[#8A8A94] hover:bg-white/6"
+                ? "border-white/30 bg-white/10 text-zinc-300"
+                : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
             }`}
           >
             Deterministic Optimizer
@@ -165,8 +165,8 @@ export default function MealPlansPage() {
             onClick={() => setActiveTab("ai")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "ai"
-                ? "border-[#DC143C]/30 bg-[#DC143C]/10 text-[#FF4060]"
-                : "border-white/10 bg-white/4 text-[#8A8A94] hover:bg-white/6"
+                ? "border-white/30 bg-white/10 text-zinc-300"
+                : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
             }`}
           >
             AI Generator ✨
@@ -184,7 +184,7 @@ export default function MealPlansPage() {
         <h1 className="text-xl font-semibold text-white">
           {state.status === "ready" ? "Your Plan" : "Optimizer Plan"}
         </h1>
-        <p className="mt-2 text-[#8A8A94]">
+        <p className="mt-2 text-zinc-400">
           {state.status === "ready"
             ? "View your current plan or generate a new one."
             : "Generate a structured plan based on your nutrition targets and food database."}
@@ -193,7 +193,7 @@ export default function MealPlansPage() {
         {/* Controls */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#C4C4CC]">
+            <label className="text-sm font-medium text-zinc-300">
               Number of days
             </label>
             <div className="flex flex-wrap gap-2">
@@ -203,8 +203,8 @@ export default function MealPlansPage() {
                   onClick={() => setPlanDays(d)}
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     planDays === d
-                      ? "border-[#DC143C]/30 bg-[#DC143C]/10 text-[#FF4060]"
-                      : "border-white/10 bg-white/4 text-[#C4C4CC] hover:bg-white/6"
+                      ? "border-white/30 bg-white/10 text-zinc-300"
+                      : "border-white/10 bg-white/4 text-zinc-300 hover:bg-white/6"
                   }`}
                   aria-pressed={planDays === d}
                 >
@@ -215,7 +215,7 @@ export default function MealPlansPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#C4C4CC]">
+            <label className="text-sm font-medium text-zinc-300">
               Meals per day
             </label>
             <div className="flex flex-wrap gap-2">
@@ -225,8 +225,8 @@ export default function MealPlansPage() {
                   onClick={() => setMealCount(m)}
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     mealCount === m
-                      ? "border-[#DC143C]/30 bg-[#DC143C]/10 text-[#FF4060]"
-                      : "border-white/10 bg-white/4 text-[#C4C4CC] hover:bg-white/6"
+                      ? "border-white/30 bg-white/10 text-zinc-300"
+                      : "border-white/10 bg-white/4 text-zinc-300 hover:bg-white/6"
                   }`}
                   aria-pressed={mealCount === m}
                 >
@@ -257,7 +257,7 @@ export default function MealPlansPage() {
           className="rounded-2xl glass p-6"
           aria-live="polite"
         >
-          <p className="text-center text-[#8A8A94]">
+          <p className="text-center text-zinc-400">
             Generating your personalized plan...
           </p>
         </div>
@@ -299,11 +299,11 @@ export default function MealPlansPage() {
 
       {/* Paywall / Upgrade */}
       {showPaywall && (
-        <div className="rounded-2xl border border-[#DC143C]/20 bg-[#DC143C]/5 p-8 text-center shadow-sm">
-          <p className="text-lg font-semibold text-[#DC143C]">
+        <div className="rounded-2xl border border-white/20 bg-white/5 p-8 text-center shadow-sm">
+          <p className="text-lg font-semibold text-white">
             You've reached your limit
           </p>
-          <p className="mt-2 text-[#DC143C]">
+          <p className="mt-2 text-white">
             Free users can generate up to 3 meal plans per month.
             Upgrade to Pro for unlimited generation.
           </p>
@@ -321,8 +321,8 @@ export default function MealPlansPage() {
       {/* Idle state */}
       {state.status === "idle" && !showPaywall && (
         <div className="rounded-2xl border border-dashed border-white/10 bg-white/2 p-8 text-center">
-          <p className="text-lg font-medium text-[#C4C4CC]">No meal plan yet</p>
-          <p className="mt-2 text-[#8A8A94]">
+          <p className="text-lg font-medium text-zinc-300">No meal plan yet</p>
+          <p className="mt-2 text-zinc-400">
             Select your preferences above and click &quot;Generate Plan&quot; to
             create a personalized meal plan.
           </p>
@@ -344,7 +344,7 @@ export default function MealPlansPage() {
         <h2 className="text-lg font-semibold text-white">
           Plan History
         </h2>
-        <p className="mt-1 text-sm text-[#8A8A94]">
+        <p className="mt-1 text-sm text-zinc-400">
           Your previously generated meal plans.
         </p>
 
@@ -360,7 +360,7 @@ export default function MealPlansPage() {
         )}
 
         {!historyLoading && history && history.items.length === 0 && (
-          <p className="mt-4 text-sm text-[#8A8A94]">
+          <p className="mt-4 text-sm text-zinc-400">
             No meal plans generated yet.
           </p>
         )}
@@ -408,13 +408,13 @@ function PlanHistoryCard({
               {plan.day_count} {plan.day_count === 1 ? "day" : "days"}
             </Badge>
           </div>
-          <p className="mt-0.5 text-xs text-[#8A8A94]">
+          <p className="mt-0.5 text-xs text-zinc-400">
             {dateRange}
             {plan.calorie_target != null && (
               <> · {Math.round(plan.calorie_target)} kcal/day</>
             )}
           </p>
-          <p className="mt-0.5 text-xs text-[#8A8A94]">
+          <p className="mt-0.5 text-xs text-zinc-400">
             Created {createdDate}
           </p>
         </div>

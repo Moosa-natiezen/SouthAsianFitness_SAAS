@@ -19,7 +19,7 @@ import {
 const PAGE_SIZE = 20;
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-[#8A8A94] transition-all focus:border-[#DC143C]/50 focus:outline-none focus:ring-1 focus:ring-[#DC143C]/30";
+  "w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-[#DC143C]/30";
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
@@ -51,13 +51,13 @@ function FoodCard({ food }: { food: FoodItem }) {
 
         {/* Description */}
         {food.description && (
-          <p className="text-xs leading-relaxed text-[#8A8A94] line-clamp-2">
+          <p className="text-xs leading-relaxed text-zinc-400 line-clamp-2">
             {food.description}
           </p>
         )}
 
         {/* Serving */}
-        <p className="text-xs text-[#8A8A94]">
+        <p className="text-xs text-zinc-400">
           Per {formatServing(food.serving_size, food.serving_unit)}
         </p>
 
@@ -71,7 +71,7 @@ function FoodCard({ food }: { food: FoodItem }) {
 
         {/* Micro-nutrition */}
         {(food.nutrition.sugar_g != null || food.nutrition.sodium_mg != null) && (
-          <div className="flex gap-3 text-xs text-[#8A8A94]">
+          <div className="flex gap-3 text-xs text-zinc-400">
             {food.nutrition.sugar_g != null && (
               <span>Sugar {formatMacro(food.nutrition.sugar_g)}g</span>
             )}
@@ -114,10 +114,10 @@ function NutrientPill({
 }) {
   return (
     <div className="rounded-md bg-white/5 px-2 py-1 text-center">
-      <p className="text-[10px] font-medium uppercase text-[#8A8A94]">{label}</p>
-      <p className="text-sm font-semibold text-[#E8E8EC]">
+      <p className="text-[10px] font-medium uppercase text-zinc-400">{label}</p>
+      <p className="text-sm font-semibold text-zinc-100">
         {value}
-        <span className="text-[10px] font-normal text-[#8A8A94]"> {unit}</span>
+        <span className="text-[10px] font-normal text-zinc-400"> {unit}</span>
       </p>
     </div>
   );
@@ -252,7 +252,7 @@ export default function FoodLibraryPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-semibold text-white">Food Library</h2>
-        <p className="mt-1 text-sm text-[#8A8A94]">
+        <p className="mt-1 text-sm text-zinc-400">
           Browse {total} verified South Asian foods with full nutrition data.
         </p>
       </div>
@@ -271,7 +271,7 @@ export default function FoodLibraryPage() {
           aria-label="Search foods"
         />
         <svg
-          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#8A8A94]"
+          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -292,8 +292,8 @@ export default function FoodLibraryPage() {
             onClick={() => handleCategoryClick(null)}
             className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               selectedCategory === null
-                ? "border-[#DC143C] bg-[#DC143C] text-white"
-                : "border-white/10 bg-white/4 text-[#8A8A94] hover:bg-white/6"
+                ? "border-white bg-white text-white"
+                : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
             }`}
             role="tab"
             aria-selected={selectedCategory === null}
@@ -306,8 +306,8 @@ export default function FoodLibraryPage() {
               onClick={() => handleCategoryClick(cat.slug)}
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 selectedCategory === cat.slug
-                  ? "border-[#DC143C] bg-[#DC143C] text-white"
-                  : "border-white/10 bg-white/4 text-[#8A8A94] hover:bg-white/6"
+                  ? "border-white bg-white text-white"
+                  : "border-white/10 bg-white/4 text-zinc-400 hover:bg-white/6"
               }`}
               role="tab"
               aria-selected={selectedCategory === cat.slug}
@@ -333,10 +333,10 @@ export default function FoodLibraryPage() {
       {/* Empty state */}
       {!loading && foods.length === 0 && (
         <div className="rounded-xl border border-dashed border-white/10 bg-white/2 py-16 text-center">
-          <p className="text-sm font-medium text-[#8A8A94]">
+          <p className="text-sm font-medium text-zinc-400">
             No foods found matching your criteria.
           </p>
-          <p className="mt-1 text-xs text-[#8A8A94]">
+          <p className="mt-1 text-xs text-zinc-400">
             Try a different search term or category.
           </p>
         </div>

@@ -67,14 +67,14 @@ export default function WorkoutsPage() {
   return (
     <div className="space-y-6">
       {/* Header + tabs */}
-      <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 p-6 backdrop-blur-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8A8A94]">
+      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-zinc-400">
           Workout Studio
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-white">
           AI Workout Generator
         </h1>
-        <p className="mt-2 text-[#8A8A94]">
+        <p className="mt-2 text-zinc-400">
           Generate progressive overload routines with AI, or browse your saved programs.
         </p>
 
@@ -84,7 +84,7 @@ export default function WorkoutsPage() {
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "generator"
                 ? "border-white/20 bg-white/8 text-white"
-                : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
+                : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
             }`}
           >
             Generator
@@ -94,7 +94,7 @@ export default function WorkoutsPage() {
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "archive"
                 ? "border-white/20 bg-white/8 text-white"
-                : "border-white/10 bg-white/3 text-[#8A8A94] hover:bg-white/5"
+                : "border-white/10 bg-white/3 text-zinc-400 hover:bg-white/5"
             }`}
           >
             Archive {archive && archive.total > 0 && (
@@ -111,9 +111,9 @@ export default function WorkoutsPage() {
 
       {/* Archive tab */}
       {activeTab === "archive" && (
-        <div className="rounded-2xl border border-white/10 bg-[#12121A]/80 p-6 backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
           <h2 className="text-lg font-semibold text-white">Saved Workouts</h2>
-          <p className="mt-1 text-sm text-[#8A8A94]">
+          <p className="mt-1 text-sm text-zinc-400">
             Your archived AI-generated workout programs.
           </p>
 
@@ -129,7 +129,7 @@ export default function WorkoutsPage() {
           )}
 
           {!archiveLoading && archive && archive.items.length === 0 && (
-            <p className="mt-4 text-sm text-[#8A8A94]">
+            <p className="mt-4 text-sm text-zinc-400">
               No saved workouts yet. Generate one in the Generator tab!
             </p>
           )}
@@ -139,13 +139,13 @@ export default function WorkoutsPage() {
               {archive.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border border-white/8 bg-white/3 p-4 transition hover:bg-white/5"
+                  className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/3 p-4 transition hover:bg-white/5"
                 >
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-sm font-semibold text-white">
                       {item.title}
                     </h3>
-                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-[#8A8A94]">
+                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-zinc-400">
                       {item.goal && (
                         <span className="rounded bg-white/5 px-1.5 py-0.5">
                           {goalLabels[item.goal] ?? item.goal}
@@ -202,14 +202,14 @@ export default function WorkoutsPage() {
           onClick={() => setViewing(null)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-[#0A0A12] p-6"
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-900/50 p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{viewing.title}</h2>
               <button
                 onClick={() => setViewing(null)}
-                className="rounded-lg p-1 text-[#8A8A94] transition hover:bg-white/5 hover:text-white"
+                className="rounded-lg p-1 text-zinc-400 transition hover:bg-white/5 hover:text-white"
               >
                 ✕
               </button>

@@ -84,7 +84,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#05050A] px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] px-4 py-8">
       <Card className="w-full max-w-md border-white/10 shadow-xl">
         <CardHeader>
           <CardTitle>{isSignup ? "Create your account" : "Welcome back"}</CardTitle>
@@ -99,7 +99,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           <form onSubmit={handleSubmit} className="space-y-5">
             {isSignup ? (
               <div className="space-y-2">
-                <label htmlFor="displayName" className="text-sm font-medium text-[#8A8A94]">
+                <label htmlFor="displayName" className="text-sm font-medium text-zinc-400">
                   Display name
                 </label>
                 <input
@@ -109,7 +109,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, displayName: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-[#8A8A94] outline-none transition-all focus:border-[#DC143C]/50 focus:ring-1 focus:ring-[#DC143C]/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30"
                   placeholder="Your name"
                   autoComplete="name"
                 />
@@ -117,7 +117,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             ) : null}
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-[#8A8A94]">
+              <label htmlFor="email" className="text-sm font-medium text-zinc-400">
                 Email
               </label>
               <input
@@ -126,14 +126,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-[#8A8A94] outline-none transition-all focus:border-[#DC143C]/50 focus:ring-1 focus:ring-[#DC143C]/30"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30"
                 placeholder="you@example.com"
                 autoComplete={isSignup ? "email" : "username"}
               />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-[#8A8A94]">
+              <label htmlFor="password" className="text-sm font-medium text-zinc-400">
                 Password
               </label>
               <input
@@ -144,7 +144,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 onChange={(event) =>
                   setForm((current) => ({ ...current, password: event.target.value }))
                 }
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-[#8A8A94] outline-none transition-all focus:border-[#DC143C]/50 focus:ring-1 focus:ring-[#DC143C]/30"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-[#DC143C]/30"
                 placeholder="Enter an 8+ character password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
               />
@@ -161,9 +161,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-[#8A8A94]">
+          <p className="mt-6 text-center text-sm text-zinc-400">
             {isSignup ? "Already have an account?" : "Need an account?"}{" "}
-            <Link href={isSignup ? "/auth/login" : "/auth/signup"} className="font-medium text-[#DC143C] hover:text-[#DC143C]">
+            <Link href={isSignup ? "/auth/login" : "/auth/signup"} className="font-medium text-white hover:text-white">
               {isSignup ? "Log in" : "Sign up"}
             </Link>
           </p>

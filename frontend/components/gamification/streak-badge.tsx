@@ -29,10 +29,10 @@ function BadgeEmblem() {
           <mesh>
             <cylinderGeometry args={[0.9, 0.9, 0.15, 64]} />
             <meshPhysicalMaterial
-              color="#DC143C"
+              color="#a1a1aa"
               metalness={0.9}
               roughness={0.15}
-              emissive="#DC143C"
+              emissive="#52525b"
               emissiveIntensity={0.15}
               envMapIntensity={2}
             />
@@ -42,10 +42,10 @@ function BadgeEmblem() {
           <mesh position={[0, 0.08, 0]}>
             <torusGeometry args={[0.55, 0.04, 16, 64]} />
             <meshPhysicalMaterial
-              color="#7B61FF"
+              color="#71717a"
               metalness={0.95}
               roughness={0.1}
-              emissive="#7B61FF"
+              emissive="#3f3f46"
               emissiveIntensity={0.2}
             />
           </mesh>
@@ -57,7 +57,7 @@ function BadgeEmblem() {
               color="#FFFFFF"
               metalness={0.8}
               roughness={0.1}
-              emissive="#7B61FF"
+              emissive="#3f3f46"
               emissiveIntensity={0.4}
             />
           </mesh>
@@ -80,7 +80,7 @@ function BadgeEmblem() {
 function LoadingFallback() {
   return (
     <RoundedBox args={[1, 1, 0.2]} radius={0.1} smoothness={4}>
-      <meshBasicMaterial color="#DC143C" wireframe />
+      <meshBasicMaterial color="#a1a1aa" wireframe />
     </RoundedBox>
   );
 }
@@ -103,7 +103,7 @@ export function StreakBadge({ streak = 1 }: StreakBadgeProps) {
       >
         <ambientLight intensity={0.4} />
         <directionalLight position={[3, 4, 5]} intensity={0.7} color="#FFFFFF" />
-        <pointLight position={[-2, 1, 3]} intensity={0.4} color="#7B61FF" />
+        <pointLight position={[-2, 1, 3]} intensity={0.4} color="#71717a" />
 
         <Suspense fallback={<LoadingFallback />}>
           <BadgeEmblem />
@@ -112,14 +112,14 @@ export function StreakBadge({ streak = 1 }: StreakBadgeProps) {
             opacity={0.25}
             scale={4}
             blur={2}
-            color="#DC143C"
+            color="#a1a1aa"
           />
           <Environment preset="studio" environmentIntensity={0.4} />
         </Suspense>
       </Canvas>
 
       {/* Streak count overlay */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#05050A]/80 px-3 py-1 text-xs font-bold text-[#7B61FF] backdrop-blur-sm border border-[#7B61FF]/20">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#0a0a0a]/80 px-3 py-1 text-xs font-bold text-zinc-400 backdrop-blur-sm border border-zinc-700/20">
         🔥 {streak} day{streak !== 1 ? "s" : ""}
       </div>
     </div>

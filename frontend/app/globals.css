@@ -4,33 +4,33 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════════════
-   MINIMAL DARK — Linear-style flat design system
+   PROFESSIONAL DARK — Vercel / Linear style
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --background: #09090b;
+  --background: #0a0a0a;
   --foreground: #fafafa;
-  --card: #18181b;
+  --card: #141414;
   --card-foreground: #fafafa;
-  --popover: #18181b;
+  --popover: #141414;
   --popover-foreground: #fafafa;
   --primary: #fafafa;
-  --primary-foreground: #09090b;
+  --primary-foreground: #0a0a0a;
   --secondary: rgba(255, 255, 255, 0.06);
   --secondary-foreground: #a1a1aa;
   --muted: rgba(255, 255, 255, 0.06);
   --muted-foreground: #71717a;
   --accent: #fafafa;
-  --accent-foreground: #09090b;
+  --accent-foreground: #0a0a0a;
   --destructive: #ef4444;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.08);
   --ring: #52525b;
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 }
 
 .dark {
-  --background: #09090b;
+  --background: #0a0a0a;
   --foreground: #fafafa;
 }
 
@@ -88,10 +88,108 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   UTILITIES — Required by components across the codebase
+   ═══════════════════════════════════════════════════════════════════════ */
+
 @layer utilities {
+  /* Font families */
   .font-serif {
     font-family: var(--font-playfair), "Georgia", serif;
   }
+
+  /* Glass card (used by today-plan-card, meal plans, etc.) */
+  .glass {
+    background: rgba(20, 20, 20, 0.80);
+    backdrop-filter: blur(16px) saturate(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Chrome button styles (used by AI generators) */
+  .btn-chrome {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+  }
+  .btn-chrome:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .btn-chrome-accent {
+    background: #fafafa;
+    color: #0a0a0a;
+    border: 1px solid transparent;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .btn-chrome-accent:hover {
+    background: #e4e4e7;
+  }
+
+  /* Gradient text utilities (used by settings, dashboard) */
+  .text-gradient-accent {
+    background: linear-gradient(135deg, #fafafa, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-cardamom {
+    background: linear-gradient(135deg, #fafafa, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-saffron {
+    background: linear-gradient(135deg, #fafafa, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-cyber {
+    background: linear-gradient(135deg, #fafafa, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-warm {
+    background: linear-gradient(135deg, #fafafa, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Background patterns */
+  .bg-grid-editorial {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Streaming cursor */
@@ -106,12 +204,10 @@
   vertical-align: text-bottom;
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
+/* ═══════════════════════════════════════════════════════════════════════
+   PROSE OVERRIDES
+   ═══════════════════════════════════════════════════════════════════════ */
 
-/* Prose */
 .prose {
   --tw-prose-body: #a1a1aa;
   --tw-prose-headings: #fafafa;
@@ -120,7 +216,7 @@
   --tw-prose-bullets: #71717a;
   --tw-prose-hr: rgba(255, 255, 255, 0.08);
   --tw-prose-code: #d4d4d8;
-  --tw-prose-pre-bg: #18181b;
+  --tw-prose-pre-bg: #141414;
   --tw-prose-td-borders: rgba(255, 255, 255, 0.06);
   --tw-prose-th-borders: rgba(255, 255, 255, 0.1);
 }

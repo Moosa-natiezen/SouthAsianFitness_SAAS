@@ -23,7 +23,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-[#09090b] text-[#fafafa]">
       {/* ── Nav ──────────────────────────────────────────────────────── */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-[#09090b]/80 backdrop-blur-md">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xs font-bold text-[#09090b]">
@@ -84,7 +84,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Features ─────────────────────────────────────────────────── */}
-      <section id="features" className="border-t border-white/8 py-24">
+      <section id="features" className="border-t border-white/[0.08] py-24">
         <div className="mx-auto max-w-5xl px-6">
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-3">Features</p>
           <h2 className="text-2xl font-bold md:text-3xl mb-12">
@@ -92,7 +92,7 @@ export function LandingPage() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2">
             {features.map((f) => (
-              <div key={f.title} className="rounded-xl border border-white/8 bg-[#18181b] p-6">
+              <div key={f.title} className="rounded-xl border border-white/[0.08] bg-[#18181b] p-6">
                 <h3 className="font-medium text-[#fafafa]">{f.title}</h3>
                 <p className="mt-1.5 text-sm text-zinc-400">{f.desc}</p>
               </div>
@@ -102,7 +102,7 @@ export function LandingPage() {
       </section>
 
       {/* ── How it works ─────────────────────────────────────────────── */}
-      <section id="how-it-works" className="border-t border-white/8 py-24">
+      <section id="how-it-works" className="border-t border-white/[0.08] py-24">
         <div className="mx-auto max-w-5xl px-6">
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-3">How it works</p>
           <h2 className="text-2xl font-bold md:text-3xl mb-12">
@@ -121,14 +121,14 @@ export function LandingPage() {
       </section>
 
       {/* ── Pricing ──────────────────────────────────────────────────── */}
-      <section id="pricing" className="border-t border-white/8 py-24">
+      <section id="pricing" className="border-t border-white/[0.08] py-24">
         <div className="mx-auto max-w-5xl px-6">
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-3">Pricing</p>
           <h2 className="text-2xl font-bold md:text-3xl mb-12">
             Simple, transparent pricing.
           </h2>
           <div className="grid gap-6 md:grid-cols-2 max-w-2xl">
-            <div className="rounded-xl border border-white/8 bg-[#18181b] p-8">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-8">
               <p className="text-sm text-zinc-400">Free</p>
               <p className="mt-2 text-3xl font-bold">$0</p>
               <p className="mt-1 text-sm text-zinc-500">/month</p>
@@ -169,7 +169,7 @@ export function LandingPage() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────────── */}
-      <section className="border-t border-white/8 py-24">
+      <section className="border-t border-white/[0.08] py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <h2 className="text-2xl font-bold md:text-3xl">
             Your goals. Your food. Your plan.
@@ -187,7 +187,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/8 py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 text-sm text-zinc-500 md:flex-row md:items-center md:justify-between">
           <p>© 2026 South Asian Fitness.</p>
           <div className="flex gap-6">

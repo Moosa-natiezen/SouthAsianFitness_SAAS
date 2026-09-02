@@ -62,7 +62,7 @@ export function TodayPlanCard() {
 
   if (state.status === "loading") {
     return (
-      <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <div className="mt-4 space-y-3">
           <Skeleton className="h-16 w-full rounded-lg bg-white/[0.04]" />
@@ -75,7 +75,7 @@ export function TodayPlanCard() {
 
   if (state.status === "error") {
     return (
-      <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
         <Button variant="outline" size="sm" className="mt-3" onClick={fetchPlan}>
@@ -87,7 +87,7 @@ export function TodayPlanCard() {
 
   if (state.status === "failure") {
     return (
-      <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <AlertBanner variant="warning" message={state.data.reason} className="mt-4" />
         {state.data.suggestions.length > 0 && (
@@ -105,7 +105,7 @@ export function TodayPlanCard() {
   const { plan, day } = state;
 
   return (
-    <div className="rounded-lg border border-white/8 bg-[#18181b] p-5">
+    <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-5">
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Today&apos;s Plan</p>
         <Link href="/dashboard/meal-plans" className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
@@ -117,7 +117,7 @@ export function TodayPlanCard() {
       {/* Meals */}
       <div className="mt-4 space-y-2">
         {day.meals.map((meal) => (
-          <div key={meal.meal_type} className="rounded-lg border border-white/6 bg-white/[0.02] p-3">
+          <div key={meal.meal_type} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-zinc-200">
                 {mealEmoji[meal.meal_type] ?? "🍽️"}{" "}
@@ -152,7 +152,7 @@ export function TodayPlanCard() {
       </div>
 
       {/* Daily totals */}
-      <div className="mt-4 rounded-lg border border-white/8 bg-white/[0.02] p-3">
+      <div className="mt-4 rounded-lg border border-white/[0.08] bg-white/[0.02] p-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-zinc-200">Daily Total</p>
           <p className="text-sm font-semibold tabular-nums">{Math.round(day.total_calories)} kcal</p>
