@@ -84,13 +84,13 @@ export function PricingSection() {
           </div>
 
           {/* Pro Card — Visually dominant */}
-          <div className="relative scale-[1.03] rounded-3xl border border-white/30 bg-gradient-to-b from-orange-500/10 to-transparent p-8 shadow-orange-500/10 transition-all duration-500 hover:shadow-orange-500/15">
+          <div className="relative scale-[1.03] rounded-3xl border border-white/30 bg-gradient-to-b from-emerald-600/10 to-transparent p-8 shadow-emerald-600/10 transition-all duration-500 hover:shadow-emerald-600/15">
             {/* Glow accent */}
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-orange-500/10 via-transparent to-transparent opacity-50" />
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-emerald-600/10 via-transparent to-transparent opacity-50" />
 
             {/* Badge */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <span className="rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-stone-900 shadow-lg ">
+              <span className="rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-1 text-xs font-bold uppercase tracking-wider text-stone-900 shadow-lg ">
                 Most Popular
               </span>
             </div>
@@ -119,7 +119,7 @@ export function PricingSection() {
 
             <Link
               href="/auth/signup"
-              className="relative block w-full rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-center text-sm font-bold text-stone-900 shadow-lg shadow-orange-500/20 transition-all hover:shadow-orange-500/30 hover:brightness-110"
+              className="relative block w-full rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 py-3.5 text-center text-sm font-bold text-stone-900 shadow-lg shadow-emerald-600/20 transition-all hover:shadow-emerald-600/30 hover:brightness-110"
             >
               Start 14-day free trial
             </Link>

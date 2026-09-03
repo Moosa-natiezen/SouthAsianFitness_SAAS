@@ -19,7 +19,7 @@ import {
 const PAGE_SIZE = 20;
 
 const inputClass =
-  "w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-500 transition-all focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500/30";
+  "w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 transition-all focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30";
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
@@ -39,7 +39,7 @@ function FoodCard({ food }: { food: FoodItem }) {
       <CardContent className="space-y-3">
         {/* Header: name + category */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold leading-snug text-stone-900">
+          <h3 className="text-sm font-semibold leading-snug text-stone-900 dark:text-zinc-100">
             {food.name}
           </h3>
           {food.category && (
@@ -51,13 +51,13 @@ function FoodCard({ food }: { food: FoodItem }) {
 
         {/* Description */}
         {food.description && (
-          <p className="text-xs leading-relaxed text-stone-500 line-clamp-2">
+          <p className="text-xs leading-relaxed text-stone-500 dark:text-zinc-500 line-clamp-2">
             {food.description}
           </p>
         )}
 
         {/* Serving */}
-        <p className="text-xs text-stone-500">
+        <p className="text-xs text-stone-500 dark:text-zinc-500">
           Per {formatServing(food.serving_size, food.serving_unit)}
         </p>
 
@@ -71,7 +71,7 @@ function FoodCard({ food }: { food: FoodItem }) {
 
         {/* Micro-nutrition */}
         {(food.nutrition.sugar_g != null || food.nutrition.sodium_mg != null) && (
-          <div className="flex gap-3 text-xs text-stone-500">
+          <div className="flex gap-3 text-xs text-stone-500 dark:text-zinc-500">
             {food.nutrition.sugar_g != null && (
               <span>Sugar {formatMacro(food.nutrition.sugar_g)}g</span>
             )}
@@ -113,11 +113,11 @@ function NutrientPill({
   unit: string;
 }) {
   return (
-    <div className="rounded-md bg-stone-50 px-2 py-1 text-center">
-      <p className="text-[10px] font-medium uppercase text-stone-500">{label}</p>
-      <p className="text-sm font-semibold text-stone-900">
+    <div className="rounded-md bg-stone-50 dark:bg-zinc-800 px-2 py-1 text-center">
+      <p className="text-[10px] font-medium uppercase text-stone-500 dark:text-zinc-500">{label}</p>
+      <p className="text-sm font-semibold text-stone-900 dark:text-zinc-100">
         {value}
-        <span className="text-[10px] font-normal text-stone-500"> {unit}</span>
+        <span className="text-[10px] font-normal text-stone-500 dark:text-zinc-500"> {unit}</span>
       </p>
     </div>
   );
@@ -251,8 +251,8 @@ export default function FoodLibraryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-stone-900">Food Library</h2>
-        <p className="mt-1 text-sm text-stone-500">
+        <h2 className="text-2xl font-semibold text-stone-900 dark:text-zinc-100">Food Library</h2>
+        <p className="mt-1 text-sm text-stone-500 dark:text-zinc-500">
           Browse {total} verified South Asian foods with full nutrition data.
         </p>
       </div>
@@ -271,7 +271,7 @@ export default function FoodLibraryPage() {
           aria-label="Search foods"
         />
         <svg
-          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-stone-500"
+          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-stone-500 dark:text-zinc-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -292,8 +292,8 @@ export default function FoodLibraryPage() {
             onClick={() => handleCategoryClick(null)}
             className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               selectedCategory === null
-                ? "border-stone-300 bg-white text-stone-900"
-                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                ? "border-stone-300 bg-white dark:bg-zinc-900 text-stone-900 dark:text-zinc-100"
+                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
             }`}
             role="tab"
             aria-selected={selectedCategory === null}
@@ -306,8 +306,8 @@ export default function FoodLibraryPage() {
               onClick={() => handleCategoryClick(cat.slug)}
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 selectedCategory === cat.slug
-                  ? "border-stone-300 bg-white text-stone-900"
-                  : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                  ? "border-stone-300 bg-white dark:bg-zinc-900 text-stone-900 dark:text-zinc-100"
+                  : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
               }`}
               role="tab"
               aria-selected={selectedCategory === cat.slug}
@@ -332,11 +332,11 @@ export default function FoodLibraryPage() {
 
       {/* Empty state */}
       {!loading && foods.length === 0 && (
-        <div className="rounded-xl border border-dashed border-stone-200 bg-white/2 py-16 text-center">
-          <p className="text-sm font-medium text-stone-500">
+        <div className="rounded-xl border border-dashed border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900/2 py-16 text-center">
+          <p className="text-sm font-medium text-stone-500 dark:text-zinc-500">
             No foods found matching your criteria.
           </p>
-          <p className="mt-1 text-xs text-stone-500">
+          <p className="mt-1 text-xs text-stone-500 dark:text-zinc-500">
             Try a different search term or category.
           </p>
         </div>

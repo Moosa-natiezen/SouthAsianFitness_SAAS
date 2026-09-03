@@ -4,40 +4,71 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════════════
-   WARM LIGHT MODE — Premium Alabaster + Saffron
-   Clean, airy, high-end health app aesthetic.
+   EMERALD GREEN DESIGN SYSTEM — Light & Dark Mode
+   Premium health app aesthetic with emerald as the sole accent.
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --background: #FCFBF7;
+  --background: #FAFAF9;
   --foreground: #1C1917;
   --card: #FFFFFF;
   --card-foreground: #1C1917;
   --popover: #FFFFFF;
   --popover-foreground: #1C1917;
-  --primary: #F97316;
+  --primary: #059669;
   --primary-foreground: #FFFFFF;
   --secondary: rgba(28, 25, 23, 0.04);
   --secondary-foreground: #57534E;
   --muted: rgba(28, 25, 23, 0.03);
   --muted-foreground: #78716C;
-  --accent: #F97316;
+  --accent: #059669;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
   --border: rgba(28, 25, 23, 0.08);
   --input: rgba(28, 25, 23, 0.06);
-  --ring: #F97316;
+  --ring: #059669;
   --radius: 0.75rem;
 
   /* ── Brand Palette ──────────────────────────────────────────────── */
-  --brand: #F97316;
-  --brand-light: #FB923C;
-  --brand-dark: #EA580C;
+  --brand: #059669;
+  --brand-light: #10B981;
+  --brand-dark: #047857;
 
   /* ── Macro Colors ──────────────────────────────────────────────── */
-  --macro-protein: #EA580C;
-  --macro-carbs: #059669;
+  --macro-protein: #059669;
+  --macro-carbs: #0891B2;
   --macro-fat: #D97706;
+}
+
+.dark {
+  --background: #09090B;
+  --foreground: #FAFAFA;
+  --card: #18181B;
+  --card-foreground: #FAFAFA;
+  --popover: #18181B;
+  --popover-foreground: #FAFAFA;
+  --primary: #10B981;
+  --primary-foreground: #022C22;
+  --secondary: rgba(250, 250, 250, 0.06);
+  --secondary-foreground: #A1A1AA;
+  --muted: rgba(250, 250, 250, 0.04);
+  --muted-foreground: #71717A;
+  --accent: #10B981;
+  --accent-foreground: #022C22;
+  --destructive: #EF4444;
+  --border: rgba(250, 250, 250, 0.08);
+  --input: rgba(250, 250, 250, 0.06);
+  --ring: #10B981;
+
+  /* ── Brand Palette (Dark) ────────────────────────────────────── */
+  --brand: #10B981;
+  --brand-light: #34D399;
+  --brand-dark: #059669;
+
+  /* ── Macro Colors (Dark) ─────────────────────────────────────── */
+  --macro-protein: #10B981;
+  --macro-carbs: #22D3EE;
+  --macro-fat: #FBBF24;
 }
 
 @theme inline {
@@ -79,12 +110,12 @@
 
   body {
     @apply antialiased;
-    background: #FCFBF7;
-    color: #1C1917;
+    background: var(--background);
+    color: var(--foreground);
   }
 
   ::selection {
-    background: rgba(249, 115, 22, 0.15);
+    background: rgba(5, 150, 105, 0.15);
   }
 
   ::-webkit-scrollbar {
@@ -95,11 +126,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(249, 115, 22, 0.15);
+    background: rgba(5, 150, 105, 0.15);
     border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(249, 115, 22, 0.3);
+    background: rgba(5, 150, 105, 0.3);
   }
 }
 
@@ -122,6 +153,12 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
+  .dark .glass {
+    background: rgba(24, 24, 27, 0.60);
+    border: 1px solid rgba(250, 250, 250, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(250, 250, 250, 0.03);
+  }
+
   /* ── Glass strong — modal overlay ──────────────────────────────── */
   .glass-strong {
     background: rgba(255, 255, 255, 0.95);
@@ -129,6 +166,12 @@
     -webkit-backdrop-filter: blur(24px) saturate(1.2);
     border: 1px solid rgba(28, 25, 23, 0.08);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .dark .glass-strong {
+    background: rgba(24, 24, 27, 0.80);
+    border: 1px solid rgba(250, 250, 250, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(250, 250, 250, 0.04);
   }
 
   /* ── Chrome buttons ────────────────────────────────────────────── */
@@ -145,50 +188,68 @@
     transform: scale(0.98);
   }
 
+  .dark .btn-chrome {
+    background: rgba(250, 250, 250, 0.04);
+    border: 1px solid rgba(250, 250, 250, 0.08);
+  }
+  .dark .btn-chrome:hover {
+    background: rgba(250, 250, 250, 0.08);
+    border-color: rgba(250, 250, 250, 0.12);
+  }
+
   .btn-chrome-accent {
-    background: #F97316;
+    background: #059669;
     color: #FFFFFF;
     border: 1px solid transparent;
     font-weight: 600;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(249, 115, 22, 0.2);
+    box-shadow: 0 1px 3px rgba(5, 150, 105, 0.2);
   }
   .btn-chrome-accent:hover {
-    background: #EA580C;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    background: #047857;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
     transform: translateY(-1px);
   }
   .btn-chrome-accent:active {
     transform: scale(0.98) translateY(0);
   }
 
+  .dark .btn-chrome-accent {
+    background: #10B981;
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
+  }
+  .dark .btn-chrome-accent:hover {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  }
+
   /* ── Gradient text ─────────────────────────────────────────────── */
   .text-gradient-accent {
-    background: linear-gradient(135deg, #F97316, #FB923C);
+    background: linear-gradient(135deg, #059669, #10B981);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   .text-gradient-cardamom {
-    background: linear-gradient(135deg, #F97316, #FB923C);
+    background: linear-gradient(135deg, #059669, #0891B2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   .text-gradient-saffron {
-    background: linear-gradient(135deg, #F97316, #FBBF24);
+    background: linear-gradient(135deg, #10B981, #22D3EE);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   .text-gradient-cyber {
-    background: linear-gradient(135deg, #F97316, #FBBF24);
+    background: linear-gradient(135deg, #059669, #FBBF24);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   .text-gradient-warm {
-    background: linear-gradient(135deg, #F97316, #EA580C);
+    background: linear-gradient(135deg, #059669, #047857);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -197,9 +258,15 @@
   /* ── Background patterns ───────────────────────────────────────── */
   .bg-grid-editorial {
     background-image:
-      linear-gradient(rgba(249, 115, 22, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(249, 115, 22, 0.02) 1px, transparent 1px);
+      linear-gradient(rgba(5, 150, 105, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(5, 150, 105, 0.02) 1px, transparent 1px);
     background-size: 60px 60px;
+  }
+
+  .dark .bg-grid-editorial {
+    background-image:
+      linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
   }
 
   .bg-grain {
@@ -236,8 +303,13 @@
 }
 
 @keyframes glow-ring {
-  0%, 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.15); }
-  50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.3); }
+  0%, 100% { box-shadow: 0 0 15px rgba(5, 150, 105, 0.15); }
+  50% { box-shadow: 0 0 30px rgba(5, 150, 105, 0.3); }
+}
+
+.dark @keyframes glow-ring {
+  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
 }
 
 .animate-glow-ring {
@@ -262,17 +334,22 @@
   animation: fade-in-up 0.5s ease-out forwards;
 }
 
-/* Streaming cursor — saffron glow */
+/* Streaming cursor — emerald glow */
 .streaming-cursor::after {
   content: "";
   display: inline-block;
   width: 2px;
   height: 1.1em;
   margin-left: 2px;
-  background: #F97316;
+  background: #059669;
   animation: blink 1s step-end infinite;
   vertical-align: text-bottom;
-  box-shadow: 0 0 6px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 0 6px rgba(5, 150, 105, 0.4);
+}
+
+.dark .streaming-cursor::after {
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -283,7 +360,7 @@
   --tw-prose-body: #44403C;
   --tw-prose-headings: #1C1917;
   --tw-prose-bold: #1C1917;
-  --tw-prose-links: #F97316;
+  --tw-prose-links: #059669;
   --tw-prose-bullets: #A8A29E;
   --tw-prose-hr: rgba(28, 25, 23, 0.08);
   --tw-prose-code: #292524;
@@ -292,16 +369,58 @@
   --tw-prose-th-borders: rgba(28, 25, 23, 0.12);
 }
 
+.dark .prose {
+  --tw-prose-body: #A1A1AA;
+  --tw-prose-headings: #FAFAFA;
+  --tw-prose-bold: #FAFAFA;
+  --tw-prose-links: #10B981;
+  --tw-prose-bullets: #52525B;
+  --tw-prose-hr: rgba(250, 250, 250, 0.08);
+  --tw-prose-code: #E4E4E7;
+  --tw-prose-pre-bg: rgba(250, 250, 250, 0.04);
+  --tw-prose-td-borders: rgba(250, 250, 250, 0.08);
+  --tw-prose-th-borders: rgba(250, 250, 250, 0.12);
+}
+
 .prose table { border-collapse: collapse; }
 .prose th, .prose td {
   border: 1px solid rgba(28, 25, 23, 0.08);
   padding: 0.5rem 0.75rem;
 }
-.prose th { background: rgba(249, 115, 22, 0.04); }
+.dark .prose th, .dark .prose td {
+  border-color: rgba(250, 250, 250, 0.08);
+}
+.prose th { background: rgba(5, 150, 105, 0.04); }
+.dark .prose th { background: rgba(16, 185, 129, 0.06); }
 .prose code {
   background: rgba(28, 25, 23, 0.04);
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.875em;
 }
+.dark .prose code {
+  background: rgba(250, 250, 250, 0.06);
+}
 .prose pre code { background: none; padding: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THEME TRANSITION — flicker-free switching
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html *,
+html *::before,
+html *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0s;
+}
+
+html.transitioning *,
+html.transitioning *::before,
+html.transitioning *::after {
+  transition-duration: 0.3s !important;
+  transition-timing-function: ease !important;
+}

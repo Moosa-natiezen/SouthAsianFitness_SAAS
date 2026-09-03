@@ -67,14 +67,14 @@ export default function WorkoutsPage() {
   return (
     <div className="space-y-6">
       {/* Header + tabs */}
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 backdrop-blur-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
+      <div className="rounded-2xl border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6 backdrop-blur-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-zinc-500">
           Workout Studio
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-stone-900">
+        <h1 className="mt-2 text-2xl font-semibold text-stone-900 dark:text-zinc-100">
           AI Workout Generator
         </h1>
-        <p className="mt-2 text-stone-500">
+        <p className="mt-2 text-stone-500 dark:text-zinc-500">
           Generate progressive overload routines with AI, or browse your saved programs.
         </p>
 
@@ -83,8 +83,8 @@ export default function WorkoutsPage() {
             onClick={() => setActiveTab("generator")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "generator"
-                ? "border-stone-300 bg-white/8 text-stone-900"
-                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                ? "border-stone-300 bg-white dark:bg-zinc-900/8 text-stone-900 dark:text-zinc-100"
+                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
             }`}
           >
             Generator
@@ -93,12 +93,12 @@ export default function WorkoutsPage() {
             onClick={() => setActiveTab("archive")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "archive"
-                ? "border-stone-300 bg-white/8 text-stone-900"
-                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                ? "border-stone-300 bg-white dark:bg-zinc-900/8 text-stone-900 dark:text-zinc-100"
+                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
             }`}
           >
             Archive {archive && archive.total > 0 && (
-              <span className="ml-1.5 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px]">
+              <span className="ml-1.5 rounded-full bg-white dark:bg-zinc-900/10 px-1.5 py-0.5 text-[10px]">
                 {archive.total}
               </span>
             )}
@@ -111,9 +111,9 @@ export default function WorkoutsPage() {
 
       {/* Archive tab */}
       {activeTab === "archive" && (
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 backdrop-blur-xl">
-          <h2 className="text-lg font-semibold text-stone-900">Saved Workouts</h2>
-          <p className="mt-1 text-sm text-stone-500">
+        <div className="rounded-2xl border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6 backdrop-blur-xl">
+          <h2 className="text-lg font-semibold text-stone-900 dark:text-zinc-100">Saved Workouts</h2>
+          <p className="mt-1 text-sm text-stone-500 dark:text-zinc-500">
             Your archived AI-generated workout programs.
           </p>
 
@@ -129,7 +129,7 @@ export default function WorkoutsPage() {
           )}
 
           {!archiveLoading && archive && archive.items.length === 0 && (
-            <p className="mt-4 text-sm text-stone-500">
+            <p className="mt-4 text-sm text-stone-500 dark:text-zinc-500">
               No saved workouts yet. Generate one in the Generator tab!
             </p>
           )}
@@ -139,25 +139,25 @@ export default function WorkoutsPage() {
               {archive.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 p-4 transition hover:bg-stone-50"
+                  className="flex items-center justify-between rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 p-4 transition hover:bg-stone-50 dark:bg-zinc-800"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-sm font-semibold text-stone-900">
+                    <h3 className="truncate text-sm font-semibold text-stone-900 dark:text-zinc-100">
                       {item.title}
                     </h3>
-                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-stone-500">
+                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-stone-500 dark:text-zinc-500">
                       {item.goal && (
-                        <span className="rounded bg-stone-50 px-1.5 py-0.5">
+                        <span className="rounded bg-stone-50 dark:bg-zinc-800 px-1.5 py-0.5">
                           {goalLabels[item.goal] ?? item.goal}
                         </span>
                       )}
                       {item.split && (
-                        <span className="rounded bg-stone-50 px-1.5 py-0.5">
+                        <span className="rounded bg-stone-50 dark:bg-zinc-800 px-1.5 py-0.5">
                           {splitLabels[item.split] ?? item.split}
                         </span>
                       )}
                       {item.equipment && (
-                        <span className="rounded bg-stone-50 px-1.5 py-0.5 capitalize">
+                        <span className="rounded bg-stone-50 dark:bg-zinc-800 px-1.5 py-0.5 capitalize">
                           {item.equipment}
                         </span>
                       )}
@@ -174,7 +174,7 @@ export default function WorkoutsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-stone-200 bg-stone-50"
+                      className="border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800"
                       onClick={() => setViewing(item)}
                     >
                       View
@@ -202,14 +202,14 @@ export default function WorkoutsPage() {
           onClick={() => setViewing(null)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-6"
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-stone-900">{viewing.title}</h2>
+              <h2 className="text-lg font-semibold text-stone-900 dark:text-zinc-100">{viewing.title}</h2>
               <button
                 onClick={() => setViewing(null)}
-                className="rounded-lg p-1 text-stone-500 transition hover:bg-stone-50 hover:text-stone-900"
+                className="rounded-lg p-1 text-stone-500 dark:text-zinc-500 transition hover:bg-stone-50 dark:bg-zinc-800 hover:text-stone-900 dark:text-zinc-100"
               >
                 ✕
               </button>

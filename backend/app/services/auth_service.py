@@ -197,6 +197,65 @@ def change_password(db: Session, user: User, current_password: str, new_password
     logger.info("Password changed for user %s", user.id)
 
 
+def google_login_or_register(db: Session, id_token: str) -> User:
+    """Verify a Google ID token and log in or register the user.
+
+    Uses the google-auth library to verify the token against Google's
+    public keys.  If the email already exists the user is logged in;
+    otherwise a new account is created automatically.
+    """
+    from fastapi import HTTPException
+    from google.auth.transport import requests as google_requests
+    from google.oauth2 import id_token as google_id_token
+
+    try:
+        idinfo = google_id_token.verify_oauth2_token(
+            id_token,
+            google_requests.Request(),
+            settings.google_client_id or "",
+        )
+    except Exception:
+        logger.exception("Google ID token verification failed")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired Google token.",
+        )
+
+    email = idinfo.get("email", "")
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google token does not contain an email.",
+        )
+
+    normalized_email = normalize_email(email)
+    user = db.query(User).filter(User.email == normalized_email).first()
+
+    if user is None:
+        # Auto-register
+        display_name = idinfo.get("name", email.split("@")[0])
+        user = User(
+            email=normalized_email,
+            display_name=display_name,
+            password_hash="",  # No password for Google OAuth users
+            preferred_language="en",
+            preferred_unit_system=None,
+            preferred_currency_code=None,
+            country_id=None,
+            is_onboarded=False,
+            is_active=True,
+        )
+        db.add(user)
+        db.flush()
+        logger.info("Registered new Google OAuth user %s (%s)", user.id, normalized_email)
+    else:
+        user.last_login_at = datetime.now(UTC)
+        db.flush()
+        logger.info("Google OAuth login for user %s (%s)", user.id, normalized_email)
+
+    return user
+
+
 def submit_onboarding(db: Session, user: User, payload: dict) -> User:
     country_id = payload.get("country_id")
     region_id = payload.get("region_id")

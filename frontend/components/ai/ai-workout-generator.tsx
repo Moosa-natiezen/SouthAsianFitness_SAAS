@@ -94,13 +94,13 @@ export function AiWorkoutGenerator() {
     <div className="space-y-6">
       {/* Form Card */}
       <div className="glass rounded-2xl p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-zinc-500">
           AI Workout Generator
         </p>
-        <h1 className="mt-2 text-xl font-semibold text-stone-900">
+        <h1 className="mt-2 text-xl font-semibold text-stone-900 dark:text-zinc-100">
           Build Your Program
         </h1>
-        <p className="mt-2 text-stone-500">
+        <p className="mt-2 text-stone-500 dark:text-zinc-500">
           Generate a structured, progressive workout routine tailored to your goals.
         </p>
 
@@ -114,13 +114,13 @@ export function AiWorkoutGenerator() {
                 onClick={() => setGoal(g.value)}
                 className={`rounded-xl border p-3 text-left transition-all ${
                   goal === g.value
-                    ? "border-stone-200 bg-stone-50 text-stone-900"
-                    : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                    ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-900 dark:text-zinc-100"
+                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
                 }`}
               >
                 <span className="text-lg">{g.icon}</span>
                 <p className="mt-1 text-sm font-medium">{g.label}</p>
-                <p className="text-xs text-stone-400">{g.desc}</p>
+                <p className="text-xs text-stone-400 dark:text-zinc-500">{g.desc}</p>
               </button>
             ))}
           </div>
@@ -137,12 +137,12 @@ export function AiWorkoutGenerator() {
                   onClick={() => setExperience(e.value)}
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     experience === e.value
-                      ? "border-stone-300 bg-white/[0.08] text-stone-900"
-                      : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                      ? "border-stone-300 bg-white dark:bg-zinc-900/[0.08] text-stone-900 dark:text-zinc-100"
+                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
                   }`}
                 >
                   {e.label}{" "}
-                  <span className="text-stone-400">· {e.desc}</span>
+                  <span className="text-stone-400 dark:text-zinc-500">· {e.desc}</span>
                 </button>
               ))}
             </div>
@@ -157,8 +157,8 @@ export function AiWorkoutGenerator() {
                   onClick={() => setSplit(s.value)}
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     split === s.value
-                      ? "border-stone-300 bg-white/[0.08] text-stone-900"
-                      : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                      ? "border-stone-300 bg-white dark:bg-zinc-900/[0.08] text-stone-900 dark:text-zinc-100"
+                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
                   }`}
                 >
                   {s.label}
@@ -176,8 +176,8 @@ export function AiWorkoutGenerator() {
                   onClick={() => setEquipment(eq.value)}
                   className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
                     equipment === eq.value
-                      ? "border-stone-300 bg-white/[0.08] text-stone-900"
-                      : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                      ? "border-stone-300 bg-white dark:bg-zinc-900/[0.08] text-stone-900 dark:text-zinc-100"
+                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
                   }`}
                 >
                   <span className="mr-1.5">{eq.icon}</span>
@@ -194,7 +194,7 @@ export function AiWorkoutGenerator() {
             <Button
               onClick={abort}
               variant="outline"
-              className="border-stone-300 bg-stone-50"
+              className="border-stone-300 bg-stone-50 dark:bg-zinc-800"
             >
               Stop Generation
             </Button>
@@ -218,7 +218,7 @@ export function AiWorkoutGenerator() {
 
       {/* Error */}
       {error && !isSandbox && (
-        <div className="rounded-2xl border border-stone-300 bg-stone-50 p-4 text-sm text-red-300">
+        <div className="rounded-2xl border border-stone-300 bg-stone-50 dark:bg-zinc-800 p-4 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -227,17 +227,17 @@ export function AiWorkoutGenerator() {
       {(hasContent || isStreaming) && (
         <div className="glass rounded-2xl">
           {/* Terminal header */}
-          <div className="flex items-center justify-between border-b border-stone-200 px-5 py-3">
+          <div className="flex items-center justify-between border-b border-stone-200 dark:border-zinc-700 px-5 py-3">
             <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-white/60" />
+              <div className="h-2.5 w-2.5 rounded-full bg-white dark:bg-zinc-900/60" />
               <div className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]/60" />
               <div className="h-2.5 w-2.5 rounded-full bg-[#10B981]/60" />
-              <span className="ml-2 text-xs text-stone-400">AI Workout Generator</span>
+              <span className="ml-2 text-xs text-stone-400 dark:text-zinc-500">AI Workout Generator</span>
             </div>
             <div className="flex items-center gap-2">
               {isStreaming && (
-                <span className="flex items-center gap-1.5 text-xs text-stone-900">
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                <span className="flex items-center gap-1.5 text-xs text-stone-900 dark:text-zinc-100">
+                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white dark:bg-zinc-900" />
                   streaming
                 </span>
               )}
@@ -247,7 +247,7 @@ export function AiWorkoutGenerator() {
           {/* Content */}
           <div className="max-h-[600px] overflow-y-auto p-6">
             {isStreaming && !hasContent && (
-              <p className="text-sm text-stone-500">Generating your workout program...</p>
+              <p className="text-sm text-stone-500 dark:text-zinc-500">Generating your workout program...</p>
             )}
             {hasContent && (
               <div className="prose prose-invert max-w-none">
@@ -260,7 +260,7 @@ export function AiWorkoutGenerator() {
 
           {/* Action toolbar */}
           {hasContent && !isStreaming && (
-            <div className="flex items-center gap-3 border-t border-stone-200 px-5 py-3">
+            <div className="flex items-center gap-3 border-t border-stone-200 dark:border-zinc-700 px-5 py-3">
               <Button
                 onClick={handleSave}
                 disabled={saving}
@@ -269,14 +269,14 @@ export function AiWorkoutGenerator() {
               >
                 {saving ? "Saving..." : "Save to Archive"}
               </Button>
-              <Button onClick={handleCopy} variant="outline" size="sm" className="border-stone-200 bg-stone-50">
+              <Button onClick={handleCopy} variant="outline" size="sm" className="border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800">
                 Copy Markdown
               </Button>
-              <Button onClick={reset} variant="outline" size="sm" className="border-stone-200 bg-stone-50">
+              <Button onClick={reset} variant="outline" size="sm" className="border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800">
                 Regenerate
               </Button>
               {saveMsg && (
-                <span className="ml-auto text-xs text-stone-500">{saveMsg}</span>
+                <span className="ml-auto text-xs text-stone-500 dark:text-zinc-500">{saveMsg}</span>
               )}
             </div>
           )}

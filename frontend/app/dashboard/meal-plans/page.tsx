@@ -140,13 +140,13 @@ export default function MealPlansPage() {
     <div className="space-y-6">
       {/* Tab switcher */}
       <div className="rounded-2xl glass p-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-900">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-900 dark:text-zinc-100">
           Meal Plans
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-stone-900">
+        <h1 className="mt-2 text-2xl font-semibold text-stone-900 dark:text-zinc-100">
           Generate Your Plan
         </h1>
-        <p className="mt-2 text-stone-500">
+        <p className="mt-2 text-stone-500 dark:text-zinc-500">
           Create a personalized meal plan using our optimizer or AI assistant.
         </p>
 
@@ -155,8 +155,8 @@ export default function MealPlansPage() {
             onClick={() => setActiveTab("optimizer")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "optimizer"
-                ? "border-stone-200 bg-stone-50 text-stone-600"
-                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
+                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
             }`}
           >
             Deterministic Optimizer
@@ -165,8 +165,8 @@ export default function MealPlansPage() {
             onClick={() => setActiveTab("ai")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "ai"
-                ? "border-stone-200 bg-stone-50 text-stone-600"
-                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
+                ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
+                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
             }`}
           >
             AI Generator ✨
@@ -181,10 +181,10 @@ export default function MealPlansPage() {
       {activeTab === "optimizer" && (
         <>
           <div className="rounded-2xl glass p-6">
-        <h1 className="text-xl font-semibold text-stone-900">
+        <h1 className="text-xl font-semibold text-stone-900 dark:text-zinc-100">
           {state.status === "ready" ? "Your Plan" : "Optimizer Plan"}
         </h1>
-        <p className="mt-2 text-stone-500">
+        <p className="mt-2 text-stone-500 dark:text-zinc-500">
           {state.status === "ready"
             ? "View your current plan or generate a new one."
             : "Generate a structured plan based on your nutrition targets and food database."}
@@ -193,7 +193,7 @@ export default function MealPlansPage() {
         {/* Controls */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-600">
+            <label className="text-sm font-medium text-stone-600 dark:text-zinc-400">
               Number of days
             </label>
             <div className="flex flex-wrap gap-2">
@@ -203,8 +203,8 @@ export default function MealPlansPage() {
                   onClick={() => setPlanDays(d)}
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     planDays === d
-                      ? "border-stone-200 bg-stone-50 text-stone-600"
-                      : "border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-50"
+                      ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
+                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 hover:bg-stone-50 dark:bg-zinc-800"
                   }`}
                   aria-pressed={planDays === d}
                 >
@@ -215,7 +215,7 @@ export default function MealPlansPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-600">
+            <label className="text-sm font-medium text-stone-600 dark:text-zinc-400">
               Meals per day
             </label>
             <div className="flex flex-wrap gap-2">
@@ -225,8 +225,8 @@ export default function MealPlansPage() {
                   onClick={() => setMealCount(m)}
                   className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
                     mealCount === m
-                      ? "border-stone-200 bg-stone-50 text-stone-600"
-                      : "border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-50"
+                      ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
+                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 hover:bg-stone-50 dark:bg-zinc-800"
                   }`}
                   aria-pressed={mealCount === m}
                 >
@@ -257,7 +257,7 @@ export default function MealPlansPage() {
           className="rounded-2xl glass p-6"
           aria-live="polite"
         >
-          <p className="text-center text-stone-500">
+          <p className="text-center text-stone-500 dark:text-zinc-500">
             Generating your personalized plan...
           </p>
         </div>
@@ -299,11 +299,11 @@ export default function MealPlansPage() {
 
       {/* Paywall / Upgrade */}
       {showPaywall && (
-        <div className="rounded-2xl border border-stone-300 bg-stone-50 p-8 text-center shadow-sm">
-          <p className="text-lg font-semibold text-stone-900">
+        <div className="rounded-2xl border border-stone-300 bg-stone-50 dark:bg-zinc-800 p-8 text-center shadow-sm">
+          <p className="text-lg font-semibold text-stone-900 dark:text-zinc-100">
             You've reached your limit
           </p>
-          <p className="mt-2 text-stone-900">
+          <p className="mt-2 text-stone-900 dark:text-zinc-100">
             Free users can generate up to 3 meal plans per month.
             Upgrade to Pro for unlimited generation.
           </p>
@@ -320,9 +320,9 @@ export default function MealPlansPage() {
 
       {/* Idle state */}
       {state.status === "idle" && !showPaywall && (
-        <div className="rounded-2xl border border-dashed border-stone-200 bg-white/2 p-8 text-center">
-          <p className="text-lg font-medium text-stone-600">No meal plan yet</p>
-          <p className="mt-2 text-stone-500">
+        <div className="rounded-2xl border border-dashed border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900/2 p-8 text-center">
+          <p className="text-lg font-medium text-stone-600 dark:text-zinc-400">No meal plan yet</p>
+          <p className="mt-2 text-stone-500 dark:text-zinc-500">
             Select your preferences above and click &quot;Generate Plan&quot; to
             create a personalized meal plan.
           </p>
@@ -341,10 +341,10 @@ export default function MealPlansPage() {
 
       {/* ── Plan History ──────────────────────────────────────────── */}
       <div className="rounded-2xl glass p-6">
-        <h2 className="text-lg font-semibold text-stone-900">
+        <h2 className="text-lg font-semibold text-stone-900 dark:text-zinc-100">
           Plan History
         </h2>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-stone-500 dark:text-zinc-500">
           Your previously generated meal plans.
         </p>
 
@@ -360,7 +360,7 @@ export default function MealPlansPage() {
         )}
 
         {!historyLoading && history && history.items.length === 0 && (
-          <p className="mt-4 text-sm text-stone-500">
+          <p className="mt-4 text-sm text-stone-500 dark:text-zinc-500">
             No meal plans generated yet.
           </p>
         )}
@@ -401,20 +401,20 @@ function PlanHistoryCard({
       <CardContent className="flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="truncate text-sm font-semibold text-stone-900">
+            <h3 className="truncate text-sm font-semibold text-stone-900 dark:text-zinc-100">
               {plan.name || "Meal Plan"}
             </h3>
             <Badge variant="secondary" className="shrink-0 text-xs">
               {plan.day_count} {plan.day_count === 1 ? "day" : "days"}
             </Badge>
           </div>
-          <p className="mt-0.5 text-xs text-stone-500">
+          <p className="mt-0.5 text-xs text-stone-500 dark:text-zinc-500">
             {dateRange}
             {plan.calorie_target != null && (
               <> · {Math.round(plan.calorie_target)} kcal/day</>
             )}
           </p>
-          <p className="mt-0.5 text-xs text-stone-500">
+          <p className="mt-0.5 text-xs text-stone-500 dark:text-zinc-500">
             Created {createdDate}
           </p>
         </div>

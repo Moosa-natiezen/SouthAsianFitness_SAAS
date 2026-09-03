@@ -156,7 +156,7 @@ export function FeatureScroll() {
               <div className="h-0.5 bg-stone-50">
                 <div
                   ref={progressRef}
-                  className="h-full origin-left bg-gradient-to-r from-orange-500 to-orange-600"
+                  className="h-full origin-left bg-gradient-to-r from-emerald-600 to-emerald-700"
                   style={{ transform: "scaleX(0)" }}
                 />
               </div>

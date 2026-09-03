@@ -22,6 +22,7 @@ from app.services.auth_service import (
     _user_response,
     change_password,
     create_session_for_user,
+    google_login_or_register,
     login_user,
     logout_user,
     register_user,
@@ -127,6 +128,64 @@ def get_current_user_data(user: Annotated[User, Depends(require_auth)]):
             "Pragma": "no-cache",
         },
     )
+
+
+@router.post("/google")
+def google_auth(
+    request: Request,
+    response: Response,
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Authenticate or register a user via Google OAuth ID token."""
+    import asyncio
+
+    from pydantic import BaseModel
+
+    class GoogleTokenRequest(BaseModel):
+        id_token: str
+
+    async def _get_body():
+        body = await request.body()
+        return body
+
+    # We need to parse the request body manually since we're not using Depends
+    import json as _json
+
+    async def _parse_payload():
+        body = await request.body()
+        return _json.loads(body)
+
+    loop = asyncio.get_event_loop()
+    payload_data = loop.run_until_complete(_parse_payload())
+    id_token_str = payload_data.get("id_token", "")
+
+    if not id_token_str:
+        from fastapi import HTTPException as HE
+        raise HE(status_code=status.HTTP_400_BAD_REQUEST, detail="id_token is required.")
+
+    user = google_login_or_register(db, id_token_str)
+    token = create_session_for_user(db, user, request)
+
+    response.set_cookie(
+        key=settings.session_cookie_name,
+        value=token,
+        httponly=True,
+        secure=settings.is_production or settings.secure_cookies,
+        samesite=settings.cookie_samesite,
+        max_age=settings.session_lifetime_seconds,
+        path="/",
+    )
+    csrf_token = generate_token()
+    response.set_cookie(
+        key=settings.csrf_cookie_name,
+        value=csrf_token,
+        httponly=False,
+        secure=settings.is_production or settings.secure_cookies,
+        samesite=settings.cookie_samesite,
+        path="/",
+    )
+    db.commit()
+    return AuthSession(user=AuthUser(**_user_response(user)), csrf_token=csrf_token)
 
 
 @router.post("/change-password")
