@@ -63,7 +63,7 @@ export function TodayPlanCard() {
   if (state.status === "loading") {
     return (
       <div className="glass rounded-2xl p-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">Today&apos;s Plan</p>
         <div className="mt-4 space-y-3">
           <Skeleton className="h-20 w-full rounded-xl bg-white/[0.03]" />
           <Skeleton className="h-20 w-full rounded-xl bg-white/[0.03]" />
@@ -76,7 +76,7 @@ export function TodayPlanCard() {
   if (state.status === "error") {
     return (
       <div className="glass rounded-2xl p-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">Today&apos;s Plan</p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
         <Button variant="outline" size="sm" className="mt-3" onClick={fetchPlan}>
           Try again
@@ -88,7 +88,7 @@ export function TodayPlanCard() {
   if (state.status === "failure") {
     return (
       <div className="glass rounded-2xl p-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">Today&apos;s Plan</p>
         <AlertBanner variant="warning" message={state.data.reason} className="mt-4" />
         {state.data.suggestions.length > 0 && (
           <ul className="mt-2 list-inside list-disc text-sm text-zinc-400">
@@ -105,10 +105,10 @@ export function TodayPlanCard() {
   const { plan, day } = state;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-indigo-500/10">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-600/10">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">Today&apos;s Plan</p>
-        <Link href="/dashboard/meal-plans" className="text-xs text-zinc-500 hover:text-indigo-400 transition-colors duration-300">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">Today&apos;s Plan</p>
+        <Link href="/dashboard/meal-plans" className="text-xs text-zinc-500 hover:text-orange-400 transition-colors duration-300">
           View full plan →
         </Link>
       </div>
@@ -144,8 +144,8 @@ export function TodayPlanCard() {
             </div>
             <div className="mt-2.5 flex gap-3 text-xs">
               <span className="text-orange-400/80">P {Math.round(meal.subtotal_protein_g)}g</span>
-              <span className="text-cyan-400/80">C {Math.round(meal.subtotal_carbs_g)}g</span>
-              <span className="text-violet-400/80">F {Math.round(meal.subtotal_fat_g)}g</span>
+              <span className="text-emerald-400/80">C {Math.round(meal.subtotal_carbs_g)}g</span>
+              <span className="text-amber-400/80">F {Math.round(meal.subtotal_fat_g)}g</span>
             </div>
           </div>
         ))}
@@ -159,8 +159,8 @@ export function TodayPlanCard() {
         </div>
         <div className="mt-2 flex gap-4 text-xs">
           <span className="text-orange-400/80 tabular-nums">Protein {Math.round(day.total_protein_g)}g</span>
-          <span className="text-cyan-400/80 tabular-nums">Carbs {Math.round(day.total_carbs_g)}g</span>
-          <span className="text-violet-400/80 tabular-nums">Fat {Math.round(day.total_fat_g)}g</span>
+          <span className="text-emerald-400/80 tabular-nums">Carbs {Math.round(day.total_carbs_g)}g</span>
+          <span className="text-amber-400/80 tabular-nums">Fat {Math.round(day.total_fat_g)}g</span>
         </div>
         {plan.nutrition && (
           <p className="mt-2 text-xs text-zinc-600">

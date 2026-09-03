@@ -19,7 +19,7 @@ import {
 const PAGE_SIZE = 20;
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
+  "w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30";
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 

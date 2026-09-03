@@ -74,7 +74,7 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30 text-sm";
+  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30 text-sm";
 
 const labelClass = "text-sm font-medium text-zinc-400";
 

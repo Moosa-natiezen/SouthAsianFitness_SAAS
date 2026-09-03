@@ -63,8 +63,8 @@ export function AiMealGenerator() {
     <div className="space-y-5">
       {/* ── Form ─────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl glass p-6">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-indigo-500/5 blur-[40px]" />
-        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-violet-500/5 blur-[40px]" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-orange-600/5 blur-[40px]" />
+        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-orange-500/5 blur-[40px]" />
 
         <div className="relative">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-300">
@@ -168,7 +168,7 @@ export function AiMealGenerator() {
       {/* ── Streaming Output ──────────────────────────────────────────── */}
       {(content || isStreaming) && (
         <div className="relative overflow-hidden rounded-2xl glass p-6">
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-indigo-500/5 blur-[40px]" />
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-orange-600/5 blur-[40px]" />
 
           <div className="relative">
             <div className="mb-4 flex items-center justify-between">
@@ -309,7 +309,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 disabled:opacity-50"
+        className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-400 transition-all focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30 disabled:opacity-50"
       />
     </div>
   );

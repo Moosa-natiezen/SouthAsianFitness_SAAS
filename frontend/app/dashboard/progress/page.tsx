@@ -426,7 +426,7 @@ function LogForm({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30"
             required
           />
         </div>
@@ -443,7 +443,7 @@ function LogForm({
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="e.g. 72.5"
-            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30"
             required
           />
         </div>
@@ -461,7 +461,7 @@ function LogForm({
               value={waist}
               onChange={(e) => setWaist(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30"
             />
           </div>
           <div>
@@ -476,7 +476,7 @@ function LogForm({
               value={hip}
               onChange={(e) => setHip(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30"
             />
           </div>
         </div>
@@ -494,7 +494,7 @@ function LogForm({
             value={bodyFat}
             onChange={(e) => setBodyFat(e.target.value)}
             placeholder="Optional"
-            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30"
           />
         </div>
 
@@ -508,7 +508,7 @@ function LogForm({
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional notes"
             rows={2}
-            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+            className="mt-1 block w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-white focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-orange-600/30"
           />
         </div>
 

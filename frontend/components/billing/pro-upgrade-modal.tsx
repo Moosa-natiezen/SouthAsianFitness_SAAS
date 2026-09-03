@@ -58,7 +58,7 @@ export function ProUpgradeModal() {
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-sm shadow-lg shadow-indigo-500/25">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-500 text-sm shadow-lg shadow-orange-600/25">
                   ✨
                 </div>
                 <h2 className="text-xl font-bold text-white">Upgrade to Pro</h2>

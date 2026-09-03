@@ -102,12 +102,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isPro = user?.subscription_tier === "pro";
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-[#FAFAFA]">
+    <div className="min-h-screen bg-[#09090b] text-[#FAFAFA]">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-40 glass">
         <div className="flex items-center justify-between px-5 py-3 md:px-6">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-[10px] font-bold text-white shadow-lg shadow-indigo-500/20">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-orange-600 to-orange-500 text-[10px] font-bold text-white shadow-lg shadow-orange-600/20">
               SA
             </div>
             <span className="hidden text-sm font-semibold text-white sm:inline">South Asian Fitness</span>
@@ -118,7 +118,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span
                 className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-all duration-500 ${
                   isPro
-                    ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 animate-glow-ring"
+                    ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/30 animate-glow-ring"
                     : "bg-white/[0.06] text-zinc-500 border border-white/[0.06]"
                 }`}
               >
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             )}
             <div className="hidden items-center gap-3 md:flex">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 text-[10px] font-medium text-zinc-300 border border-white/[0.06]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-600/20 to-orange-500/20 text-[10px] font-medium text-zinc-300 border border-white/[0.06]">
                 {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
               </div>
               <button
@@ -160,11 +160,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={isActive ? "page" : undefined}
                 className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-300 md:gap-3 ${
                   isActive
-                    ? "bg-gradient-to-r from-indigo-500/10 to-violet-500/5 text-white font-medium border border-indigo-500/15 shadow-[0_0_15px_rgba(99,102,241,0.08)]"
+                    ? "bg-gradient-to-r from-orange-600/10 to-orange-500/5 text-white font-medium border border-orange-600/15 shadow-[0_0_15px_rgba(234,88,12,0.08)]"
                     : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                 }`}
               >
-                <span className={`shrink-0 transition-colors duration-300 ${isActive ? "text-indigo-400" : ""}`}>
+                <span className={`shrink-0 transition-colors duration-300 ${isActive ? "text-orange-400" : ""}`}>
                   {item.icon}
                 </span>
                 <span className="text-[13px]">{item.label}</span>

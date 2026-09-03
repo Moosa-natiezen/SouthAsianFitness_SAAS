@@ -72,7 +72,7 @@ export default function DashboardPage() {
       {showUpgradeBanner && !upgradeDismissed && (
         <div className="glass rounded-xl px-5 py-4 text-sm animate-fade-in-up">
           <div className="flex items-center justify-between">
-            <span className="text-indigo-300">
+            <span className="text-orange-300">
               <span className="mr-2">🎉</span>Welcome to Pro! Your account has been upgraded.
             </span>
             <button
@@ -99,7 +99,7 @@ export default function DashboardPage() {
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${
                 isPro
-                  ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 animate-glow-ring"
+                  ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/25 animate-glow-ring"
                   : "bg-white/[0.06] text-zinc-400 border border-white/[0.08]"
               }`}
             >
@@ -176,8 +176,8 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
   const fatPct = totalMacro > 0 ? (n.fat_g / totalMacro) * 100 : 0;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-indigo-500/15">
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-indigo-400/70">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-600/15">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">
         Nutrition Targets
       </p>
       <div className="mt-4 flex items-end gap-3">
@@ -234,8 +234,8 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   const hasBudget = b.daily_budget !== null;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-violet-500/15">
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-violet-400/70">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-600/15">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">
         Budget
       </p>
       {hasBudget ? (
@@ -275,7 +275,7 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
 function AchievementsSection() {
   const badges = [
     { icon: "🔥", label: "7-Day Streak", desc: "Logged in for 7 days straight", glow: "from-orange-500/20 to-amber-500/10" },
-    { icon: "📊", label: "First Entry", desc: "Logged your first progress entry", glow: "from-indigo-500/20 to-violet-500/10" },
+    { icon: "📊", label: "First Entry", desc: "Logged your first progress entry", glow: "from-orange-600/20 to-orange-500/10" },
     { icon: "🎯", label: "Goal Setter", desc: "Set your nutrition targets", glow: "from-emerald-500/20 to-teal-500/10" },
   ];
 
@@ -288,7 +288,7 @@ function AchievementsSection() {
         {badges.map((badge) => (
           <div
             key={badge.label}
-            className="glass rounded-2xl p-5 text-center transition-all duration-300 hover:bg-white/[0.06] hover:border-violet-500/20 hover:shadow-[0_0_25px_rgba(139,92,246,0.1)] group cursor-default"
+            className="glass rounded-2xl p-5 text-center transition-all duration-300 hover:bg-white/[0.06] hover:border-orange-600/20 hover:shadow-[0_0_25px_rgba(234,88,12,0.1)] group cursor-default"
           >
             <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${badge.glow} text-2xl transition-transform duration-300 group-hover:scale-110`}>
               {badge.icon}

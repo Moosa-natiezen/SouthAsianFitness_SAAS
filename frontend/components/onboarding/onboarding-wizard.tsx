@@ -379,7 +379,7 @@ export function OnboardingWizard() {
   /* ── Step content ───────────────────────────────────────────────────── */
 
   const selectClass =
-    "w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30";
+    "w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30";
 
   const renderStep = () => {
     // ─── Step 0: Goal Selection ────────────────────────────────────────
@@ -433,7 +433,7 @@ export function OnboardingWizard() {
                   max={120}
                   value={form.age_years}
                   onChange={(e) => updateField("age_years", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30"
                 />
               </div>
               <div className="space-y-2">
@@ -442,7 +442,7 @@ export function OnboardingWizard() {
                   type="number"
                   value={form.height_cm}
                   onChange={(e) => updateField("height_cm", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30"
                 />
               </div>
               <div className="space-y-2">
@@ -451,7 +451,7 @@ export function OnboardingWizard() {
                   type="number"
                   value={form.weight_kg}
                   onChange={(e) => updateField("weight_kg", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-2xl font-bold text-white outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30"
                 />
               </div>
             </div>

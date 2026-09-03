@@ -109,7 +109,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, displayName: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30"
                   placeholder="Your name"
                   autoComplete="name"
                 />
@@ -126,7 +126,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30"
                 placeholder="you@example.com"
                 autoComplete={isSignup ? "email" : "username"}
               />
@@ -144,7 +144,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 onChange={(event) =>
                   setForm((current) => ({ ...current, password: event.target.value }))
                 }
-                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-indigo-500/30"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30"
                 placeholder="Enter an 8+ character password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
               />
