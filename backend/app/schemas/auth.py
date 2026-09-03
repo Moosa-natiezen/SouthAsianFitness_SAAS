@@ -29,6 +29,7 @@ class AuthUser(BaseModel):
     is_onboarded: bool
     subscription_tier: str = "free"
     customer_portal_url: str | None = None
+    has_google_account: bool = False
 
 
 class AuthSession(BaseModel):

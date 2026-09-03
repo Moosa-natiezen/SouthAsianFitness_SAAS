@@ -37,6 +37,7 @@ def _user_response(user: User) -> dict:
         "is_onboarded": user.is_onboarded,
         "subscription_tier": user.subscription_tier,
         "customer_portal_url": user.customer_portal_url,
+        "has_google_account": bool(user.google_id),
     }
 
 
@@ -201,8 +202,14 @@ def google_login_or_register(db: Session, id_token: str) -> User:
     """Verify a Google ID token and log in or register the user.
 
     Uses the google-auth library to verify the token against Google's
-    public keys.  If the email already exists the user is logged in;
-    otherwise a new account is created automatically.
+    public keys.
+
+    Account-linking logic:
+    1. If no user exists with this email → create a new Google-only user.
+    2. If a user exists with this email:
+       a. If they already have a ``google_id`` linked → normal Google login.
+       b. If they signed up with email/password (no ``google_id``) → seamlessly
+          link their Google account so they can use *both* auth methods.
     """
     from fastapi import HTTPException
     from google.auth.transport import requests as google_requests
@@ -228,11 +235,12 @@ def google_login_or_register(db: Session, id_token: str) -> User:
             detail="Google token does not contain an email.",
         )
 
+    google_sub = idinfo.get("sub", "")  # Google's unique user ID
     normalized_email = normalize_email(email)
     user = db.query(User).filter(User.email == normalized_email).first()
 
     if user is None:
-        # Auto-register
+        # ── Case 1: Brand-new user — auto-register ────────────────────
         display_name = idinfo.get("name", email.split("@")[0])
         user = User(
             email=normalized_email,
@@ -244,11 +252,29 @@ def google_login_or_register(db: Session, id_token: str) -> User:
             country_id=None,
             is_onboarded=False,
             is_active=True,
+            google_id=google_sub or None,
         )
         db.add(user)
         db.flush()
         logger.info("Registered new Google OAuth user %s (%s)", user.id, normalized_email)
     else:
+        # ── Case 2: Existing user — seamless account linking ───────────
+        # Link the Google account if not already linked.  This allows
+        # email/password users to also authenticate via Google without
+        # any friction — they can use *both* methods going forward.
+        if google_sub and not user.google_id:
+            user.google_id = google_sub
+            logger.info(
+                "Linked Google account %s to existing user %s (%s)",
+                google_sub, user.id, normalized_email,
+            )
+
+        # Update the display name from Google if the user's current name
+        # looks like a placeholder (e.g. just the email prefix).
+        google_name = idinfo.get("name", "")
+        if google_name and user.display_name == email.split("@")[0]:
+            user.display_name = google_name
+
         user.last_login_at = datetime.now(UTC)
         db.flush()
         logger.info("Google OAuth login for user %s (%s)", user.id, normalized_email)

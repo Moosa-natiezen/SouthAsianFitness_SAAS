@@ -122,6 +122,7 @@ export type AuthUser = {
   is_onboarded: boolean;
   subscription_tier: string;
   customer_portal_url: string | null;
+  has_google_account: boolean;
 };
 
 export type AuthSession = {

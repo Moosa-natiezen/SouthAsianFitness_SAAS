@@ -90,6 +90,11 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_onboarded: Mapped[bool] = mapped_column(nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
+    # ── Google OAuth ─────────────────────────────────────────────────
+    google_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, unique=True, index=True
+    )
+
     # ── Lemon Squeezy subscription fields ──────────────────────────────
     subscription_tier: Mapped[str] = mapped_column(
         String(20), nullable=False, default="free"
