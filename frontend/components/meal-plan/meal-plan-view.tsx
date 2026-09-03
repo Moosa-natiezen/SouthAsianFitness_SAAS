@@ -22,12 +22,12 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
   return (
     <div className="space-y-4">
       {/* Plan header */}
-      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-zinc-400">
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 backdrop-blur-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
           Generated Plan
         </p>
-        <h2 className="mt-1 text-xl font-semibold text-white">{plan.plan_name}</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h2 className="mt-1 text-xl font-semibold text-stone-900">{plan.plan_name}</h2>
+        <p className="mt-1 text-sm text-stone-500">
           {plan.start_date} → {plan.end_date}
           {" · "}
           {plan.days.length} {plan.days.length === 1 ? "day" : "days"}
@@ -36,7 +36,7 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
 
       {/* Day selector for multi-day plans */}
       {hasMultipleDays && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
           <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Select day">
             {plan.days.map((d, i) => (
               <button
@@ -46,12 +46,12 @@ export function MealPlanView({ plan }: MealPlanViewProps) {
                 onClick={() => setSelectedDay(i)}
                 className={`flex-shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                   i === selectedDay
-                    ? "border-white/20 bg-white/8 text-white"
-                    : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
+                    ? "border-stone-300 bg-white/8 text-stone-900"
+                    : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
                 }`}
               >
                 <span className="block">Day {i + 1}</span>
-                <span className="block text-xs text-zinc-400">{formatDate(d.plan_date)}</span>
+                <span className="block text-xs text-stone-500">{formatDate(d.plan_date)}</span>
               </button>
             ))}
           </div>
@@ -105,10 +105,10 @@ function DaySummary({
     : 0;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-5 backdrop-blur-xl">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 backdrop-blur-xl">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-white">Daily Totals</h3>
-        <span className="text-sm text-zinc-300">
+        <h3 className="font-semibold text-stone-900">Daily Totals</h3>
+        <span className="text-sm text-stone-600">
           {Math.round(day.total_calories)} / {Math.round(nutrition.calorie_target)} kcal ({calPct}%)
         </span>
       </div>
@@ -120,7 +120,7 @@ function DaySummary({
       </div>
 
       {day.total_estimated_cost !== null && currency && (
-        <p className="mt-3 text-sm text-zinc-400">
+        <p className="mt-3 text-sm text-stone-500">
           Estimated cost: {currency} {Number(day.total_estimated_cost).toLocaleString()}
           {!day.cost_complete && " (partial — some foods lack pricing)"}
         </p>
@@ -167,7 +167,7 @@ function MacroBar({
           style={{ width: `${pct}%`, background: c.bar }}
         />
       </div>
-      <p className="mt-0.5 text-xs text-zinc-400">of {Math.round(target)}{unit}</p>
+      <p className="mt-0.5 text-xs text-stone-500">of {Math.round(target)}{unit}</p>
     </div>
   );
 }

@@ -61,15 +61,15 @@ export function ProUpgradeModal() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-500 text-sm shadow-lg shadow-orange-600/25">
                   ✨
                 </div>
-                <h2 className="text-xl font-bold text-white">Upgrade to Pro</h2>
+                <h2 className="text-xl font-bold text-stone-900">Upgrade to Pro</h2>
               </div>
-              <p className="mt-2 text-sm text-zinc-400">
+              <p className="mt-2 text-sm text-stone-500">
                 Unlock the full power of your fitness journey.
               </p>
             </div>
             <button
               onClick={handleClose}
-              className="rounded-lg p-1.5 text-zinc-400 transition-colors duration-300 hover:bg-white/[0.06] hover:text-zinc-300"
+              className="rounded-lg p-1.5 text-stone-500 transition-colors duration-300 hover:bg-stone-50 hover:text-stone-600"
               aria-label="Close"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -114,7 +114,7 @@ export function ProUpgradeModal() {
             </button>
             <button
               onClick={handleClose}
-              className="btn-chrome rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 hover:text-zinc-200"
+              className="btn-chrome rounded-xl px-4 py-3 text-sm font-medium text-stone-500 hover:text-stone-700"
             >
               Not now
             </button>
@@ -127,9 +127,9 @@ export function ProUpgradeModal() {
 
 function PerkItem({ icon, text }: { icon: string; text: string }) {
   return (
-    <div className="flex items-center gap-3 glass rounded-xl px-4 py-3 transition-all duration-300 hover:bg-white/[0.04]">
+    <div className="flex items-center gap-3 glass rounded-xl px-4 py-3 transition-all duration-300 hover:bg-stone-50">
       <span className="text-lg">{icon}</span>
-      <span className="text-sm text-zinc-300">{text}</span>
+      <span className="text-sm text-stone-600">{text}</span>
     </div>
   );
 }

@@ -67,14 +67,14 @@ export default function WorkoutsPage() {
   return (
     <div className="space-y-6">
       {/* Header + tabs */}
-      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-zinc-400">
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 backdrop-blur-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
           Workout Studio
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">
+        <h1 className="mt-2 text-2xl font-semibold text-stone-900">
           AI Workout Generator
         </h1>
-        <p className="mt-2 text-zinc-400">
+        <p className="mt-2 text-stone-500">
           Generate progressive overload routines with AI, or browse your saved programs.
         </p>
 
@@ -83,8 +83,8 @@ export default function WorkoutsPage() {
             onClick={() => setActiveTab("generator")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "generator"
-                ? "border-white/20 bg-white/8 text-white"
-                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
+                ? "border-stone-300 bg-white/8 text-stone-900"
+                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
             }`}
           >
             Generator
@@ -93,8 +93,8 @@ export default function WorkoutsPage() {
             onClick={() => setActiveTab("archive")}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
               activeTab === "archive"
-                ? "border-white/20 bg-white/8 text-white"
-                : "border-white/10 bg-white/[0.04] text-zinc-400 hover:bg-white/[0.05]"
+                ? "border-stone-300 bg-white/8 text-stone-900"
+                : "border-stone-200 bg-stone-50 text-stone-500 hover:bg-stone-50"
             }`}
           >
             Archive {archive && archive.total > 0 && (
@@ -111,9 +111,9 @@ export default function WorkoutsPage() {
 
       {/* Archive tab */}
       {activeTab === "archive" && (
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-xl">
-          <h2 className="text-lg font-semibold text-white">Saved Workouts</h2>
-          <p className="mt-1 text-sm text-zinc-400">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 backdrop-blur-xl">
+          <h2 className="text-lg font-semibold text-stone-900">Saved Workouts</h2>
+          <p className="mt-1 text-sm text-stone-500">
             Your archived AI-generated workout programs.
           </p>
 
@@ -129,7 +129,7 @@ export default function WorkoutsPage() {
           )}
 
           {!archiveLoading && archive && archive.items.length === 0 && (
-            <p className="mt-4 text-sm text-zinc-400">
+            <p className="mt-4 text-sm text-stone-500">
               No saved workouts yet. Generate one in the Generator tab!
             </p>
           )}
@@ -139,25 +139,25 @@ export default function WorkoutsPage() {
               {archive.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 transition hover:bg-white/[0.05]"
+                  className="flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 p-4 transition hover:bg-stone-50"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-sm font-semibold text-white">
+                    <h3 className="truncate text-sm font-semibold text-stone-900">
                       {item.title}
                     </h3>
-                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-zinc-400">
+                    <div className="mt-1 flex flex-wrap gap-2 text-xs text-stone-500">
                       {item.goal && (
-                        <span className="rounded bg-white/[0.05] px-1.5 py-0.5">
+                        <span className="rounded bg-stone-50 px-1.5 py-0.5">
                           {goalLabels[item.goal] ?? item.goal}
                         </span>
                       )}
                       {item.split && (
-                        <span className="rounded bg-white/[0.05] px-1.5 py-0.5">
+                        <span className="rounded bg-stone-50 px-1.5 py-0.5">
                           {splitLabels[item.split] ?? item.split}
                         </span>
                       )}
                       {item.equipment && (
-                        <span className="rounded bg-white/[0.05] px-1.5 py-0.5 capitalize">
+                        <span className="rounded bg-stone-50 px-1.5 py-0.5 capitalize">
                           {item.equipment}
                         </span>
                       )}
@@ -174,7 +174,7 @@ export default function WorkoutsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-white/10 bg-white/[0.04]"
+                      className="border-stone-200 bg-stone-50"
                       onClick={() => setViewing(item)}
                     >
                       View
@@ -202,14 +202,14 @@ export default function WorkoutsPage() {
           onClick={() => setViewing(null)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-900/50 p-6"
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">{viewing.title}</h2>
+              <h2 className="text-lg font-semibold text-stone-900">{viewing.title}</h2>
               <button
                 onClick={() => setViewing(null)}
-                className="rounded-lg p-1 text-zinc-400 transition hover:bg-white/[0.05] hover:text-white"
+                className="rounded-lg p-1 text-stone-500 transition hover:bg-stone-50 hover:text-stone-900"
               >
                 ✕
               </button>

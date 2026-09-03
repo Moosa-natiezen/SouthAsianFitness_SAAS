@@ -7,7 +7,7 @@ type AlertBannerProps = {
 };
 
 const styles = {
-  info: "border-orange-600/15 bg-orange-600/5 text-orange-300",
+  info: "border-orange-600/15 bg-orange-600/5 text-orange-600",
   warning: "border-amber-500/15 bg-amber-500/5 text-amber-300",
   error: "border-red-500/15 bg-red-500/5 text-red-300",
 } as const;

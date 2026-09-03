@@ -74,9 +74,9 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/4/[0.04] px-3.5 py-2.5 text-white placeholder:text-zinc-400 outline-none transition-all focus:border-white/50 focus:ring-1 focus:ring-orange-600/30 text-sm";
+  "w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 text-sm";
 
-const labelClass = "text-sm font-medium text-zinc-400";
+const labelClass = "text-sm font-medium text-stone-500";
 
 /* ── Component ─────────────────────────────────────────────────────────── */
 
@@ -425,7 +425,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-white">Settings</h2>
+        <h2 className="text-2xl font-semibold text-stone-900">Settings</h2>
         <Skeleton className="h-48 w-full" />
         <Skeleton className="h-48 w-full" />
         <Skeleton className="h-48 w-full" />
@@ -436,7 +436,7 @@ export default function SettingsPage() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-white">Settings</h2>
+        <h2 className="text-2xl font-semibold text-stone-900">Settings</h2>
         <AlertBanner variant="error" message={error} />
       </div>
     );
@@ -446,12 +446,12 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-white">Settings</h2>
+      <h2 className="text-2xl font-semibold text-stone-900">Settings</h2>
 
       {/* ── Macro Targets Display ─────────────────────────────────────── */}
       {targets && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 backdrop-blur-xl">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">
             Your Daily Targets
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -461,9 +461,9 @@ export default function SettingsPage() {
             <MacroStat label="Fat" value={targets.fat_g} unit="g" color="from-[#10B981] to-[#059669]" />
           </div>
           {targets.bmr && targets.tdee && (
-            <div className="mt-3 flex gap-4 text-xs text-zinc-400">
-              <span>BMR: <span className="text-white">{Math.round(targets.bmr)}</span> kcal</span>
-              <span>TDEE: <span className="text-white">{Math.round(targets.tdee)}</span> kcal</span>
+            <div className="mt-3 flex gap-4 text-xs text-stone-500">
+              <span>BMR: <span className="text-stone-900">{Math.round(targets.bmr)}</span> kcal</span>
+              <span>TDEE: <span className="text-stone-900">{Math.round(targets.tdee)}</span> kcal</span>
             </div>
           )}
         </div>
@@ -939,12 +939,12 @@ export default function SettingsPage() {
       </Card>
 
       {/* ── Billing Card ──────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+      <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 backdrop-blur-xl">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
           Subscription & Billing
         </h3>
         {upgradePolling && (
-          <p className="mt-3 rounded-lg bg-white/[0.05] px-4 py-3 text-sm font-medium text-white" role="status">
+          <p className="mt-3 rounded-lg bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900" role="status">
             ⏳ Processing your upgrade… We&apos;ll update once payment is confirmed.
           </p>
         )}
@@ -954,18 +954,18 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-5 py-4">
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-stone-200 bg-white/[0.02] px-5 py-4">
           <div className="flex items-center gap-3">
             <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
               isPro
-                ? "bg-gradient-to-br from-zinc-700 to-zinc-800 text-white"
-                : "bg-white/8 text-zinc-600"
+                ? "bg-gradient-to-br from-zinc-700 to-zinc-800 text-stone-900"
+                : "bg-white/8 text-stone-400"
             }`}>
               {isPro ? "P" : "F"}
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-400">Current Plan</p>
-              <p className="text-lg font-semibold text-white">
+              <p className="text-sm font-medium text-stone-500">Current Plan</p>
+              <p className="text-lg font-semibold text-stone-900">
                 {isPro ? "Pro Member" : "Free Tier"}
               </p>
             </div>
@@ -973,7 +973,7 @@ export default function SettingsPage() {
           <Button
             onClick={handleManageBilling}
             disabled={portalLoading}
-            className={isPro ? "" : "bg-gradient-to-r from-zinc-700 to-zinc-800 text-white hover:shadow-[0_0_20px_rgba(220,20,60,0.4)]"}
+            className={isPro ? "" : "bg-gradient-to-r from-zinc-700 to-zinc-800 text-stone-900 hover:shadow-[0_0_20px_rgba(220,20,60,0.4)]"}
           >
             {portalLoading ? "Loading..." : isPro ? "Manage Subscription" : "Upgrade to Pro"}
           </Button>
@@ -997,12 +997,12 @@ function MacroStat({
   color: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
+    <div className="rounded-xl border border-stone-200 bg-stone-100 p-3">
+      <p className="text-xs font-medium uppercase tracking-wider text-stone-500">{label}</p>
       <p className={`mt-1 bg-gradient-to-r ${color} bg-clip-text text-2xl font-bold text-transparent`}>
         {value != null ? Math.round(value) : "—"}
       </p>
-      <p className="text-[10px] text-zinc-600">{unit}</p>
+      <p className="text-[10px] text-stone-400">{unit}</p>
     </div>
   );
 }

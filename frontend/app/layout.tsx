@@ -21,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: "#FCFBF7",
   width: "device-width",
   initialScale: 1,
 };
@@ -58,15 +58,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full bg-[#09090b] text-zinc-100">
-        {/* Ambient brand glow orbs */}
-        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-          <div className="glow-orb-brand absolute -left-40 -top-40 h-96 w-96" />
-          <div className="glow-orb-brand absolute -bottom-40 -right-40 h-96 w-96" />
-        </div>
+      <body className="min-h-full bg-[#FCFBF7] text-stone-900">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-zinc-800 focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-stone-900 focus:outline-none focus:shadow-lg"
         >
           Skip to content
         </a>

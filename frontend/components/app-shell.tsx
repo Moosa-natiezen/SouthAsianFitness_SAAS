@@ -102,15 +102,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isPro = user?.subscription_tier === "pro";
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-[#FAFAFA]">
+    <div className="min-h-screen bg-[#FCFBF7] text-stone-900">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-40 glass">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-stone-200/50">
         <div className="flex items-center justify-between px-5 py-3 md:px-6">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-orange-600 to-orange-500 text-[10px] font-bold text-white shadow-lg shadow-orange-600/20">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500 text-[10px] font-bold text-stone-900 shadow-sm shadow-orange-500/20">
               SA
             </div>
-            <span className="hidden text-sm font-semibold text-white sm:inline">South Asian Fitness</span>
+            <span className="hidden text-sm font-semibold text-stone-800 sm:inline">South Asian Fitness</span>
           </Link>
 
           <div className="flex items-center gap-4">
@@ -118,20 +118,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span
                 className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-all duration-500 ${
                   isPro
-                    ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/30 animate-glow-ring"
-                    : "bg-white/[0.06] text-zinc-500 border border-white/[0.06]"
+                    ? "bg-orange-500 text-stone-900 shadow-sm shadow-orange-500/20 animate-glow-ring"
+                    : "bg-stone-100 text-stone-500 border border-stone-200"
                 }`}
               >
                 {isPro ? "✦ Pro" : "Free"}
               </span>
             )}
             <div className="hidden items-center gap-3 md:flex">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-600/20 to-orange-500/20 text-[10px] font-medium text-zinc-300 border border-white/[0.06]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/10 text-[10px] font-medium text-orange-600 border border-orange-200">
                 {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
               </div>
               <button
                 onClick={handleLogout}
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors duration-300"
+                className="text-xs text-stone-400 hover:text-stone-700 transition-colors duration-300"
               >
                 Log out
               </button>
@@ -146,7 +146,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* ── Bottom Nav (mobile) / Side Nav (desktop) ──────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 glass md:bottom-auto md:top-[52px] md:left-0 md:right-auto md:h-[calc(100vh-52px)] md:w-[200px] md:border-t-0 md:border-r md:border-white/[0.06]">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-stone-200/50 md:bottom-auto md:top-[52px] md:left-0 md:right-auto md:h-[calc(100vh-52px)] md:w-[200px] md:border-t-0 md:border-r md:border-stone-200/50">
         <div className="flex items-center justify-around gap-1 px-2 py-2 md:flex-col md:items-stretch md:gap-0.5 md:px-3 md:pt-4">
           {navItems.map((item) => {
             const isActive =
@@ -158,13 +158,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-300 md:gap-3 ${
+                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 md:gap-3 ${
                   isActive
-                    ? "bg-gradient-to-r from-orange-600/10 to-orange-500/5 text-white font-medium border border-orange-600/15 shadow-[0_0_15px_rgba(234,88,12,0.08)]"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
+                    ? "bg-orange-500/8 text-orange-600 font-medium border border-orange-200/60"
+                    : "text-stone-400 hover:text-stone-700 hover:bg-stone-50"
                 }`}
               >
-                <span className={`shrink-0 transition-colors duration-300 ${isActive ? "text-orange-400" : ""}`}>
+                <span className={`shrink-0 transition-colors duration-200 ${isActive ? "text-orange-500" : ""}`}>
                   {item.icon}
                 </span>
                 <span className="text-[13px]">{item.label}</span>

@@ -10,23 +10,23 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Link href="/" className="text-sm font-medium text-white hover:text-white">
+        <Link href="/" className="text-sm font-medium text-stone-900 hover:text-stone-900">
           ← Back to South Asian Fitness
         </Link>
 
-        <h1 className="mt-6 text-3xl font-bold text-white">Terms of Service</h1>
-        <p className="mt-2 text-sm text-zinc-400">Last updated: August 2026</p>
+        <h1 className="mt-6 text-3xl font-bold text-stone-900">Terms of Service</h1>
+        <p className="mt-2 text-sm text-stone-500">Last updated: August 2026</p>
 
-        <div className="mt-8 space-y-6 text-zinc-300">
+        <div className="mt-8 space-y-6 text-stone-600">
           <section>
-            <h2 className="text-xl font-semibold text-white">Acceptance</h2>
+            <h2 className="text-xl font-semibold text-stone-900">Acceptance</h2>
             <p className="mt-2">
               By creating an account and using South Asian Fitness, you agree to these terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-white">Service Description</h2>
+            <h2 className="text-xl font-semibold text-stone-900">Service Description</h2>
             <p className="mt-2">
               South Asian Fitness provides personalized nutrition targets and meal plan
               suggestions based on your profile. Our recommendations are for general
@@ -35,7 +35,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-white">Health Disclaimer</h2>
+            <h2 className="text-xl font-semibold text-stone-900">Health Disclaimer</h2>
             <p className="mt-2">
               The nutrition information and meal plans provided are general in nature and
               are not a substitute for professional medical advice, diagnosis, or treatment.
@@ -45,7 +45,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-white">Account Responsibility</h2>
+            <h2 className="text-xl font-semibold text-stone-900">Account Responsibility</h2>
             <p className="mt-2">
               You are responsible for maintaining the confidentiality of your account
               credentials and for all activity under your account.
@@ -53,10 +53,10 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-white">Contact</h2>
+            <h2 className="text-xl font-semibold text-stone-900">Contact</h2>
             <p className="mt-2">
               For questions about these terms, contact us at{" "}
-              <span className="font-medium text-white">[CONTACT EMAIL TO BE ADDED]</span>.
+              <span className="font-medium text-stone-900">[CONTACT EMAIL TO BE ADDED]</span>.
             </p>
           </section>
         </div>

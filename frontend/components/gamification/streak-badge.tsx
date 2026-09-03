@@ -119,7 +119,7 @@ export function StreakBadge({ streak = 1 }: StreakBadgeProps) {
       </Canvas>
 
       {/* Streak count overlay */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#0a0a0a]/80 px-3 py-1 text-xs font-bold text-zinc-400 backdrop-blur-sm border border-zinc-700/20">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#0a0a0a]/80 px-3 py-1 text-xs font-bold text-stone-500 backdrop-blur-sm border border-zinc-700/20">
         🔥 {streak} day{streak !== 1 ? "s" : ""}
       </div>
     </div>

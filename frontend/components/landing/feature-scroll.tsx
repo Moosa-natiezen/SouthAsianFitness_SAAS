@@ -87,19 +87,19 @@ export function FeatureScroll() {
     <section className="relative py-24 md:py-32">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.05] blur-[120px]" />
+        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-stone-50 blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
         {/* Section header */}
         <div className="mb-16 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-stone-900">
             The AI in action
           </p>
-          <h2 className="mt-4 font-serif text-3xl font-bold text-white md:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-bold text-stone-900 md:text-5xl">
             Watch your plan come alive
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">
+          <p className="mx-auto mt-4 max-w-xl text-lg text-stone-500">
             Real-time streaming. Real South Asian cuisine. Real macro precision.
           </p>
         </div>
@@ -126,37 +126,37 @@ export function FeatureScroll() {
             ].map((item, i) => (
               <div
                 key={item.num}
-                className="group relative rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05]"
+                className="group relative rounded-2xl border border-stone-200 bg-stone-50 p-6 transition-all duration-500 hover:border-stone-300 hover:bg-stone-50"
               >
-                <span className="font-serif text-4xl font-bold text-white/20 group-hover:text-white/40 transition-colors">
+                <span className="font-serif text-4xl font-bold text-stone-900/20 group-hover:text-stone-900/40 transition-colors">
                   {item.num}
                 </span>
-                <h3 className="mt-2 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{item.desc}</p>
+                <h3 className="mt-2 text-lg font-semibold text-stone-900">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-stone-500">{item.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Right: streaming mock terminal */}
           <div ref={containerRef} className="relative min-h-[500px]">
-            <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 shadow-2xl">
+            <div className="sticky top-24 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
               {/* Terminal header */}
-              <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+              <div className="flex items-center gap-2 border-b border-stone-200 px-4 py-3">
                 <div className="h-3 w-3 rounded-full bg-white/60" />
                 <div className="h-3 w-3 rounded-full bg-zinc-700/60" />
                 <div className="h-3 w-3 rounded-full bg-white/60" />
-                <span className="ml-3 text-xs text-zinc-400">AI Meal Generator</span>
-                <span className="ml-auto flex items-center gap-1.5 text-xs text-white">
+                <span className="ml-3 text-xs text-stone-500">AI Meal Generator</span>
+                <span className="ml-auto flex items-center gap-1.5 text-xs text-stone-900">
                   <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
                   streaming
                 </span>
               </div>
 
               {/* Progress bar */}
-              <div className="h-0.5 bg-white/[0.04]">
+              <div className="h-0.5 bg-stone-50">
                 <div
                   ref={progressRef}
-                  className="h-full origin-left bg-gradient-to-r from-zinc-700 to-zinc-800"
+                  className="h-full origin-left bg-gradient-to-r from-orange-500 to-orange-600"
                   style={{ transform: "scaleX(0)" }}
                 />
               </div>
@@ -164,7 +164,7 @@ export function FeatureScroll() {
               {/* Terminal content */}
               <pre
                 ref={textRef}
-                className="p-6 text-sm leading-relaxed text-zinc-300 font-mono whitespace-pre-wrap"
+                className="p-6 text-sm leading-relaxed text-stone-600 font-mono whitespace-pre-wrap"
               >
                 {SAMPLE_MEAL_PLAN}
               </pre>

@@ -72,13 +72,13 @@ export default function DashboardPage() {
       {showUpgradeBanner && !upgradeDismissed && (
         <div className="glass rounded-xl px-5 py-4 text-sm animate-fade-in-up">
           <div className="flex items-center justify-between">
-            <span className="text-orange-300">
+            <span className="text-orange-600">
               <span className="mr-2">🎉</span>Welcome to Pro! Your account has been upgraded.
             </span>
             <button
               type="button"
               onClick={() => setUpgradeDismissed(true)}
-              className="ml-4 text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="ml-4 text-stone-400 hover:text-stone-600 transition-colors"
             >
               Dismiss
             </button>
@@ -90,8 +90,8 @@ export default function DashboardPage() {
       <div className="glass rounded-2xl p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">{greeting}</h1>
-            <p className="mt-1 text-sm text-zinc-400">
+            <h1 className="text-2xl font-bold tracking-tight text-stone-900">{greeting}</h1>
+            <p className="mt-1 text-sm text-stone-500">
               Your personalized nutrition targets and today&apos;s meal plan.
             </p>
           </div>
@@ -99,8 +99,8 @@ export default function DashboardPage() {
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${
                 isPro
-                  ? "bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/25 animate-glow-ring"
-                  : "bg-white/[0.06] text-zinc-400 border border-white/[0.08]"
+                  ? "bg-gradient-to-r from-orange-600 to-orange-500 text-stone-900 shadow-lg shadow-orange-600/25 animate-glow-ring"
+                  : "bg-stone-100 text-stone-500 border border-stone-200"
               }`}
             >
               {isPro ? "✦ Pro" : "Free"}
@@ -116,13 +116,13 @@ export default function DashboardPage() {
           </Link>
           <Link
             href="/dashboard/food"
-            className="btn-chrome rounded-xl px-5 py-2.5 text-sm font-medium text-zinc-300"
+            className="btn-chrome rounded-xl px-5 py-2.5 text-sm font-medium text-stone-600"
           >
             Browse Foods
           </Link>
           <Link
             href="/dashboard/progress"
-            className="btn-chrome rounded-xl px-5 py-2.5 text-sm font-medium text-zinc-300"
+            className="btn-chrome rounded-xl px-5 py-2.5 text-sm font-medium text-stone-600"
           >
             Track Progress
           </Link>
@@ -132,14 +132,14 @@ export default function DashboardPage() {
       {/* Loading */}
       {state.status === "loading" && (
         <div className="grid gap-5 md:grid-cols-2">
-          <Skeleton className="h-48 rounded-2xl bg-white/[0.03]" />
-          <Skeleton className="h-48 rounded-2xl bg-white/[0.03]" />
+          <Skeleton className="h-48 rounded-2xl bg-stone-100" />
+          <Skeleton className="h-48 rounded-2xl bg-stone-100" />
         </div>
       )}
 
       {/* Error */}
       {state.status === "error" && (
-        <div className="glass rounded-2xl p-5 text-sm text-zinc-400">
+        <div className="glass rounded-2xl p-5 text-sm text-stone-500">
           {state.message}
         </div>
       )}
@@ -176,17 +176,17 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
   const fatPct = totalMacro > 0 ? (n.fat_g / totalMacro) * 100 : 0;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-600/15">
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-200">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-500">
         Nutrition Targets
       </p>
       <div className="mt-4 flex items-end gap-3">
-        <span className="text-3xl font-bold text-white tabular-nums">
+        <span className="text-3xl font-bold text-stone-900 tabular-nums">
           {Math.round(n.calorie_target).toLocaleString()}
         </span>
-        <span className="text-sm text-zinc-500 mb-1">kcal / day</span>
+        <span className="text-sm text-stone-400 mb-1">kcal / day</span>
       </div>
-      <p className="mt-1 text-sm text-zinc-400">{goalLabel[n.goal] ?? n.goal}</p>
+      <p className="mt-1 text-sm text-stone-500">{goalLabel[n.goal] ?? n.goal}</p>
 
       {/* Macro progress bars */}
       <div className="mt-5 space-y-3">
@@ -195,7 +195,7 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
         <MacroBar label="Fat" value={Math.round(n.fat_g)} unit="g" pct={fatPct} color="var(--macro-fat)" />
       </div>
 
-      <p className="mt-4 text-xs text-zinc-600">
+      <p className="mt-4 text-xs text-stone-400">
         BMR {Math.round(n.bmr)} · TDEE {Math.round(n.tdee)}
       </p>
     </div>
@@ -214,10 +214,10 @@ function MacroBar({ label, value, unit, pct, color }: {
   return (
     <div>
       <div className="flex items-center justify-between text-sm mb-1.5">
-        <span className="text-zinc-400">{label}</span>
-        <span className="text-zinc-300 tabular-nums font-medium">{value}{unit}</span>
+        <span className="text-stone-500">{label}</span>
+        <span className="text-stone-600 tabular-nums font-medium">{value}{unit}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700 ease-out"
           style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: color }}
@@ -234,35 +234,35 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   const hasBudget = b.daily_budget !== null;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-600/15">
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-400/70">
+    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-orange-200">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-orange-500">
         Budget
       </p>
       {hasBudget ? (
         <>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-white tabular-nums">
+            <span className="text-3xl font-bold text-stone-900 tabular-nums">
               {Number(b.daily_budget).toLocaleString()}
             </span>
-            <span className="text-sm text-zinc-500">{b.currency_code} / day</span>
+            <span className="text-sm text-stone-400">{b.currency_code} / day</span>
           </div>
           <div className="mt-5 space-y-3">
             <div className="flex items-center justify-between text-sm glass rounded-lg px-4 py-2.5">
-              <span className="text-zinc-500">Weekly</span>
-              <span className="font-medium text-zinc-200 tabular-nums">
+              <span className="text-stone-400">Weekly</span>
+              <span className="font-medium text-stone-700 tabular-nums">
                 {b.currency_code} {Number(b.weekly_budget).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm glass rounded-lg px-4 py-2.5">
-              <span className="text-zinc-500">Monthly</span>
-              <span className="font-medium text-zinc-200 tabular-nums">
+              <span className="text-stone-400">Monthly</span>
+              <span className="font-medium text-stone-700 tabular-nums">
                 {b.currency_code} {Number(b.monthly_budget).toLocaleString()}
               </span>
             </div>
           </div>
         </>
       ) : (
-        <p className="mt-4 text-sm text-zinc-500">
+        <p className="mt-4 text-sm text-stone-400">
           No budget set. Add one in your profile settings.
         </p>
       )}
@@ -281,20 +281,20 @@ function AchievementsSection() {
 
   return (
     <div>
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-500 mb-4">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-stone-400 mb-4">
         Your Progress Badges
       </p>
       <div className="grid grid-cols-3 gap-4">
         {badges.map((badge) => (
           <div
             key={badge.label}
-            className="glass rounded-2xl p-5 text-center transition-all duration-300 hover:bg-white/[0.06] hover:border-orange-600/20 hover:shadow-[0_0_25px_rgba(234,88,12,0.1)] group cursor-default"
+            className="glass rounded-2xl p-5 text-center transition-all duration-300 hover:bg-stone-100 hover:border-orange-200 hover:shadow-md group cursor-default"
           >
             <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${badge.glow} text-2xl transition-transform duration-300 group-hover:scale-110`}>
               {badge.icon}
             </div>
-            <p className="mt-3 text-sm font-medium text-white">{badge.label}</p>
-            <p className="mt-1 text-xs text-zinc-500 leading-relaxed">{badge.desc}</p>
+            <p className="mt-3 text-sm font-medium text-stone-900">{badge.label}</p>
+            <p className="mt-1 text-xs text-stone-400 leading-relaxed">{badge.desc}</p>
           </div>
         ))}
       </div>
