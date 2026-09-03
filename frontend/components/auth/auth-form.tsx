@@ -173,16 +173,29 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             }
 
             if (!res.ok) {
-              // Try to extract a meaningful error message from the backend
+              // Try to extract a meaningful error code from the backend
               let detail = "Google sign-in failed.";
+              let errorCode = "";
               try {
                 const errBody = await res.json();
                 if (typeof errBody.detail === "string") {
                   detail = errBody.detail;
+                  errorCode = errBody.detail;
                 }
               } catch {
                 // Ignore JSON parse failure — use the default message
               }
+
+              // Special handling for email/password collision
+              if (errorCode === "EMAIL_EXISTS_WITH_PASSWORD") {
+                setError(
+                  "An account with this email already exists using a password. " +
+                  "Please log in with your email and password instead."
+                );
+                setGoogleLoading(false);
+                return;
+              }
+
               throw new Error(detail);
             }
 
