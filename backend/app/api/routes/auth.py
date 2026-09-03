@@ -131,40 +131,51 @@ def get_current_user_data(user: Annotated[User, Depends(require_auth)]):
 
 
 @router.post("/google")
-def google_auth(
+async def google_auth(
     request: Request,
     response: Response,
     db: Annotated[Session, Depends(get_db)],
 ):
-    """Authenticate or register a user via Google OAuth ID token."""
-    import asyncio
+    """Authenticate or register a user via Google OAuth ID token.
 
-    from pydantic import BaseModel
+    This is an async endpoint so we can ``await request.body()`` directly
+    without resorting to ``asyncio.get_event_loop()`` (which deadlocks in
+    FastAPI's threadpool-based sync handlers).
+    """
+    from fastapi import HTTPException
 
-    class GoogleTokenRequest(BaseModel):
-        id_token: str
-
-    async def _get_body():
+    try:
         body = await request.body()
-        return body
+        import json as _json
 
-    # We need to parse the request body manually since we're not using Depends
-    import json as _json
+        payload_data = _json.loads(body)
+    except Exception:
+        logger.exception("Failed to parse Google auth request body")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid request body.",
+        )
 
-    async def _parse_payload():
-        body = await request.body()
-        return _json.loads(body)
-
-    loop = asyncio.get_event_loop()
-    payload_data = loop.run_until_complete(_parse_payload())
     id_token_str = payload_data.get("id_token", "")
-
     if not id_token_str:
-        from fastapi import HTTPException as HE
-        raise HE(status_code=status.HTTP_400_BAD_REQUEST, detail="id_token is required.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="id_token is required.",
+        )
 
-    user = google_login_or_register(db, id_token_str)
-    token = create_session_for_user(db, user, request)
+    try:
+        user = google_login_or_register(db, id_token_str)
+        token = create_session_for_user(db, user, request)
+    except HTTPException:
+        # Re-raise known HTTP errors (401, 400) directly
+        raise
+    except Exception:
+        logger.exception("Google auth DB operation failed for token exchange")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Authentication failed. Please try again.",
+        )
 
     response.set_cookie(
         key=settings.session_cookie_name,
@@ -184,7 +195,17 @@ def google_auth(
         samesite=settings.cookie_samesite,
         path="/",
     )
-    db.commit()
+
+    try:
+        db.commit()
+    except Exception:
+        logger.exception("Failed to commit Google auth session")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Authentication failed. Please try again.",
+        )
+
     return AuthSession(user=AuthUser(**_user_response(user)), csrf_token=csrf_token)
 
 

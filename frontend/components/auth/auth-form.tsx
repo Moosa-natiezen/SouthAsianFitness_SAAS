@@ -146,25 +146,57 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             promptTimeoutRef.current = null;
           }
 
+          const GOOGLE_TOKEN_EXCHANGE_TIMEOUT_MS = 10_000;
+
           try {
             const { apiBaseUrl } = await import("@/lib/api");
-            const res = await fetch(`${apiBaseUrl}/api/auth/google`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ id_token: response.credential }),
-            });
 
-            if (!res.ok) {
-              throw new Error("Google sign-in failed");
+            // Race the token exchange against a 10s timeout so the UI
+            // never freezes if the backend is unreachable or slow
+            const controller = new AbortController();
+            const timeoutId = setTimeout(
+              () => controller.abort(),
+              GOOGLE_TOKEN_EXCHANGE_TIMEOUT_MS,
+            );
+
+            let res: Response;
+            try {
+              res = await fetch(`${apiBaseUrl}/api/auth/google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ id_token: response.credential }),
+                signal: controller.signal,
+              });
+            } finally {
+              clearTimeout(timeoutId);
             }
 
-            // The session cookie is set by the backend
-            router.push("/dashboard");
+            if (!res.ok) {
+              // Try to extract a meaningful error message from the backend
+              let detail = "Google sign-in failed.";
+              try {
+                const errBody = await res.json();
+                if (typeof errBody.detail === "string") {
+                  detail = errBody.detail;
+                }
+              } catch {
+                // Ignore JSON parse failure — use the default message
+              }
+              throw new Error(detail);
+            }
+
+            // The session cookie is set by the backend — navigate away
+            await router.push("/dashboard");
             router.refresh();
           } catch (err) {
-            const message = err instanceof Error ? err.message : "Google sign-in failed.";
-            setError(message);
+            if (err instanceof DOMException && err.name === "AbortError") {
+              setError("Google sign-in timed out. Please try again.");
+            } else {
+              const message =
+                err instanceof Error ? err.message : "Google sign-in failed.";
+              setError(message);
+            }
           } finally {
             setGoogleLoading(false);
           }
