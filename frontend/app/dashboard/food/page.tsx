@@ -31,22 +31,62 @@ function formatServing(size: number, unit: string): string {
   return `${formatMacro(size)} ${unit}`;
 }
 
+/** Map food names to curated Unsplash thumbnail URLs for visual richness */
+const foodImageMap: Record<string, string> = {
+  "chicken-biryani": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&h=200&fit=crop&q=70",
+  "butter-chicken": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200&h=200&fit=crop&q=70",
+  "chicken-karahi": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&h=200&fit=crop&q=70",
+  "daal-chawal": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200&h=200&fit=crop&q=70",
+  "paneer-tikka": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200&h=200&fit=crop&q=70",
+  "garlic-naan": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200&h=200&fit=crop&q=70",
+  "gulab-jamun": "https://images.unsplash.com/photo-1666190462587-4d3a0c4c2b61?w=200&h=200&fit=crop&q=70",
+  "chicken-tikka": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=200&h=200&fit=crop&q=70",
+  "samosa": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200&h=200&fit=crop&q=70",
+  "biryani": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&h=200&fit=crop&q=70",
+  "roti": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200&h=200&fit=crop&q=70",
+  "rice": "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200&h=200&fit=crop&q=70",
+  "chicken": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop&q=70",
+  "curry": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=200&h=200&fit=crop&q=70",
+  "fish": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=200&h=200&fit=crop&q=70",
+  "default": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=200&h=200&fit=crop&q=70",
+};
+
+function getFoodImage(name: string, slug: string): string {
+  const normalized = (slug || name).toLowerCase().replace(/\s+/g, "-");
+  // Try exact match, then partial match
+  if (foodImageMap[normalized]) return foodImageMap[normalized];
+  for (const [key, url] of Object.entries(foodImageMap)) {
+    if (normalized.includes(key) || key.includes(normalized)) return url;
+  }
+  return foodImageMap["default"];
+}
+
 /* ── FoodCard component ────────────────────────────────────────────────── */
 
 function FoodCard({ food }: { food: FoodItem }) {
   return (
-    <Card className="flex flex-col gap-3 py-4">
+    <Card className="flex flex-col gap-3 py-0 overflow-hidden">
+      {/* Food thumbnail image */}
+      <div className="relative h-32 w-full overflow-hidden">
+        <img
+          src={getFoodImage(food.name, food.slug)}
+          alt={food.name}
+          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        {food.category && (
+          <Badge variant="secondary" className="absolute right-2 top-2 text-[10px] bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm">
+            {food.category}
+          </Badge>
+        )}
+      </div>
       <CardContent className="space-y-3">
-        {/* Header: name + category */}
-        <div className="flex items-start justify-between gap-2">
+        {/* Header: name */}
+        <div>
           <h3 className="text-sm font-semibold leading-snug text-stone-900 dark:text-zinc-100">
             {food.name}
           </h3>
-          {food.category && (
-            <Badge variant="secondary" className="shrink-0 text-xs">
-              {food.category}
-            </Badge>
-          )}
         </div>
 
         {/* Description */}

@@ -27,6 +27,13 @@ const mealEmoji: Record<string, string> = {
   dinner: "🍲",
 };
 
+const mealImages: Record<string, string> = {
+  breakfast: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=120&h=120&fit=crop&q=70",
+  lunch: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&h=120&fit=crop&q=70",
+  snack: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&h=120&fit=crop&q=70",
+  dinner: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=120&h=120&fit=crop&q=70",
+};
+
 export function TodayPlanCard() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
 
@@ -118,7 +125,14 @@ export function TodayPlanCard() {
       <div className="mt-4 space-y-2">
         {day.meals.map((meal) => (
           <div key={meal.meal_type} className="glass rounded-xl p-4 transition-all duration-300 hover:bg-stone-50 dark:bg-zinc-800">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src={mealImages[meal.meal_type] || mealImages["dinner"]}
+                alt={meal.meal_type}
+                className="h-10 w-10 rounded-lg object-cover ring-1 ring-stone-200 dark:ring-zinc-700 shrink-0"
+                loading="lazy"
+              />
+              <div className="flex-1 flex items-center justify-between">
               <p className="text-sm font-medium text-stone-700 dark:text-zinc-300">
                 {mealEmoji[meal.meal_type] ?? "🍽️"}{" "}
                 {meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}
@@ -126,6 +140,7 @@ export function TodayPlanCard() {
               <p className="text-sm text-stone-500 dark:text-zinc-500 tabular-nums">
                 {Math.round(meal.subtotal_calories)} kcal
               </p>
+              </div>
             </div>
             <div className="mt-2.5 space-y-1">
               {meal.foods.map((food) => (

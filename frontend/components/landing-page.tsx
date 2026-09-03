@@ -72,7 +72,7 @@ export function LandingPage() {
               </div>
             </div>
 
-            {/* Right — Floating Macro Data Card */}
+            {/* Right — Floating Macro Data Card + Hero Food Image */}
             <div className="relative flex justify-center lg:justify-end">
               <div className="absolute inset-0 m-auto h-[60%] w-[60%] rounded-full bg-emerald-600/4 blur-3xl" />
               <div className="relative w-full max-w-md">
@@ -80,9 +80,11 @@ export function LandingPage() {
                 <div className="rounded-[2rem] bg-white dark:bg-zinc-900 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] ring-1 ring-stone-200 dark:ring-zinc-700">
                   {/* Dish header */}
                   <div className="mb-5 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600/8 text-lg">
-                      🍛
-                    </div>
+                    <img
+                      src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&h=120&fit=crop&q=80"
+                      alt="Chicken Biryani"
+                      className="h-12 w-12 rounded-2xl object-cover ring-1 ring-stone-200 dark:ring-zinc-700"
+                    />
                     <div>
                       <div className="text-sm font-semibold text-stone-900 dark:text-zinc-100">Chicken Biryani</div>
                       <div className="text-xs text-stone-400 dark:text-zinc-500">1 standard serving · 520 kcal</div>
@@ -131,6 +133,14 @@ export function LandingPage() {
                   <div className="text-2xl font-bold text-stone-900 dark:text-zinc-100 font-serif">215+</div>
                   <div className="text-xs text-stone-500 dark:text-zinc-500 mt-0.5">Seeded dishes</div>
                 </div>
+              </div>
+              {/* Secondary floating food image */}
+              <div className="absolute -bottom-8 -right-8 hidden lg:block">
+                <img
+                  src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&h=200&fit=crop&q=80"
+                  alt="Butter Chicken"
+                  className="h-28 w-28 rounded-2xl object-cover shadow-xl ring-2 ring-white dark:ring-zinc-800 animate-float"
+                />
               </div>
             </div>
           </div>
@@ -206,14 +216,19 @@ export function LandingPage() {
               {/* Mock food list */}
               <div className="mt-6 space-y-2.5">
                 {[
-                  { name: "Chicken Biryani", cal: 520, p: 32 },
-                  { name: "Butter Chicken", cal: 450, p: 30 },
-                  { name: "Daal Chawal", cal: 420, p: 20 },
-                  { name: "Paneer Tikka", cal: 420, p: 22 },
-                  { name: "Garlic Naan", cal: 260, p: 7 },
+                  { name: "Chicken Biryani", cal: 520, p: 32, img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=80&h=80&fit=crop&q=60" },
+                  { name: "Butter Chicken", cal: 450, p: 30, img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=80&h=80&fit=crop&q=60" },
+                  { name: "Daal Chawal", cal: 420, p: 20, img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=80&h=80&fit=crop&q=60" },
+                  { name: "Paneer Tikka", cal: 420, p: 22, img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=80&h=80&fit=crop&q=60" },
+                  { name: "Garlic Naan", cal: 260, p: 7, img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=80&h=80&fit=crop&q=60" },
                 ].map((d) => (
-                  <div key={d.name} className="flex items-center justify-between rounded-xl bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5">
-                    <span className="text-xs font-medium text-stone-700 dark:text-zinc-300">{d.name}</span>
+                  <div key={d.name} className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5">
+                    <img
+                      src={d.img}
+                      alt={d.name}
+                      className="h-9 w-9 rounded-lg object-cover ring-1 ring-stone-200 dark:ring-zinc-700"
+                    />
+                    <span className="flex-1 text-xs font-medium text-stone-700 dark:text-zinc-300">{d.name}</span>
                     <div className="flex gap-2">
                       <span className="text-[10px] font-medium text-emerald-600">{d.cal} cal</span>
                       <span className="text-[10px] font-medium text-emerald-600">{d.p}g P</span>
@@ -227,8 +242,12 @@ export function LandingPage() {
             <div className="md:col-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
               <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
                 <div className="flex-1">
-                  <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-xl">
-                    🤖
+                  <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=100&h=100&fit=crop&q=60"
+                      alt="AI Meal Plans"
+                      className="h-10 w-10 rounded-xl object-cover"
+                    />
                   </div>
                   <h3 className="text-xl font-semibold text-stone-900 dark:text-zinc-100 font-serif">
                     Dual-pipeline AI streaming
@@ -290,8 +309,12 @@ export function LandingPage() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-xl">
-                    📊
+                  <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-xl">
+                    <img
+                      src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=100&h=100&fit=crop&q=60"
+                      alt="Macro Targets"
+                      className="h-10 w-10 rounded-xl object-cover"
+                    />
                   </div>
                   <h3 className="text-xl font-semibold text-stone-900 dark:text-zinc-100 font-serif">
                     Mifflin-St Jeor TDEE engine
