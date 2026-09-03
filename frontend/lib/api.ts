@@ -25,6 +25,9 @@ function dispatchProRequired(): void {
   }
 }
 
+/** Default timeout for API requests (15 seconds). Prevents infinite hangs. */
+const API_TIMEOUT_MS = 15_000;
+
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers ?? {});
 
@@ -36,12 +39,18 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Accept", "application/json");
   }
 
-  const response = await fetch(`${apiBaseUrl}${path}`, {
-    ...init,
-    credentials: "include",
-    headers,
-    cache: "no-store",
-  });
+  // Create an AbortController with a timeout so requests never hang forever
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${apiBaseUrl}${path}`, {
+      ...init,
+      credentials: "include",
+      headers,
+      cache: "no-store",
+      signal: controller.signal,
+    });
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
@@ -86,6 +95,15 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   return (await response.json()) as T;
+  } catch (err) {
+    // Convert AbortError to a clear timeout message instead of a generic error
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error("Request timed out. Please check your connection and try again.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 /* ── Auth types ────────────────────────────────────────────────────────── */

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
@@ -31,12 +31,21 @@ const initialState = {
   password: "",
 };
 
+/** Maximum time (ms) to wait for the Google Identity Services library to load */
+const GIS_LOAD_TIMEOUT_MS = 8_000;
+/** Maximum time (ms) to wait for the user to select a Google account */
+const GOOGLE_PROMPT_TIMEOUT_MS = 60_000;
+
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Refs to track timeouts so we can clean them up
+  const googleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const promptTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isSignup = mode === "signup";
 
@@ -104,16 +113,39 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   };
 
   const handleGoogleSignIn = async () => {
+    // Prevent double-clicks
+    if (googleLoading) return;
+
     setGoogleLoading(true);
     setError(null);
 
     try {
-      // Load the Google Identity Services library
-      const google = await loadGoogleIdentityServices();
+      // Load the Google Identity Services library with a timeout
+      const google = await Promise.race([
+        loadGoogleIdentityServices(),
+        new Promise<never>((_, reject) => {
+          googleTimeoutRef.current = setTimeout(
+            () => reject(new Error("Google sign-in library timed out. Please try again.")),
+            GIS_LOAD_TIMEOUT_MS,
+          );
+        }),
+      ]);
+
+      // Clear the load timeout since we succeeded
+      if (googleTimeoutRef.current) {
+        clearTimeout(googleTimeoutRef.current);
+        googleTimeoutRef.current = null;
+      }
 
       google.accounts.id.initialize({
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
         callback: async (response: { credential: string }) => {
+          // Clear the prompt timeout since we got a response
+          if (promptTimeoutRef.current) {
+            clearTimeout(promptTimeoutRef.current);
+            promptTimeoutRef.current = null;
+          }
+
           try {
             const { apiBaseUrl } = await import("@/lib/api");
             const res = await fetch(`${apiBaseUrl}/api/auth/google`, {
@@ -139,10 +171,24 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         },
       });
 
+      // Show the Google One Tap prompt
       google.accounts.id.prompt();
-    } catch {
-      setError("Failed to load Google sign-in. Please try again.");
+
+      // Set a timeout for the prompt — if the user doesn't interact
+      // with the Google dialog within 60s, reset the loading state
+      promptTimeoutRef.current = setTimeout(() => {
+        setGoogleLoading(false);
+      }, GOOGLE_PROMPT_TIMEOUT_MS);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load Google sign-in.";
+      setError(message);
       setGoogleLoading(false);
+    } finally {
+      // Always clean up the load timeout
+      if (googleTimeoutRef.current) {
+        clearTimeout(googleTimeoutRef.current);
+        googleTimeoutRef.current = null;
+      }
     }
   };
 
@@ -272,6 +318,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 /**
  * Dynamically load Google Identity Services (GIS) library.
  * Returns the `google` global with `accounts.id` API.
+ * Wrapped in try/catch so network failures never propagate.
  */
 type GoogleGIS = {
   accounts: {
@@ -300,12 +347,10 @@ function loadGoogleIdentityServices(): Promise<GoogleGIS> {
       if (window.google?.accounts?.id) {
         resolve(window.google as GoogleGIS);
       } else {
-        reject(new Error("Google Identity Services failed to load"));
+        reject(new Error("Google Identity Services loaded but not available"));
       }
     };
     script.onerror = () => reject(new Error("Failed to load Google Identity Services"));
     document.head.appendChild(script);
   });
 }
-
-
