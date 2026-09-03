@@ -1,7 +1,9 @@
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
@@ -16,6 +18,22 @@ from app.db.session import SessionLocal
 from app.models.enums import VerificationStatus
 from app.models.food import Food
 from app.scripts.seed_reference_data import seed_all
+
+# ── Sentry initialization ─────────────────────────────────────────────
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        environment=settings.environment,
+        traces_sample_rate=0.2 if settings.is_production else 1.0,
+        send_default_pii=False,
+        # Add FastAPI integration for better request context
+        _experiments={
+            "record_http_request_bodies": False,
+        },
+    )
+    logger_sentry = get_logger("sentry")
+    logger_sentry.info("Sentry initialized for %s environment", settings.environment)
 
 setup_logging(debug=settings.debug)
 logger = get_logger(__name__)

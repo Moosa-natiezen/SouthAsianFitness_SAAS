@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 
 import "./globals.css";
 import { LenisProvider } from "@/components/lenis-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,26 +65,28 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-stone-900 focus:outline-none focus:shadow-lg dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange={false}
           >
-            Skip to content
-          </a>
-          <LenisProvider>
-            <div id="main-content" className="flex-1 flex flex-col relative">
-              <div className="relative z-10">
-              {children}
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-stone-900 focus:outline-none focus:shadow-lg dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
+            >
+              Skip to content
+            </a>
+            <LenisProvider>
+              <div id="main-content" className="flex-1 flex flex-col relative">
+                <div className="relative z-10">
+                {children}
+              </div>
             </div>
-          </div>
-          </LenisProvider>
-        </ThemeProvider>
+            </LenisProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );
