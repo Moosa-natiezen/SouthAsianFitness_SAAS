@@ -27,7 +27,7 @@ export function LandingPage() {
             </Link>
             <Link
               href="/auth/signup"
-              className="rounded-full bg-stone-900 px-5 py-2 text-sm font-medium text-white hover:bg-stone-800 transition-all duration-200 active:scale-[0.97]"
+              className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-emerald-600/20 hover:bg-emerald-700 hover:shadow-md transition-all duration-200 active:scale-[0.97]"
             >
               Get started
             </Link>
@@ -36,7 +36,7 @@ export function LandingPage() {
       </header>
 
       {/* ── Hero — Warm Light ─────────────────────────────────────── */}
-      <section className="relative pt-24 pb-12 md:pt-32 md:pb-20">
+      <section className="relative pt-28 pb-16 md:pt-36 md:pb-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
             {/* Left — Copy & CTA */}
@@ -148,7 +148,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Trust / Social Proof — DARK CONTRAST ─────────────────────── */}
-      <section className="bg-zinc-900 dark:bg-zinc-950 py-16">
+      <section className="bg-zinc-900 dark:bg-zinc-950 py-20 md:py-24">
         <div className="mx-auto max-w-5xl px-6 text-center">
           <div className="mb-4 flex justify-center gap-1">
             {[...Array(5)].map((_, i) => (
@@ -164,7 +164,7 @@ export function LandingPage() {
             The smartest way to track cultural cuisines — from Karachi to Colombo.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-6 py-3 text-left transition-all duration-200 hover:bg-stone-100 dark:bg-zinc-800 hover:border-stone-300 active:scale-[0.97]">
+            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-6 py-3 text-left transition-all duration-200 hover:bg-stone-100 dark:hover:bg-zinc-700 hover:border-stone-300 active:scale-[0.97]">
               <svg className="h-7 w-7 text-stone-900 dark:text-zinc-100" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
               </svg>
@@ -173,7 +173,7 @@ export function LandingPage() {
                 <div className="text-sm font-semibold text-stone-900 dark:text-zinc-100">App Store</div>
               </div>
             </button>
-            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-6 py-3 text-left transition-all duration-200 hover:bg-stone-100 dark:bg-zinc-800 hover:border-stone-300 active:scale-[0.97]">
+            <button className="inline-flex items-center gap-3 rounded-2xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-6 py-3 text-left transition-all duration-200 hover:bg-stone-100 dark:hover:bg-zinc-700 hover:border-stone-300 active:scale-[0.97]">
               <svg className="h-7 w-7 text-stone-900 dark:text-zinc-100" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3.609 1.814 13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-1.707 2.173 1.262a1.001 1.001 0 0 1 0 1.74l-2.173 1.262-2.535-2.535 2.535-2.729zM5.864 2.658 16.8 8.99l-2.302 2.302-8.634-8.634z" />
               </svg>
@@ -187,7 +187,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Features — 3-Column Bento Grid ──────────────────────────── */}
-      <section id="features" className="py-24 md:py-32 bg-background">
+      <section id="features" className="py-28 md:py-36 bg-background">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-16 md:mb-20 text-center">
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-600">Features</p>
@@ -202,7 +202,7 @@ export function LandingPage() {
           {/* Bento Grid */}
           <div className="grid gap-5 md:grid-cols-3">
             {/* Card 1 — Food Library (Tall) */}
-            <div id="how-it-works" className="md:row-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
+            <div id="how-it-works" className="md:row-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm card-hover md:p-10">
               <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-xl">
                 🍛
               </div>
@@ -239,7 +239,7 @@ export function LandingPage() {
             </div>
 
             {/* Card 2 — AI Streaming (Wide) */}
-            <div className="md:col-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
+            <div className="md:col-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm card-hover md:p-10">
               <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
                 <div className="flex-1">
                   <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-xl">
@@ -258,7 +258,7 @@ export function LandingPage() {
                   </p>
                   <Link
                     href="/onboarding"
-                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-600 transition-colors"
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors link-underline"
                   >
                     Try the AI generator
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -284,7 +284,7 @@ export function LandingPage() {
             </div>
 
             {/* Card 3 — TDEE Engine (Wide) */}
-            <div className="md:col-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm transition-all duration-300 hover:shadow-md md:p-10">
+            <div className="md:col-span-2 rounded-3xl bg-white dark:bg-zinc-900 p-8 ring-1 ring-stone-200 dark:ring-zinc-700/60 shadow-sm card-hover md:p-10">
               <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
                 {/* Macro targets mock */}
                 <div className="flex-shrink-0 rounded-2xl bg-stone-50 dark:bg-zinc-800 p-5 ring-1 ring-stone-200 dark:ring-zinc-700/50 lg:w-64">
@@ -326,7 +326,7 @@ export function LandingPage() {
                   </p>
                   <Link
                     href="/onboarding"
-                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-600 transition-colors"
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors link-underline"
                   >
                     Calculate your TDEE
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -341,7 +341,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Pricing ──────────────────────────────────────────────────── */}
-      <section id="pricing" className="bg-stone-100 dark:bg-zinc-800/50 py-24 md:py-32">
+      <section id="pricing" className="bg-stone-100 dark:bg-zinc-800/50 py-28 md:py-36">
         <div className="mx-auto max-w-5xl px-6">
           <div className="mb-14 text-center">
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-600">Pricing</p>
@@ -352,7 +352,7 @@ export function LandingPage() {
           </div>
           <div className="grid gap-8 md:grid-cols-2 max-w-2xl mx-auto">
             {/* Free tier */}
-            <div className="rounded-3xl border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-8 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="rounded-3xl border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-8 shadow-sm card-hover">
               <p className="text-sm font-medium text-stone-400 dark:text-zinc-500">Free</p>
               <p className="mt-2 text-4xl font-bold text-stone-900 dark:text-zinc-100 font-serif">$0</p>
               <p className="mt-1 text-sm text-stone-400 dark:text-zinc-500">forever</p>
@@ -375,7 +375,7 @@ export function LandingPage() {
               </Link>
             </div>
             {/* Pro tier */}
-            <div className="relative rounded-3xl border-2 border-emerald-600 bg-white dark:bg-zinc-900 p-8 shadow-lg shadow-emerald-600/5 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-600/10">
+            <div className="relative rounded-3xl border-2 border-emerald-600 bg-white dark:bg-zinc-900 p-8 shadow-lg shadow-emerald-600/5 card-hover">
               <div className="absolute -top-3.5 right-6 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-stone-900 dark:text-zinc-100 shadow-md shadow-emerald-600/20">
                 Most Popular
               </div>
@@ -408,7 +408,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Final CTA — DARK CONTRAST ─────────────────────────────── */}
-      <section className="bg-zinc-900 dark:bg-zinc-950 py-24">
+      <section className="bg-zinc-900 dark:bg-zinc-950 py-28 md:py-32">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-3xl font-semibold text-stone-900 dark:text-zinc-100 md:text-4xl font-serif">
             Your goals. Your food. Your plan.

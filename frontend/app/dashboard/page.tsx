@@ -176,7 +176,7 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
   const fatPct = totalMacro > 0 ? (n.fat_g / totalMacro) * 100 : 0;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-200">
+    <div className="glass rounded-2xl p-6 card-hover">
       <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">
         Nutrition Targets
       </p>
@@ -234,7 +234,7 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
   const hasBudget = b.daily_budget !== null;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-200">
+    <div className="glass rounded-2xl p-6 card-hover">
       <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">
         Budget
       </p>
@@ -288,7 +288,7 @@ function AchievementsSection() {
         {badges.map((badge) => (
           <div
             key={badge.label}
-            className="glass rounded-2xl p-5 text-center transition-all duration-300 hover:bg-stone-100 dark:bg-zinc-800 hover:border-emerald-200 hover:shadow-md group cursor-default"
+            className="glass rounded-2xl p-5 text-center card-hover group cursor-default"
           >
             <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${badge.glow} text-2xl transition-transform duration-300 group-hover:scale-110`}>
               {badge.icon}

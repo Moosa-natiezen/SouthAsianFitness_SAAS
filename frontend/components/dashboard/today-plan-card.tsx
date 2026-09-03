@@ -112,7 +112,7 @@ export function TodayPlanCard() {
   const { plan, day } = state;
 
   return (
-    <div className="glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-200">
+    <div className="glass rounded-2xl p-6 card-hover">
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">Today&apos;s Plan</p>
         <Link href="/dashboard/meal-plans" className="text-xs text-stone-400 dark:text-zinc-500 hover:text-emerald-600 transition-colors duration-300">

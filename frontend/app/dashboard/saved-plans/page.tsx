@@ -146,7 +146,7 @@ function PlanCard({
   const createdDate = formatDate(plan.created_at);
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl glass p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+    <div className="group relative overflow-hidden rounded-2xl glass p-5 card-hover">
       <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white dark:bg-zinc-900/50/5 blur-[30px] transition-all duration-500 group-hover:bg-stone-100 dark:bg-zinc-800" />
 
       <div className="relative">
