@@ -33,8 +33,11 @@ const initialState = {
 
 /** Maximum time (ms) to wait for the Google Identity Services library to load */
 const GIS_LOAD_TIMEOUT_MS = 8_000;
-/** Maximum time (ms) to wait for the user to select a Google account */
-const GOOGLE_PROMPT_TIMEOUT_MS = 60_000;
+/** Maximum time (ms) to wait for the user to select a Google account.
+ *  Reduced from 60s to 15s — if the user dismisses the Google dialog
+ *  without selecting, the button should reset quickly, not stay stuck
+ *  on "Connecting..." for a full minute. */
+const GOOGLE_PROMPT_TIMEOUT_MS = 15_000;
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
@@ -219,8 +222,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       // Show the Google One Tap prompt
       google.accounts.id.prompt();
 
-      // Set a timeout for the prompt — if the user doesn't interact
-      // with the Google dialog within 60s, reset the loading state
+      // Safety timeout — if the callback never fires (e.g. user dismissed
+      // the Google dialog without selecting), reset the loading state so
+      // the button doesn't stay stuck on "Connecting...".
       promptTimeoutRef.current = setTimeout(() => {
         setGoogleLoading(false);
       }, GOOGLE_PROMPT_TIMEOUT_MS);
