@@ -25,9 +25,9 @@ if sentry_dsn:
     sentry_sdk.init(
         dsn=sentry_dsn,
         environment=settings.environment,
-        traces_sample_rate=0.2 if settings.is_production else 1.0,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
         send_default_pii=False,
-        # Add FastAPI integration for better request context
         _experiments={
             "record_http_request_bodies": False,
         },

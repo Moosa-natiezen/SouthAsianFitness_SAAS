@@ -7,7 +7,7 @@ if (dsn) {
     dsn,
     environment: process.env.NODE_ENV ?? "development",
 
-    // Adjust this value in production, or use tracesSampler for greater control
+    // Capture 100% of traces in development, 20% in production
     tracesSampleRate: process.env.NODE_ENV === "production" ? 0.2 : 1.0,
 
     // Session Replay — captures 100% of sessions on error, 10% otherwise
@@ -24,10 +24,19 @@ if (dsn) {
     // Don't send PII
     sendDefaultPii: false,
 
-    // Only allow Sentry in production or when DSN is set
+    // Ensure all exception chains are captured
+    normalizeDepth: 6,
+
+    // Only allow Sentry when DSN is set
     enabled: !!dsn,
 
-    // Set sample rate for profiling — this is relative to tracesSampleRate
+    // Profiling — relative to tracesSampleRate
     profilesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+
+    // Capture console errors as breadcrumbs
+    maxBreadcrumbs: 50,
+
+    // Attach stack traces to all events
+    attachStacktrace: true,
   });
 }
