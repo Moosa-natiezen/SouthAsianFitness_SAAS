@@ -7,7 +7,6 @@ const LeadMagnetSection = dynamic(
     import("@/components/sections/lead-magnet-section").then(
       (m) => m.LeadMagnetSection,
     ),
-  { ssr: false },
 );
 
 const TestimonialsSection = dynamic(
@@ -15,13 +14,11 @@ const TestimonialsSection = dynamic(
     import("@/components/sections/testimonials-section").then(
       (m) => m.TestimonialsSection,
     ),
-  { ssr: false },
 );
 
 const FAQSection = dynamic(
   () =>
     import("@/components/sections/faq-section").then((m) => m.FAQSection),
-  { ssr: false },
 );
 
 export default function Home() {
