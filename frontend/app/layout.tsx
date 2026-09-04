@@ -1,23 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import dynamic from "next/dynamic";
 
 import "./globals.css";
-
-/* Dynamically import non-critical providers so they never bloat the landing page */
-const LenisProvider = dynamic(
-  () => import("@/components/lenis-provider").then((m) => m.LenisProvider),
-  { ssr: false },
-);
-
-const PostHogProvider = dynamic(
-  () =>
-    import("@/components/providers/posthog-provider").then(
-      (m) => m.PostHogProvider,
-    ),
-  { ssr: false },
-);
+import { LenisProvider } from "@/components/lenis-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -119,7 +106,8 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
-    >              <body className="min-h-full bg-background text-foreground">
+    >
+      <body className="min-h-full bg-background text-foreground">
         <PostHogProvider>
           <ThemeProvider
             attribute="class"
@@ -136,9 +124,9 @@ export default function RootLayout({
             <LenisProvider>
               <div id="main-content" className="flex-1 flex flex-col relative">
                 <div className="relative z-10">
-                  {children}
-                </div>
+                {children}
               </div>
+            </div>
             </LenisProvider>
           </ThemeProvider>
         </PostHogProvider>

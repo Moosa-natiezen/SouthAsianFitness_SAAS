@@ -117,7 +117,6 @@ export function LandingPage() {
                       alt="Chicken Biryani served in a traditional bowl with saffron rice"
                       width={48}
                       height={48}
-                      quality={85}
                       className="h-12 w-12 rounded-2xl object-cover ring-1 ring-stone-200 dark:ring-zinc-700"
                       priority
                     />
@@ -229,7 +228,6 @@ export function LandingPage() {
                   alt="Rich butter chicken curry — one of 215+ South Asian dishes tracked in the food library"
                   width={112}
                   height={112}
-                  quality={85}
                   className="h-28 w-28 rounded-2xl object-cover shadow-xl ring-2 ring-white dark:ring-zinc-800 animate-float"
                   priority
                 />
@@ -345,8 +343,6 @@ export function LandingPage() {
                       alt={`${d.name} — South Asian dish with accurate macro data per serving`}
                       width={36}
                       height={36}
-                      sizes="36px"
-                      quality={80}
                       className="h-9 w-9 rounded-lg object-cover ring-1 ring-stone-200 dark:ring-zinc-700"
                       loading="lazy"
                     />
@@ -376,8 +372,6 @@ export function LandingPage() {
                       alt="AI-generated South Asian meal plan with streaming interface"
                       width={40}
                       height={40}
-                      sizes="40px"
-                      quality={80}
                       className="h-10 w-10 rounded-xl object-cover"
                       loading="lazy"
                     />
@@ -494,8 +488,6 @@ export function LandingPage() {
                       alt="Personalized macro targets — calories, protein, carbs, and fat calculated by the TDEE engine"
                       width={40}
                       height={40}
-                      sizes="40px"
-                      quality={80}
                       className="h-10 w-10 rounded-xl object-cover"
                       loading="lazy"
                     />
