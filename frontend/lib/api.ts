@@ -1,5 +1,9 @@
+// In production, NEXT_PUBLIC_API_URL should be unset or empty so fetch() uses
+// the same origin — Vercel's rewrite in vercel.json proxies /api/* to Render.
+// In local development, set NEXT_PUBLIC_API_URL=http://localhost:8000 in .env.local
+// to call the backend directly.
 export const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
 
 /* ── Shared ────────────────────────────────────────────────────────────── */
 

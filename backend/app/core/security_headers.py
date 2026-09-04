@@ -32,16 +32,19 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             response.headers["Strict-Transport-Security"] = (
                 "max-age=63072000; includeSubDomains; preload"
             )
-            # Light CSP — do not block legitimate frontend resources
-            response.headers["Content-Security-Policy"] = (
-                "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-                "style-src 'self' 'unsafe-inline'; "
-                "img-src 'self' data: https:; "
-                "font-src 'self' https://fonts.gstatic.com; "
-                "connect-src 'self'; "
-                "frame-ancestors 'none'"
-            )
+            # Light CSP — only for HTML responses (API JSON responses ignore CSP,
+            # but we include it for any future HTML error pages).  We do NOT set
+            # connect-src 'self' because the frontend makes cross-origin fetch
+            # calls to the API backend.
+            if "text/html" in response.headers.get("content-type", ""):
+                response.headers["Content-Security-Policy"] = (
+                    "default-src 'self'; "
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+                    "style-src 'self' 'unsafe-inline'; "
+                    "img-src 'self' data: https:; "
+                    "font-src 'self' https://fonts.gstatic.com; "
+                    "frame-ancestors 'none'"
+                )
         else:
             # Development: allow framing for Swagger/next dev
             response.headers["X-Frame-Options"] = "SAMEORIGIN"
