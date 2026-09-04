@@ -31,26 +31,69 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const SITE_URL = "https://southasianfitness.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "South Asian Fitness — Personalized Meal Planning",
-    template: "%s — South Asian Fitness",
+    default: "South Asian Fitness | Custom Workouts & Cultural Nutrition",
+    template: "%s | South Asian Fitness",
   },
   description:
-    "Personalized, budget-friendly South Asian diet and fitness planning. " +
-    "Get meal plans built around the foods, meals, and budgets that fit your life.",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
+    "The world's first AI-powered nutrition platform built for South Asian cuisine. " +
+    "Track macros for Biryani, Daal, Karahi and 200+ cultural dishes. " +
+    "Personalized meal plans, workout routines, and macro targets — all free.",
+  keywords: [
+    "South Asian fitness",
+    "Indian meal plan",
+    "Pakistani diet",
+    "cultural nutrition tracker",
+    "Biryani macros",
+    "AI meal planner",
+    "Desi fitness",
+    "macro tracker",
+  ],
+  authors: [{ name: "South Asian Fitness" }],
+  creator: "South Asian Fitness",
   openGraph: {
     type: "website",
     locale: "en_US",
+    url: SITE_URL,
     siteName: "South Asian Fitness",
-    title: "South Asian Fitness — Personalized Meal Planning",
+    title: "South Asian Fitness | Custom Workouts & Cultural Nutrition",
     description:
-      "Personalized, budget-friendly South Asian diet and fitness planning.",
+      "AI-powered nutrition tracking for South Asian cuisine. " +
+      "200+ cultural dishes, personalized macros, and smart meal plans.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "South Asian Fitness — AI-powered cultural nutrition platform",
+      },
+    ],
   },
-  robots: { index: true, follow: true },
+  twitter: {
+    card: "summary_large_image",
+    title: "South Asian Fitness | Custom Workouts & Cultural Nutrition",
+    description:
+      "AI-powered nutrition tracking for South Asian cuisine. 200+ cultural dishes, personalized macros, and smart meal plans.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 export default function RootLayout({
