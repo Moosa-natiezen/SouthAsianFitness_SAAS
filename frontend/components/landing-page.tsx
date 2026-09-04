@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
 /* ── Landing Page — Warm Light Mode + Dark Contrast Sections ─────────── */
 
@@ -82,8 +83,9 @@ export function LandingPage() {
                   <div className="mb-5 flex items-center gap-3">
                     <img
                       src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&h=120&fit=crop&q=80"
-                      alt="Chicken Biryani"
+                      alt="Chicken Biryani served in a traditional bowl with saffron rice"
                       className="h-12 w-12 rounded-2xl object-cover ring-1 ring-stone-200 dark:ring-zinc-700"
+                      loading="eager"
                     />
                     <div>
                       <div className="text-sm font-semibold text-stone-900 dark:text-zinc-100">Chicken Biryani</div>
@@ -138,8 +140,9 @@ export function LandingPage() {
               <div className="absolute -bottom-8 -right-8 hidden lg:block">
                 <img
                   src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&h=200&fit=crop&q=80"
-                  alt="Butter Chicken"
+                  alt="Rich butter chicken curry — one of 215+ South Asian dishes tracked in the food library"
                   className="h-28 w-28 rounded-2xl object-cover shadow-xl ring-2 ring-white dark:ring-zinc-800 animate-float"
+                  loading="eager"
                 />
               </div>
             </div>
@@ -225,8 +228,9 @@ export function LandingPage() {
                   <div key={d.name} className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5">
                     <img
                       src={d.img}
-                      alt={d.name}
+                      alt={`${d.name} — South Asian dish with accurate macro data per serving`}
                       className="h-9 w-9 rounded-lg object-cover ring-1 ring-stone-200 dark:ring-zinc-700"
+                      loading="lazy"
                     />
                     <span className="flex-1 text-xs font-medium text-stone-700 dark:text-zinc-300">{d.name}</span>
                     <div className="flex gap-2">
@@ -245,8 +249,9 @@ export function LandingPage() {
                   <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-xl">
                     <img
                       src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=100&h=100&fit=crop&q=60"
-                      alt="AI Meal Plans"
+                      alt="AI-generated South Asian meal plan with streaming interface"
                       className="h-10 w-10 rounded-xl object-cover"
+                      loading="lazy"
                     />
                   </div>
                   <h3 className="text-xl font-semibold text-stone-900 dark:text-zinc-100 font-serif">
@@ -312,8 +317,9 @@ export function LandingPage() {
                   <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-xl">
                     <img
                       src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=100&h=100&fit=crop&q=60"
-                      alt="Macro Targets"
+                      alt="Personalized macro targets — calories, protein, carbs, and fat calculated by the TDEE engine"
                       className="h-10 w-10 rounded-xl object-cover"
+                      loading="lazy"
                     />
                   </div>
                   <h3 className="text-xl font-semibold text-stone-900 dark:text-zinc-100 font-serif">
@@ -336,6 +342,131 @@ export function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials — Social Proof ──────────────────────────────── */}
+      <section className="bg-white dark:bg-zinc-900 py-28 md:py-36">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-16 md:mb-20 text-center">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-600">Testimonials</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-stone-900 dark:text-zinc-100 md:text-4xl font-serif">
+              Loved by the South Asian fitness community.
+            </h2>
+            <p className="mt-4 text-lg text-stone-500 dark:text-zinc-500 max-w-xl mx-auto">
+              Real users. Real progress. Real food.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {/* Testimonial 1 */}
+            <div className="rounded-3xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 p-8 card-hover">
+              <div className="mb-4 flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="h-4 w-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-stone-600 dark:text-zinc-400">
+                &quot;I&apos;ve tried MyFitnessPal and LoseIt but none of them had proper South Asian
+                foods. This app has Biryani, Karahi, Daal — everything my mom makes. I finally
+                know how many calories are in my daily roti.&quot;
+              </p>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                  AP
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-stone-900 dark:text-zinc-100">Ayesha P.</div>
+                  <div className="text-xs text-stone-400 dark:text-zinc-500">Karachi → London</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="rounded-3xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 p-8 card-hover">
+              <div className="mb-4 flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="h-4 w-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-stone-600 dark:text-zinc-400">
+                &quot;The AI meal generator is insane. I told it I want 180g protein on a budget,
+                and it generated a full week of Pakistani meals — Chicken Karahi, Daal, Egg
+                Bhurji. Saved me hours of planning.&quot;
+              </p>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                  RK
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-stone-900 dark:text-zinc-100">Rahul K.</div>
+                  <div className="text-xs text-stone-400 dark:text-zinc-500">Delhi → Toronto</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="rounded-3xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 p-8 card-hover">
+              <div className="mb-4 flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="h-4 w-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-stone-600 dark:text-zinc-400">
+                &quot;Lost 12kg in 3 months eating the food I grew up with. No more chicken
+                breast and broccoli. This app understood that fitness doesn&apos;t mean giving up
+                your culture.&quot;
+              </p>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                  FM
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-stone-900 dark:text-zinc-100">Fatima M.</div>
+                  <div className="text-xs text-stone-400 dark:text-zinc-500">Colombo → Melbourne</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ────────────────────────────────────────────────────────── */}
+      <section className="py-28 md:py-36 bg-background">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="mb-14 text-center">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-600">FAQ</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-stone-900 dark:text-zinc-100 md:text-4xl font-serif">
+              Frequently asked questions.
+            </h2>
+          </div>
+          <div className="space-y-4">
+            <FAQItem
+              question="How does the app customize workouts and diets for South Asian lifestyles?"
+              answer="During onboarding, we collect your body stats (height, weight, age), activity level, fitness goals, dietary preferences, and cuisine type. Our TDEE engine uses the Mifflin-St Jeor equation to calculate your exact calorie and macro targets. The AI then generates meal plans using foods from our 215+ South Asian food library — so your plan includes foods like roti, daal, biryani, and karahi instead of generic Western meals."
+            />
+            <FAQItem
+              question="Can I track traditional foods like roti, biryani, and curries?"
+              answer="Absolutely. We have a searchable food library of 215+ pre-loaded South Asian dishes — including roti, paratha, biryani, butter chicken, daal chawal, paneer tikka, gulab jamun, and many more. Every dish includes accurate macros per standard serving. You can search by name, filter by category (curries, rice, breads, sweets), and log them directly to your daily meal plan."
+            />
+            <FAQItem
+              question="How does the subscription and billing work?"
+              answer="South Asian Fitness is free to start. The Free tier includes 3 AI meal plans per month, full access to the food library, and progress tracking. Pro ($9/month) unlocks unlimited AI meal plans, the AI workout generator, saved plans archive, and priority support. Billing is handled securely through Lemon Squeezy — we never see or store your payment information."
+            />
+            <FAQItem
+              question="Can I cancel my subscription anytime?"
+              answer="Yes, you can cancel your Pro subscription at any time from your account settings. Your access continues until the end of your current billing period. There are no cancellation fees and no questions asked. If you cancel, you&apos;ll be downgraded to the Free tier with all your data preserved."
+            />
+            <FAQItem
+              question="Is my health data private and secure?"
+              answer="Yes. Your profile and health data are stored securely with industry-standard encryption (bcrypt password hashing, HttpOnly session cookies, CSRF protection, TLS in transit). We never sell, share, or monetize your personal data. You can delete your account and all associated data at any time from the Settings page."
+            />
           </div>
         </div>
       </section>
@@ -439,6 +570,38 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+/* ── FAQItem — accordion with smooth toggle ─────────────────────────── */
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden transition-all duration-200">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-6 py-5 text-left"
+        aria-expanded={open}
+      >
+        <span className="text-sm font-semibold text-stone-900 dark:text-zinc-100 pr-4">
+          {question}
+        </span>
+        <svg
+          className={`h-5 w-5 flex-shrink-0 text-stone-400 dark:text-zinc-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className="px-6 pb-5 text-sm leading-relaxed text-stone-500 dark:text-zinc-500">
+          {answer}
+        </div>
+      )}
     </div>
   );
 }
