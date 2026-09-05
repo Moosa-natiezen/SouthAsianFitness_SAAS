@@ -1,0 +1,114 @@
+[
+  {
+    "id": "chicken_biryani_cut",
+    "name": "Chicken Biryani — High-Protein Cut",
+    "request": {
+      "target_calories": 2200,
+      "protein_g": 130,
+      "dietary_preferences": ["halal"],
+      "allergies": ["peanuts"],
+      "cuisine_type": "South Asian"
+    },
+    "user_context": {
+      "user_id": "00000000-0000-0000-0000-000000000001",
+      "target_calories": 2200,
+      "target_protein": 130,
+      "dietary_preferences": ["halal"],
+      "allergies": ["peanuts"],
+      "current_goal": "cutting"
+    },
+    "expected_calories": 2200,
+    "expected_protein_g": 130,
+    "calorie_range": [1850, 2550],
+    "protein_range": [105, 155],
+    "forbidden": ["peanut", "🥜"]
+  },
+  {
+    "id": "daal_chawal_veg_maintenance",
+    "name": "Daal Chawal — Vegetarian Maintenance",
+    "request": {
+      "target_calories": 2000,
+      "protein_g": 90,
+      "dietary_preferences": ["vegetarian"],
+      "cuisine_type": "South Asian"
+    },
+    "user_context": {
+      "user_id": "00000000-0000-0000-0000-000000000002",
+      "target_calories": 2000,
+      "target_protein": 90,
+      "dietary_preferences": ["vegetarian"],
+      "current_goal": "maintenance"
+    },
+    "expected_calories": 2000,
+    "expected_protein_g": 90,
+    "calorie_range": [1700, 2300],
+    "protein_range": [75, 110],
+    "forbidden": []
+  },
+  {
+    "id": "roti_butter_chicken_bulk",
+    "name": "Roti with Butter Chicken — Lean Bulk",
+    "request": {
+      "target_calories": 2600,
+      "protein_g": 150,
+      "dietary_preferences": ["halal"],
+      "cuisine_type": "South Asian"
+    },
+    "user_context": {
+      "user_id": "00000000-0000-0000-0000-000000000003",
+      "target_calories": 2600,
+      "target_protein": 150,
+      "dietary_preferences": ["halal"],
+      "current_goal": "bulking"
+    },
+    "expected_calories": 2600,
+    "expected_protein_g": 150,
+    "calorie_range": [2250, 2950],
+    "protein_range": [125, 175],
+    "forbidden": []
+  },
+  {
+    "id": "paneer_tikka_muscle",
+    "name": "Paneer Tikka — Vegetarian Muscle Building",
+    "request": {
+      "target_calories": 2400,
+      "protein_g": 140,
+      "dietary_preferences": ["vegetarian", "eggetarian"],
+      "cuisine_type": "South Asian"
+    },
+    "user_context": {
+      "user_id": "00000000-0000-0000-0000-000000000004",
+      "target_calories": 2400,
+      "target_protein": 140,
+      "dietary_preferences": ["vegetarian", "eggetarian"],
+      "current_goal": "bulking"
+    },
+    "expected_calories": 2400,
+    "expected_protein_g": 140,
+    "calorie_range": [2050, 2750],
+    "protein_range": [115, 165],
+    "forbidden": []
+  },
+  {
+    "id": "gulab_jamun_allergen_safe",
+    "name": "Gulab Jamun — Nut-Allergy Safe Maintenance",
+    "request": {
+      "target_calories": 2100,
+      "protein_g": 110,
+      "allergies": ["peanuts", "tree nuts"],
+      "cuisine_type": "South Asian"
+    },
+    "user_context": {
+      "user_id": "00000000-0000-0000-0000-000000000005",
+      "target_calories": 2100,
+      "target_protein": 110,
+      "allergies": ["peanuts", "tree nuts"],
+      "current_goal": "maintenance"
+    },
+    "expected_calories": 2100,
+    "expected_protein_g": 110,
+    "calorie_range": [1800, 2400],
+    "protein_range": [90, 135],
+    "forbidden": ["peanut", "tree nut", "🥜", "🌰"]
+  }
+]
