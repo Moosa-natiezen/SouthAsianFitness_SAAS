@@ -6,6 +6,7 @@ from pathlib import Path
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastmcp import FastMCP
 from sqlalchemy import func, select
 
 from app.api.router import api_router
@@ -202,3 +203,10 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+# ── Model Context Protocol (MCP) ─────────────────────────────────────
+# FastMCP inspects the FastAPI OpenAPI schema and exposes declared routes
+# as MCP tools, allowing an AI agent to call our API endpoints directly.
+# Agents connect via the Streamable-HTTP transport at /mcp.
+mcp_server = FastMCP.from_fastapi(app=app, name=settings.app_name)
+app.mount("/mcp", mcp_server.http_app(transport="streamable-http"))
