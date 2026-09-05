@@ -28,6 +28,7 @@ from app.schemas.workout import (
     SaveWorkoutPlanRequest,
     WorkoutGenerateRequest,
 )
+from app.services.ai_context_service import get_user_ai_context
 from app.services.ai_service import generate_meal_plan_stream, generate_workout_stream
 
 logger = get_logger(__name__)
@@ -39,14 +40,18 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 async def generate_ai_meal_plan(
     body: MealPlanRequest,
     user: Annotated[User, Depends(require_pro)],
+    db: Session = Depends(get_db),
 ) -> StreamingResponse:
     """Stream an AI-generated meal plan using GPT-4o-mini.
 
     Returns Server-Sent Events (SSE) with the meal plan content.
+    Personalises the system prompt with the user's persistent AI context
+    (goals, dietary preferences, allergies) when available.
     Requires an active Pro subscription.
     """
+    user_context = get_user_ai_context(user.id, db)
     return StreamingResponse(
-        generate_meal_plan_stream(body),
+        generate_meal_plan_stream(body, user_context=user_context),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -160,18 +165,23 @@ def delete_saved_ai_meal_plan(
 async def generate_ai_workout(
     body: WorkoutGenerateRequest,
     user: Annotated[User, Depends(require_pro)],
+    db: Session = Depends(get_db),
 ) -> StreamingResponse:
     """Stream an AI-generated workout plan using GPT-4o-mini.
 
     Returns Server-Sent Events (SSE) with the workout content.
+    Personalises the system prompt with the user's persistent AI context
+    (goals, dietary preferences, allergies) when available.
     Requires an active Pro subscription.
     """
+    user_context = get_user_ai_context(user.id, db)
     return StreamingResponse(
         generate_workout_stream(
             goal=body.goal,
             experience_level=body.experience_level,
             split=body.split,
             equipment=body.equipment,
+            user_context=user_context,
         ),
         media_type="text/event-stream",
         headers={

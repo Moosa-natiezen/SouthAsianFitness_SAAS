@@ -355,7 +355,100 @@ def test_ai_generate_no_api_key():
         settings.openai_api_key = original_key
 
 
-# ── System prompt tests ──────────────────────────────────────────────────
+# ── AI context personalization tests ─────────────────────────────────────
+
+
+def _setup_pro_user_with_profile(
+    client: TestClient,
+    email: str = "ai_pro_ctx@example.com",
+) -> None:
+    """Give the pro user a populated profile so AI context has data."""
+    from app.models.enums import (
+        ActivityLevel,
+        DietPattern,
+        FitnessGoal,
+        Sex,
+    )
+    from app.models.user import UserProfile
+
+    uid = get_user_id_from_db(email)
+    db = db_session.SessionLocal()
+    try:
+        profile = UserProfile(
+            user_id=uid,
+            age_years=28,
+            sex=Sex.MALE,
+            height_cm=175,
+            weight_kg=72,
+            activity_level=ActivityLevel.MODERATELY_ACTIVE,
+            fitness_goal=FitnessGoal.WEIGHT_LOSS,
+            diet_pattern=DietPattern.OMNIVORE,
+            target_calories=2000,
+            target_protein_g=120,
+        )
+        db.add(profile)
+        db.commit()
+    finally:
+        db.close()
+
+
+def test_ai_generate_injects_user_context_into_system_prompt():
+    """Verify the user's persistent AI context is merged into the system prompt."""
+    client = setup_pro_client(email="ai_pro_ctx@example.com")
+    _setup_pro_user_with_profile(client, "ai_pro_ctx@example.com")
+
+    mock_client = _make_openai_stream_response("personalized plan")
+
+    with (
+        patch("app.services.ai_service.AsyncOpenAI", return_value=mock_client),
+        patch("app.services.ai_service.settings.openai_api_key", "sk-test-fake-key"),
+    ):
+        resp = client.post(
+            "/api/ai/meal-plans/generate",
+            json={"target_calories": 2000, "protein_g": 120},
+        )
+
+    assert resp.status_code == 200
+
+    call_args = mock_client.chat.completions.create.call_args
+    messages = call_args.kwargs["messages"]
+    system_msg = messages[0]["content"]
+
+    # The merged prompt should contain the static prompt AND the user context
+    assert "South Asian fitness nutritionist" in system_msg
+    assert "USER CONTEXT" in system_msg
+    assert "cutting" in system_msg  # WEIGHT_LOSS → cutting
+    assert "2000 calories/day" in system_msg
+    assert "120g protein/day" in system_msg
+    assert "28 years old" in system_msg
+
+
+def test_ai_generate_falls_back_to_generic_prompt_without_profile():
+    """Verify users without a profile still get the generic system prompt."""
+    client = setup_pro_client(email="ai_pro_noprofile@example.com")
+
+    mock_client = _make_openai_stream_response("generic plan")
+
+    with (
+        patch("app.services.ai_service.AsyncOpenAI", return_value=mock_client),
+        patch("app.services.ai_service.settings.openai_api_key", "sk-test-fake-key"),
+    ):
+        resp = client.post(
+            "/api/ai/meal-plans/generate",
+            json={"target_calories": 2000},
+        )
+
+    assert resp.status_code == 200
+
+    call_args = mock_client.chat.completions.create.call_args
+    messages = call_args.kwargs["messages"]
+    system_msg = messages[0]["content"]
+
+    # Falls back gracefully: static prompt always present, and no
+    # personalisation details (no profile → no goal/targets injected)
+    assert "South Asian fitness nutritionist" in system_msg
+    assert "cutting" not in system_msg
+    assert "2000 calories/day" not in system_msg
 
 
 def test_system_prompt_mentions_south_asian():

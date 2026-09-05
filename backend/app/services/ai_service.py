@@ -21,9 +21,30 @@ from openai import (
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.schemas.ai_context import UserAIContext
 from app.schemas.nutrition import MealPlanRequest
 
 logger = get_logger(__name__)
+
+
+# Header inserted between the static system prompt and the user's persistent
+# context so the LLM treats the context as hard constraints, not suggestions.
+_CONTEXT_HEADER = "# USER CONTEXT — Persistent facts. Always respect these constraints."
+
+
+def _merge_system_prompt(base: str, context: UserAIContext | None) -> str:
+    """Merge a user's AI context into the base system prompt.
+
+    Returns the base prompt unchanged when *context* is ``None`` or contains
+    no usable information, so anonymous / incomplete profiles still get the
+    generic default prompt.
+    """
+    if context is None:
+        return base
+    context_block = context.format_for_prompt()
+    if not context_block:
+        return base
+    return f"{base}\n\n{_CONTEXT_HEADER}\n{context_block}"
 
 # ── OpenAI exception types we treat as "transient / quota" ───────────
 _OPENAI_ERRORS = (
@@ -118,6 +139,7 @@ async def _stream_sandbox_chunks(
 
 async def generate_meal_plan_stream(
     payload: MealPlanRequest,
+    user_context: UserAIContext | None = None,
 ) -> AsyncGenerator[str, None]:
     """Generate a meal plan using OpenAI GPT-4o-mini with streaming.
 
@@ -130,6 +152,13 @@ async def generate_meal_plan_stream(
     If the OpenAI call fails (quota exhausted, rate-limited, network error, etc.)
     a realistic fallback plan is streamed instead so the frontend UX is never
     broken.
+
+    Args:
+        payload: Meal plan generation request.
+        user_context: The user's persistent AI context (goals, dietary
+            preferences, allergies). When provided, it is merged into the
+            system prompt so generation is personalised. ``None`` falls back
+            to the generic system prompt.
     """
     api_key = settings.openai_api_key
     model = settings.openai_model
@@ -143,19 +172,21 @@ async def generate_meal_plan_stream(
 
     client = _build_openai_client(api_key)
     user_message = _build_user_message(payload)
+    system_prompt = _merge_system_prompt(SYSTEM_PROMPT, user_context)
 
     logger.info(
-        "Streaming AI meal plan: calories=%s protein=%s cuisine=%s",
+        "Streaming AI meal plan: calories=%s protein=%s cuisine=%s context=%s",
         payload.target_calories,
         payload.protein_g,
         payload.cuisine_type,
+        "yes" if user_context else "none",
     )
 
     try:
         stream = await client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
             ],
             stream=True,
@@ -277,12 +308,23 @@ async def generate_workout_stream(
     experience_level: str,
     split: str,
     equipment: str,
+    user_context: UserAIContext | None = None,
 ) -> AsyncGenerator[str, None]:
     """Generate a workout plan using OpenAI GPT-4o-mini with streaming.
 
     Yields SSE-formatted chunks matching the meal plan streaming pattern.
 
     Falls back to a realistic mock workout when the OpenAI API is unavailable.
+
+    Args:
+        goal: Primary training goal (strength / hypertrophy / ...).
+        experience_level: User's experience level (beginner / intermediate / ...).
+        split: Training split (upper_lower / push_pull_legs / ...).
+        equipment: Equipment availability (gym / bodyweight / dumbbells).
+        user_context: The user's persistent AI context (goals, dietary
+            preferences, allergies). When provided, it is merged into the
+            system prompt so generation is personalised. ``None`` falls back
+            to the generic system prompt.
     """
     api_key = settings.openai_api_key
     model = settings.openai_model
@@ -296,17 +338,19 @@ async def generate_workout_stream(
 
     client = _build_openai_client(api_key)
     user_message = _build_workout_user_message(goal, experience_level, split, equipment)
+    system_prompt = _merge_system_prompt(WORKOUT_SYSTEM_PROMPT, user_context)
 
     logger.info(
-        "Streaming AI workout: goal=%s experience=%s split=%s equipment=%s",
+        "Streaming AI workout: goal=%s experience=%s split=%s equipment=%s context=%s",
         goal, experience_level, split, equipment,
+        "yes" if user_context else "none",
     )
 
     try:
         stream = await client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": WORKOUT_SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
             ],
             stream=True,
