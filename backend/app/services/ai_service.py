@@ -23,6 +23,7 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.ai_context import UserAIContext
 from app.schemas.nutrition import MealPlanRequest
+from app.services.loop_guard import AgentLoopGuard, MaxIterationsExceededError
 
 logger = get_logger(__name__)
 
@@ -57,6 +58,11 @@ _OPENAI_ERRORS = (
 # Delay (seconds) between SSE chunk yields during mock streaming so the
 # frontend cursor animation still runs smoothly.
 _MOCK_CHUNK_DELAY = 0.02
+
+# Maximum chunks before the loop guard terminates a streaming response.
+# This prevents runaway token usage if the API never sends a stop token.
+_MAX_STREAM_CHUNKS_MEAL = 2000  # ~2000 tokens ≈ 2 full meal plans
+_MAX_STREAM_CHUNKS_WORKOUT = 3000  # workouts are longer
 
 SYSTEM_PROMPT = """You are an expert South Asian fitness nutritionist. Generate detailed,
 practical meal plans based on the user's requirements. Focus on foods commonly
@@ -182,6 +188,7 @@ async def generate_meal_plan_stream(
         "yes" if user_context else "none",
     )
 
+    guard = AgentLoopGuard(max_iterations=_MAX_STREAM_CHUNKS_MEAL)
     try:
         stream = await client.chat.completions.create(
             model=model,
@@ -195,6 +202,18 @@ async def generate_meal_plan_stream(
         )
 
         async for chunk in stream:
+            try:
+                guard.tick()
+            except MaxIterationsExceededError:
+                logger.warning(
+                    "Meal plan stream terminated: loop budget exceeded after %d chunks",
+                    guard.current,
+                )
+                yield _sse_chunk({
+                    "error": True,
+                    "message": "Generation terminated: maximum output length reached",
+                })
+                break
             delta = chunk.choices[0].delta if chunk.choices else None
             if delta and delta.content:
                 yield _sse_chunk({"text": delta.content})
@@ -346,6 +365,7 @@ async def generate_workout_stream(
         "yes" if user_context else "none",
     )
 
+    guard = AgentLoopGuard(max_iterations=_MAX_STREAM_CHUNKS_WORKOUT)
     try:
         stream = await client.chat.completions.create(
             model=model,
@@ -359,6 +379,18 @@ async def generate_workout_stream(
         )
 
         async for chunk in stream:
+            try:
+                guard.tick()
+            except MaxIterationsExceededError:
+                logger.warning(
+                    "Workout stream terminated: loop budget exceeded after %d chunks",
+                    guard.current,
+                )
+                yield _sse_chunk({
+                    "error": True,
+                    "message": "Generation terminated: maximum output length reached",
+                })
+                break
             delta = chunk.choices[0].delta if chunk.choices else None
             if delta and delta.content:
                 yield _sse_chunk({"text": delta.content})
