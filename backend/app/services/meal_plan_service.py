@@ -18,12 +18,15 @@ from uuid import UUID
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.core.logging import get_logger
 from app.models.enums import MealPlanStatus, MealType
 from app.models.food import FoodPrice
 from app.models.meal import Meal, MealFood
 from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
 from app.models.user import User, UserPreferences
 from app.schemas.meal_plan import MealPlanResponse
+
+logger = get_logger(__name__)
 
 # ── Free-tier usage limits ──────────────────────────────────────────────────
 
@@ -736,19 +739,29 @@ def delete_meal_plan(
 ) -> None:
     """Delete a meal plan owned by the user.
 
-    Raises HTTPException 404 if the plan does not exist or does not belong to the user.
+    Raises HTTPException 404 if the plan does not exist.
+    Raises HTTPException 403 if the plan belongs to another user (cross-tenant protection).
     """
     from fastapi import HTTPException, status
 
-    plan = (
-        db.query(MealPlan)
-        .filter(MealPlan.id == plan_id, MealPlan.user_id == user_id)
-        .first()
-    )
+    # First check if the record exists at all (regardless of owner)
+    plan = db.query(MealPlan).filter(MealPlan.id == plan_id).first()
     if plan is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Meal plan not found",
         )
+
+    # Cross-tenant check: verify ownership before deletion
+    if plan.user_id != user_id:
+        logger.warning(
+            "Cross-tenant access denied: user %s attempted to delete meal plan %s owned by %s",
+            user_id, plan_id, plan.user_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this meal plan",
+        )
+
     db.delete(plan)
     db.commit()

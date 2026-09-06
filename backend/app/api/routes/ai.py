@@ -134,7 +134,11 @@ def delete_saved_ai_meal_plan(
     user: Annotated[User, Depends(require_auth)],
     db: Session = Depends(get_db),
 ) -> None:
-    """Delete a saved AI meal plan owned by the authenticated user."""
+    """Delete a saved AI meal plan owned by the authenticated user.
+
+    Security: Returns 403 if the plan exists but belongs to another user,
+    preventing cross-tenant data access via IDOR.
+    """
     from uuid import UUID
 
     try:
@@ -145,15 +149,23 @@ def delete_saved_ai_meal_plan(
             detail="Saved plan not found",
         )
 
-    saved = (
-        db.query(SavedMealPlan)
-        .filter(SavedMealPlan.id == plan_uuid, SavedMealPlan.user_id == user.id)
-        .first()
-    )
+    # First check if the record exists at all (regardless of owner)
+    saved = db.query(SavedMealPlan).filter(SavedMealPlan.id == plan_uuid).first()
     if saved is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Saved plan not found",
+        )
+
+    # Cross-tenant check: verify ownership before deletion
+    if saved.user_id != user.id:
+        logger.warning(
+            "Cross-tenant access denied: user %s attempted to delete plan %s owned by %s",
+            user.id, plan_id, saved.user_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this plan",
         )
 
     db.delete(saved)
@@ -336,7 +348,11 @@ def delete_saved_ai_workout(
     user: Annotated[User, Depends(require_auth)],
     db: Session = Depends(get_db),
 ) -> None:
-    """Delete a saved AI workout plan owned by the authenticated user."""
+    """Delete a saved AI workout plan owned by the authenticated user.
+
+    Security: Returns 403 if the plan exists but belongs to another user,
+    preventing cross-tenant data access via IDOR.
+    """
     from uuid import UUID
 
     from app.models.workout import SavedWorkoutPlan
@@ -349,15 +365,23 @@ def delete_saved_ai_workout(
             detail="Saved workout not found",
         )
 
-    saved = (
-        db.query(SavedWorkoutPlan)
-        .filter(SavedWorkoutPlan.id == plan_uuid, SavedWorkoutPlan.user_id == user.id)
-        .first()
-    )
+    # First check if the record exists at all (regardless of owner)
+    saved = db.query(SavedWorkoutPlan).filter(SavedWorkoutPlan.id == plan_uuid).first()
     if saved is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Saved workout not found",
+        )
+
+    # Cross-tenant check: verify ownership before deletion
+    if saved.user_id != user.id:
+        logger.warning(
+            "Cross-tenant access denied: user %s attempted to delete workout %s owned by %s",
+            user.id, plan_id, saved.user_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this workout",
         )
 
     db.delete(saved)

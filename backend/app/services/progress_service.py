@@ -74,20 +74,30 @@ def list_progress_entries(
 def delete_progress_entry(db: Session, user: User, entry_id: UUID) -> None:
     """Delete a progress entry owned by the user.
 
-    Raises HTTPException 404 if the entry does not exist or does not belong to the user.
+    Raises HTTPException 404 if the entry does not exist.
+    Raises HTTPException 403 if the entry belongs to another user (cross-tenant protection).
     """
     from fastapi import HTTPException, status
 
-    entry = (
-        db.query(ProgressEntry)
-        .filter(ProgressEntry.id == entry_id, ProgressEntry.user_id == user.id)
-        .first()
-    )
+    # First check if the record exists at all (regardless of owner)
+    entry = db.query(ProgressEntry).filter(ProgressEntry.id == entry_id).first()
     if entry is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Progress entry not found",
         )
+
+    # Cross-tenant check: verify ownership before deletion
+    if entry.user_id != user.id:
+        logger.warning(
+            "Cross-tenant access denied: user %s attempted to delete progress entry %s owned by %s",
+            user.id, entry_id, entry.user_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this entry",
+        )
+
     db.delete(entry)
     db.commit()
 
