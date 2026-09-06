@@ -16,10 +16,22 @@ import { Suspense, useEffect } from "react";
  * - Entire init is try/caught so a network failure is a silent no-op
  */
 if (typeof window !== "undefined") {
-  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://app.posthog.com";
+  // Safeguard debug log — presence only, NEVER the key value itself.
+  // If this logs `false`, NEXT_PUBLIC_POSTHOG_KEY is missing or was stripped
+  // from the client bundle (must have the NEXT_PUBLIC_ prefix to be inlined
+  // by Next.js at build time).
+  console.log("PH Key present:", !!process.env.NEXT_PUBLIC_POSTHOG_KEY);
 
-  if (key) {
+  // Trim and reject the literal string "undefined" — some deployment pipelines
+  // inject "undefined" when the shell var is unset. That literal passes a
+  // truthiness check and produces exactly the 404 on config.js / 401 on
+  // flags/ seen in the network tab.
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim();
+  const host =
+    process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim().replace(/\/+$/, "") ??
+    "https://app.posthog.com";
+
+  if (key && key !== "undefined") {
     try {
       posthog.init(key, {
         api_host: host,
@@ -39,6 +51,13 @@ if (typeof window !== "undefined") {
     } catch {
       // PostHog init failed — silently continue. Analytics is non-critical.
     }
+  } else {
+    // Visible warning (not an error) so a misconfigured deployment is obvious
+    // in the console without breaking the app.
+    console.warn(
+      "[posthog] NEXT_PUBLIC_POSTHOG_KEY is missing or invalid — analytics disabled. " +
+        "Set it in .env.local or your hosting provider's env vars using the NEXT_PUBLIC_ prefix."
+    );
   }
 }
 
