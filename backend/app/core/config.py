@@ -75,6 +75,11 @@ class Settings(BaseSettings):
     google_client_id: str = ""
 
     @property
+    def google_oauth_configured(self) -> bool:
+        """Return True if the Google OAuth client ID is set and non-empty."""
+        return bool(self.google_client_id and self.google_client_id.strip())
+
+    @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 

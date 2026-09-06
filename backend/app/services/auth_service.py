@@ -215,17 +215,60 @@ def google_login_or_register(db: Session, id_token: str) -> User:
     from google.auth.transport import requests as google_requests
     from google.oauth2 import id_token as google_id_token
 
+    # Validate that the Google client ID is configured before attempting verification.
+    audience = settings.google_client_id or ""
+    if not audience:
+        logger.error(
+            "Google OAuth is not configured — GOOGLE_CLIENT_ID is empty or unset."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google Sign-In is not configured on this server.",
+        )
+
     try:
         idinfo = google_id_token.verify_oauth2_token(
             id_token,
             google_requests.Request(),
-            settings.google_client_id or "",
+            audience,
         )
-    except Exception:
-        logger.exception("Google ID token verification failed")
+    except ValueError as exc:
+        # google-auth raises ValueError for all token validation failures:
+        # expired, wrong audience, malformed, wrong issuer, etc.
+        exc_msg = str(exc)
+        logger.error(
+            "Google ID token verification failed: %s | token_prefix=%s",
+            exc_msg,
+            id_token[:12] + "..." if len(id_token) > 12 else id_token,
+        )
+
+        # Map specific failure modes to user-friendly messages.
+        if "audience" in exc_msg.lower() or "aud" in exc_msg.lower():
+            detail = (
+                f"Token audience mismatch — expected audience '{audience}'. "
+                "The Google ID token was issued for a different client ID."
+            )
+        elif "expired" in exc_msg.lower() or "exp" in exc_msg.lower():
+            detail = "Google token has expired. Please try signing in again."
+        elif "token" in exc_msg.lower() and ("format" in exc_msg.lower() or "malformed" in exc_msg.lower()):
+            detail = "Malformed Google token — the client may have sent an authorization code instead of an ID token."
+        elif "issuer" in exc_msg.lower():
+            detail = "Token issuer mismatch — the token was not issued by Google."
+        else:
+            detail = f"Invalid or expired Google token: {exc_msg}"
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired Google token.",
+            detail=detail,
+        )
+    except Exception:
+        # Catch-all for unexpected errors (network failures talking to Google, etc.)
+        logger.exception(
+            "Unexpected error during Google token verification"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Could not verify Google token — network or service error.",
         )
 
     email = idinfo.get("email", "")

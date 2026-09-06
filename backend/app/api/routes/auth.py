@@ -163,14 +163,32 @@ async def google_auth(
             detail="id_token is required.",
         )
 
+    # Validate Google OAuth configuration before attempting verification.
+    if not settings.google_oauth_configured:
+        logger.error(
+            "Google OAuth sign-in attempted but GOOGLE_CLIENT_ID is not configured."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Google Sign-In is not configured on this server. "
+                "Please set GOOGLE_CLIENT_ID in your environment."
+            ),
+        )
+
     try:
         user = google_login_or_register(db, id_token_str)
         token = create_session_for_user(db, user, request)
     except HTTPException:
-        # Re-raise known HTTP errors (401, 400) directly
+        # Re-raise known HTTP errors (401, 400) directly — they carry
+        # detailed error messages from the token verification step.
         raise
     except Exception:
-        logger.exception("Google auth DB operation failed for token exchange")
+        logger.exception(
+            "Google auth DB operation failed for token exchange — "
+            "google_client_id=%s",
+            settings.google_client_id[:8] + "..." if settings.google_client_id else "(empty)",
+        )
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
