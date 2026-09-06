@@ -22,6 +22,12 @@ const POSTHOG_HOST =
   "https://app.posthog.com";
 
 /**
+ * TEMPORARILY DISABLED — PostHog analytics paused to clean up production
+ * console errors. Flip this to `true` to re-enable; no other changes needed.
+ */
+const POSTHOG_ENABLED = false;
+
+/**
  * PostHog initialization — wrapped in try/catch so that 404/401 errors
  * from the config/flags API never block the main thread or crash the app.
  *
@@ -31,7 +37,7 @@ const POSTHOG_HOST =
  * - `loaded` callback only runs debug in dev, no blocking operations
  * - Entire init is try/caught so a network failure is a silent no-op
  */
-if (typeof window !== "undefined") {
+if (POSTHOG_ENABLED && typeof window !== "undefined") {
   // Safeguard debug log — presence only, NEVER the key value itself.
   // If this logs `false`, the hardcoded key was removed; previously this
   // flagged NEXT_PUBLIC_POSTHOG_KEY missing/stripped from the client bundle.

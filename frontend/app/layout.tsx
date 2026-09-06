@@ -4,7 +4,8 @@ import { ThemeProvider } from "next-themes";
 
 import "./globals.css";
 import { LenisProvider } from "@/components/lenis-provider";
-import { PostHogProvider } from "@/components/providers/posthog-provider";
+// TEMPORARILY DISABLED — PostHog analytics paused (see provider POSTHOG_ENABLED flag).
+// import { PostHogProvider } from "@/components/providers/posthog-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -108,8 +109,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background text-foreground">
-        <PostHogProvider>
-          <ThemeProvider
+        {/* TEMPORARILY DISABLED — PostHog analytics paused. */}
+        {/* <PostHogProvider> */}
+        <ThemeProvider
             attribute="class"
             defaultTheme="light"
             enableSystem
@@ -129,7 +131,7 @@ export default function RootLayout({
             </div>
             </LenisProvider>
           </ThemeProvider>
-        </PostHogProvider>
+          {/* </PostHogProvider> — TEMPORARILY DISABLED */}
       </body>
     </html>
   );
