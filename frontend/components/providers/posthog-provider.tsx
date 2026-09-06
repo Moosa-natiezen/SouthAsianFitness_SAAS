@@ -6,6 +6,22 @@ import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react";
 import { Suspense, useEffect } from "react";
 
 /**
+ * TEMPORARY HARDCODE — requested for the Vercel production build.
+ * The Vercel env vars were not inlining NEXT_PUBLIC_POSTHOG_KEY into the
+ * client bundle, causing 404 config.js / 401 flags/ errors.
+ *
+ * NOTE: The PostHog project PUBLIC API key is safe to ship to the browser
+ * (it is public by design — every client already receives it), so this is
+ * not a credential leak. It is still a workaround:
+ * TODO: revert to `process.env.NEXT_PUBLIC_POSTHOG_KEY` once the env var is
+ * confirmed working in Vercel, so the key isn't duplicated in source control.
+ */
+const POSTHOG_KEY = "phc_AkJZgk2J6i6yEc7mspyZSNOnXxVduq5BN8WR4KrWvrs";
+const POSTHOG_HOST =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim().replace(/\/+$/, "") ??
+  "https://app.posthog.com";
+
+/**
  * PostHog initialization — wrapped in try/catch so that 404/401 errors
  * from the config/flags API never block the main thread or crash the app.
  *
@@ -17,24 +33,14 @@ import { Suspense, useEffect } from "react";
  */
 if (typeof window !== "undefined") {
   // Safeguard debug log — presence only, NEVER the key value itself.
-  // If this logs `false`, NEXT_PUBLIC_POSTHOG_KEY is missing or was stripped
-  // from the client bundle (must have the NEXT_PUBLIC_ prefix to be inlined
-  // by Next.js at build time).
-  console.log("PH Key present:", !!process.env.NEXT_PUBLIC_POSTHOG_KEY);
+  // If this logs `false`, the hardcoded key was removed; previously this
+  // flagged NEXT_PUBLIC_POSTHOG_KEY missing/stripped from the client bundle.
+  console.log("PH Key present:", !!POSTHOG_KEY);
 
-  // Trim and reject the literal string "undefined" — some deployment pipelines
-  // inject "undefined" when the shell var is unset. That literal passes a
-  // truthiness check and produces exactly the 404 on config.js / 401 on
-  // flags/ seen in the network tab.
-  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim();
-  const host =
-    process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim().replace(/\/+$/, "") ??
-    "https://app.posthog.com";
-
-  if (key && key !== "undefined") {
+  if (POSTHOG_KEY) {
     try {
-      posthog.init(key, {
-        api_host: host,
+      posthog.init(POSTHOG_KEY, {
+        api_host: POSTHOG_HOST,
         capture_pageview: false,
         capture_pageleave: true,
         persistence: "localStorage",
@@ -55,8 +61,7 @@ if (typeof window !== "undefined") {
     // Visible warning (not an error) so a misconfigured deployment is obvious
     // in the console without breaking the app.
     console.warn(
-      "[posthog] NEXT_PUBLIC_POSTHOG_KEY is missing or invalid — analytics disabled. " +
-        "Set it in .env.local or your hosting provider's env vars using the NEXT_PUBLIC_ prefix."
+      "[posthog] POSTHOG_KEY is missing or invalid — analytics disabled."
     );
   }
 }
