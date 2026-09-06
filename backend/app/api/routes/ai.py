@@ -16,6 +16,7 @@ from app.api.deps import get_db, require_auth, require_pro
 from app.core.logging import get_logger
 from app.models.meal_plan import SavedMealPlan
 from app.models.user import User
+from app.schemas.agent_chat import AgentChatRequest
 from app.schemas.meal_plan import (
     SavedMealPlanListResponse,
     SavedMealPlanOut,
@@ -28,12 +29,16 @@ from app.schemas.workout import (
     SaveWorkoutPlanRequest,
     WorkoutGenerateRequest,
 )
+from app.services.agents.orchestrator import OrchestratorAgent
 from app.services.ai_context_service import get_user_ai_context
 from app.services.ai_service import generate_meal_plan_stream, generate_workout_stream
 
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["ai"])
+
+# Singleton orchestrator instance — stateless, so safe to share.
+_orchestrator = OrchestratorAgent()
 
 
 @router.post("/meal-plans/generate")
@@ -154,6 +159,71 @@ def delete_saved_ai_meal_plan(
     db.delete(saved)
     db.commit()
     logger.info("Deleted saved AI plan %s for user %s", plan_id, user.id)
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Orchestrator Chat (Multi-Agent Routing)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+@router.post("/chat")
+async def orchestrator_chat(
+    body: AgentChatRequest,
+    user: Annotated[User, Depends(require_pro)],
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    """Orchestrator-driven chat endpoint for multi-domain AI generation.
+
+    Accepts free-form user messages and routes them to specialized domain
+    workers (Nutrition, Workout) via the OrchestratorAgent.
+
+    For queries spanning multiple domains (e.g., "give me a meal plan and
+    a workout"), the Orchestrator dispatches to both workers in parallel
+    and synthesizes the results.
+
+    Requires an active Pro subscription.
+    """
+    user_context = get_user_ai_context(user.id, db)
+
+    # Build kwargs from the request, filtering out None values
+    kwargs: dict = {}
+    if body.target_calories is not None:
+        kwargs["target_calories"] = body.target_calories
+    if body.protein_g is not None:
+        kwargs["protein_g"] = body.protein_g
+    if body.dietary_preferences:
+        kwargs["dietary_preferences"] = body.dietary_preferences
+    if body.allergies:
+        kwargs["allergies"] = body.allergies
+    if body.cuisine_type is not None:
+        kwargs["cuisine_type"] = body.cuisine_type
+    if body.goal is not None:
+        kwargs["goal"] = body.goal
+    if body.experience_level is not None:
+        kwargs["experience_level"] = body.experience_level
+    if body.split is not None:
+        kwargs["split"] = body.split
+    if body.equipment is not None:
+        kwargs["equipment"] = body.equipment
+
+    logger.info(
+        "Orchestrator chat: user=%s message_length=%d kwargs=%s",
+        user.id, len(body.message), list(kwargs.keys()),
+    )
+
+    return StreamingResponse(
+        _orchestrator.dispatch(
+            body.message,
+            user_context=user_context,
+            **kwargs,
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════
