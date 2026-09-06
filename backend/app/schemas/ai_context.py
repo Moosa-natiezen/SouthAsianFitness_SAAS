@@ -54,6 +54,7 @@ class UserAIContext(BaseModel):
     height_cm: Decimal | None = None
     weight_kg: Decimal | None = None
     is_pro: bool = False
+    memories: list[str] = Field(default_factory=list)
 
     def format_for_prompt(self) -> str:
         """Render this context as a text block for an LLM system prompt.
@@ -125,5 +126,13 @@ class UserAIContext(BaseModel):
 
         if self.is_pro:
             lines.append("- Subscription: Pro member (full feature access).")
+
+        # Add relevant memories
+        if self.memories:
+            lines.append("")
+            lines.append("# RELEVANT PAST MEMORIES")
+            lines.append("")
+            for i, memory in enumerate(self.memories, 1):
+                lines.append(f"{i}. {memory}")
 
         return "\n".join(lines)

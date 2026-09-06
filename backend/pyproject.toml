@@ -20,6 +20,7 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.68.1",
     "fastmcp>=4.0.3",
     "langfuse>=4.15.1",
+    "pgvector>=0.5.0",
 ]
 
 [dependency-groups]

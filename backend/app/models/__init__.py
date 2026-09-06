@@ -13,6 +13,7 @@ from app.models.food_source import FoodSource
 from app.models.geography import Country, Region
 from app.models.meal import Meal, MealFood
 from app.models.meal_plan import MealPlan, MealPlanDay, MealPlanDayMeal
+from app.models.memory import UserMemory
 from app.models.progress import ProgressEntry
 from app.models.tags import CuisineTag, DietaryTag, FoodCategory
 from app.models.unit import Unit
@@ -40,6 +41,7 @@ __all__ = [
     "Unit",
     "User",
     "UserFoodPreference",
+    "UserMemory",
     "UserPreferences",
     "UserProfile",
     "UserSession",

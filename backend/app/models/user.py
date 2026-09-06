@@ -48,6 +48,7 @@ if TYPE_CHECKING:
     from app.models.food import Food
     from app.models.geography import Country, Region
     from app.models.meal_plan import MealPlan, SavedMealPlan
+    from app.models.memory import UserMemory
     from app.models.progress import ProgressEntry
     from app.models.tags import CuisineTag, DietaryTag
     from app.models.workout import SavedWorkoutPlan
@@ -149,6 +150,10 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         cascade="all, delete-orphan",
     )
     progress_entries: Mapped[list[ProgressEntry]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    memories: Mapped[list[UserMemory]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
