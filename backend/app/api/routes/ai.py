@@ -227,6 +227,7 @@ async def orchestrator_chat(
         _orchestrator.dispatch(
             body.message,
             user_context=user_context,
+            user_id=str(user.id),
             **kwargs,
         ),
         media_type="text/event-stream",

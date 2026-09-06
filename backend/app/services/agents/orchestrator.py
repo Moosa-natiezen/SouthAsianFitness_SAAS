@@ -11,6 +11,8 @@ import asyncio
 import json
 from collections.abc import AsyncGenerator
 
+from langfuse import observe, propagate_attributes
+
 from app.core.logging import get_logger
 from app.schemas.ai_context import UserAIContext
 from app.services.agents.base import BaseWorker, WorkerDomain
@@ -86,6 +88,7 @@ class OrchestratorAgent:
         """Return all registered workers."""
         return list(self._workers.values())
 
+    @observe()
     def classify_intent(self, user_message: str) -> RoutingDecision:
         """Analyze user message and determine which workers to dispatch to.
 
@@ -134,10 +137,12 @@ class OrchestratorAgent:
             reasoning=reasoning,
         )
 
+    @observe()
     async def dispatch(
         self,
         user_message: str,
         user_context: UserAIContext | None = None,
+        user_id: str | None = None,
         **kwargs,
     ) -> AsyncGenerator[str, None]:
         """Route and dispatch user request to appropriate worker(s).
@@ -149,74 +154,78 @@ class OrchestratorAgent:
         Args:
             user_message: The user's natural language request.
             user_context: Persistent user context for personalization.
+            user_id: Optional user ID for Langfuse trace attribution.
             **kwargs: Additional parameters forwarded to workers.
 
         Yields:
             SSE-formatted strings from the dispatched worker(s).
         """
-        decision = self.classify_intent(user_message)
+        # Use propagate_attributes to set user_id for all nested observations
+        # This ensures all child spans (workers, LLM calls) inherit the user_id
+        with propagate_attributes(user_id=user_id) if user_id else _no_op_context():
+            decision = self.classify_intent(user_message)
 
-        logger.info(
-            "[Orchestrator] Routing: %s (confidence=%.2f)",
-            decision.reasoning, decision.confidence,
-        )
+            logger.info(
+                "[Orchestrator] Routing: %s (confidence=%.2f)",
+                decision.reasoning, decision.confidence,
+            )
 
-        if len(decision.domains) == 1:
-            # Single domain — direct delegation
-            worker = self._workers[decision.domains[0]]
-            async for chunk in worker.generate_stream(
-                user_message, user_context=user_context, **kwargs,
-            ):
-                yield chunk
-        else:
-            # Multi-domain — parallel dispatch with synthesis header
-            yield self._sse({
-                "text": (
-                    f"## 🔄 Generating {len(decision.domains)} plans for you...\n\n"
-                    f"*Routing to: {', '.join(d.value for d in decision.domains)}*\n\n"
-                    "---\n\n"
-                ),
-            })
-
-            # Run workers in parallel
-            tasks = []
-            for domain in decision.domains:
-                worker = self._workers[domain]
-                tasks.append(
-                    self._collect_worker_output(
-                        worker, user_message, user_context, **kwargs,
-                    )
-                )
-
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-
-            # Stream results sequentially with section separators
-            for i, (domain, result) in enumerate(zip(decision.domains, results)):
-                worker_name = domain.value.replace("_", " ").title()
-
-                if isinstance(result, Exception):
-                    logger.error(
-                        "[Orchestrator] Worker %s failed: %s",
-                        domain.value, result,
-                    )
-                    yield self._sse({
-                        "text": f"\n\n## ❌ {worker_name} Generation Failed\n\n*{result!s}*\n\n---\n\n",
-                    })
-                    continue
-
-                # Section header
-                if i > 0:
-                    yield self._sse({"text": "\n\n---\n\n"})
-
+            if len(decision.domains) == 1:
+                # Single domain — direct delegation
+                worker = self._workers[decision.domains[0]]
+                async for chunk in worker.generate_stream(
+                    user_message, user_context=user_context, **kwargs,
+                ):
+                    yield chunk
+            else:
+                # Multi-domain — parallel dispatch with synthesis header
                 yield self._sse({
-                    "text": f"## 📋 {worker_name} Plan\n\n",
+                    "text": (
+                        f"## 🔄 Generating {len(decision.domains)} plans for you...\n\n"
+                        f"*Routing to: {', '.join(d.value for d in decision.domains)}*\n\n"
+                        "---\n\n"
+                    ),
                 })
 
-                # Stream the worker's output
-                for chunk in result:
-                    yield chunk
+                # Run workers in parallel
+                tasks = []
+                for domain in decision.domains:
+                    worker = self._workers[domain]
+                    tasks.append(
+                        self._collect_worker_output(
+                            worker, user_message, user_context, **kwargs,
+                        )
+                    )
 
-            yield "data: [DONE]\n\n"
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+
+                # Stream results sequentially with section separators
+                for i, (domain, result) in enumerate(zip(decision.domains, results)):
+                    worker_name = domain.value.replace("_", " ").title()
+
+                    if isinstance(result, Exception):
+                        logger.error(
+                            "[Orchestrator] Worker %s failed: %s",
+                            domain.value, result,
+                        )
+                        yield self._sse({
+                            "text": f"\n\n## ❌ {worker_name} Generation Failed\n\n*{result!s}*\n\n---\n\n",
+                        })
+                        continue
+
+                    # Section header
+                    if i > 0:
+                        yield self._sse({"text": "\n\n---\n\n"})
+
+                    yield self._sse({
+                        "text": f"## 📋 {worker_name} Plan\n\n",
+                    })
+
+                    # Stream the worker's output
+                    for chunk in result:
+                        yield chunk
+
+                yield "data: [DONE]\n\n"
 
     async def _collect_worker_output(
         self,
@@ -245,3 +254,21 @@ class OrchestratorAgent:
     def _sse(data: dict) -> str:
         """Format data as an SSE line."""
         return f"data: {json.dumps(data)}\n\n"
+
+
+# ── Helpers ────────────────────────────────────────────────────────────────
+
+
+class _NoOpContext:
+    """No-op context manager for when user_id is not provided."""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+
+def _no_op_context() -> _NoOpContext:
+    """Return a no-op context manager."""
+    return _NoOpContext()

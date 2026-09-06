@@ -11,10 +11,10 @@ import asyncio
 import json
 from collections.abc import AsyncGenerator
 
+from langfuse.openai import AsyncOpenAI
 from openai import (
     APIConnectionError,
     APIStatusError,
-    AsyncOpenAI,
     AuthenticationError,
     RateLimitError,
 )

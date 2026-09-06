@@ -19,6 +19,7 @@ dependencies = [
     "google-auth>=2.57.0",
     "sentry-sdk[fastapi]>=2.68.1",
     "fastmcp>=4.0.3",
+    "langfuse>=4.15.1",
 ]
 
 [dependency-groups]

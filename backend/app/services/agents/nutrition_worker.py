@@ -10,10 +10,11 @@ import asyncio
 import json
 from collections.abc import AsyncGenerator
 
+from langfuse import observe
+from langfuse.openai import AsyncOpenAI
 from openai import (
     APIConnectionError,
     APIStatusError,
-    AsyncOpenAI,
     AuthenticationError,
     RateLimitError,
 )
@@ -198,6 +199,7 @@ class NutritionWorker(BaseWorker):
             return min(base_score + 0.3, 1.0)
         return base_score
 
+    @observe()
     async def generate_stream(
         self,
         user_message: str,
