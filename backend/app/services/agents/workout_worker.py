@@ -307,9 +307,9 @@ class WorkoutWorker(BaseWorker):
                     yield self._sse({"text": delta.content})
 
         except _OPENAI_ERRORS as exc:
-            logger.warning(
-                "[WorkoutWorker] OpenAI unavailable (%s: %s) — sandbox fallback",
-                type(exc).__name__, exc,
+            logger.exception(
+                "[WorkoutWorker] OpenAI API unavailable (%s) — sandbox fallback",
+                type(exc).__name__,
             )
             async for chunk in self._stream_sandbox(_MOCK_WORKOUT):
                 yield chunk
