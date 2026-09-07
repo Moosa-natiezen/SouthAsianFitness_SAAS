@@ -163,9 +163,9 @@ export function AiMealGenerator() {
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3">
           <p className="flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
             <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-            Meal plan queued for background generation
-            {runHandle ? ` (run ${runHandle.slice(0, 8)})` : ""} — it will appear in your
-            saved plans when ready.
+            Meal plan is generating in the background
+            {runHandle ? ` (run ${runHandle.slice(0, 8)})` : ""} — it will appear here
+            automatically when ready.
           </p>
         </div>
       )}

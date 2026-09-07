@@ -1,8 +1,11 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { useRealtimeRun } from "@trigger.dev/react-hooks";
 
 import { apiBaseUrl } from "@/lib/api";
+import type { generateMealPlanTask } from "@/trigger/generate-meal-plan";
 
 export type MealPlanStreamRequest = {
   target_calories?: number | null;
@@ -12,6 +15,16 @@ export type MealPlanStreamRequest = {
   cuisine_type?: string | null;
 };
 
+/** Terminal run statuses that mean the background task did not succeed. */
+const FAILED_RUN_STATUSES = [
+  "FAILED",
+  "CANCELED",
+  "CRASHED",
+  "SYSTEM_FAILURE",
+  "TIMED_OUT",
+  "EXPIRED",
+] as const;
+
 type MealPlanStreamState = {
   content: string;
   isStreaming: boolean;
@@ -19,8 +32,10 @@ type MealPlanStreamState = {
   isSandbox: boolean;
   /** True when generation was handed off to a background Trigger.dev task. */
   queued: boolean;
-  /** Trigger.dev run handle for the queued background task. */
+  /** Trigger.dev run id for the queued background task. */
   runHandle: string | null;
+  /** Public access token used to subscribe to the run's realtime updates. */
+  publicAccessToken: string | null;
 };
 
 /**
@@ -29,7 +44,8 @@ type MealPlanStreamState = {
  * Generation is attempted in two stages:
  * 1. **Enqueue (preferred)** — POSTs to the same-origin `/api/meal-plans/enqueue`
  *    route, which hands the job to a Trigger.dev background task and returns an
- *    immediate run handle (no long-held SSE connection).
+ *    immediate run handle. The hook then subscribes to the run with
+ *    `useRealtimeRun` and renders the generated markdown when it completes.
  * 2. **Direct SSE fallback** — if the enqueue route is unavailable (Trigger.dev
  *    not configured, missing session cookie, or a transient failure), streams
  *    from the FastAPI backend exactly as before.
@@ -42,8 +58,76 @@ export function useMealPlanStream() {
     isSandbox: false,
     queued: false,
     runHandle: null,
+    publicAccessToken: null,
   });
   const abortRef = useRef<AbortController | null>(null);
+
+  // ── Realtime subscription to the queued background run ───────────────
+  // Called unconditionally (hooks rules); it no-ops when nothing is queued
+  // or no public access token is available.
+  const realtime = useRealtimeRun<typeof generateMealPlanTask>(
+    state.queued && state.runHandle ? state.runHandle : undefined,
+    {
+      accessToken: state.publicAccessToken ?? undefined,
+      enabled: state.queued && !!state.runHandle && !!state.publicAccessToken,
+    },
+  );
+
+  // When the background run reaches a terminal state, materialize the result.
+  useEffect(() => {
+    if (!state.queued) return;
+
+    const run = realtime.run;
+    if (!run) return;
+
+    if (run.status === "COMPLETED") {
+      const output = run.output as { markdown?: string } | null | undefined;
+      if (output?.markdown) {
+        setState({
+          content: output.markdown,
+          isStreaming: false,
+          error: null,
+          isSandbox: false,
+          queued: false,
+          runHandle: null,
+          publicAccessToken: null,
+        });
+      }
+      return;
+    }
+
+    if (FAILED_RUN_STATUSES.includes(run.status as (typeof FAILED_RUN_STATUSES)[number])) {
+      setState({
+        content: "",
+        isStreaming: false,
+        error: `Background generation ${run.status
+          .toLowerCase()
+          .replace(/_/g, " ")}. Please try again.`,
+        isSandbox: false,
+        queued: false,
+        runHandle: null,
+        publicAccessToken: null,
+      });
+      return;
+    }
+  }, [state.queued, realtime.run]);
+
+  // Surface subscription-level errors (auth/network) instead of hanging.
+  useEffect(() => {
+    if (!state.queued || !realtime.error) return;
+    setState((prev) =>
+      prev.queued
+        ? {
+            ...prev,
+            isStreaming: false,
+            error: `Could not subscribe to background task: ${realtime.error!.message}`,
+            queued: false,
+            runHandle: null,
+            publicAccessToken: null,
+          }
+        : prev,
+    );
+  }, [realtime.error, state.queued]);
 
   const generate = useCallback(async (payload: MealPlanStreamRequest) => {
     // Abort any in-flight stream
@@ -58,6 +142,7 @@ export function useMealPlanStream() {
       isSandbox: false,
       queued: false,
       runHandle: null,
+      publicAccessToken: null,
     });
 
     // ── Stage 1: try the background enqueue route ─────────────────────
@@ -70,6 +155,7 @@ export function useMealPlanStream() {
       const enqueueData = (await enqueueRes.json().catch(() => null)) as {
         success?: boolean;
         handle?: string;
+        publicAccessToken?: string;
       } | null;
 
       if (enqueueRes.ok && enqueueData?.success && enqueueData.handle) {
@@ -80,6 +166,7 @@ export function useMealPlanStream() {
           isSandbox: false,
           queued: true,
           runHandle: enqueueData.handle,
+          publicAccessToken: enqueueData.publicAccessToken ?? null,
         });
         return;
       }
@@ -128,6 +215,7 @@ export function useMealPlanStream() {
             isSandbox: false,
             queued: false,
             runHandle: null,
+            publicAccessToken: null,
           });
           return;
         }
@@ -139,6 +227,7 @@ export function useMealPlanStream() {
           isSandbox: false,
           queued: false,
           runHandle: null,
+          publicAccessToken: null,
         });
         return;
       }
@@ -156,6 +245,7 @@ export function useMealPlanStream() {
           isSandbox: false,
           queued: false,
           runHandle: null,
+          publicAccessToken: null,
         });
         return;
       }
@@ -170,6 +260,7 @@ export function useMealPlanStream() {
           isSandbox: false,
           queued: false,
           runHandle: null,
+          publicAccessToken: null,
         });
         return;
       }
@@ -248,6 +339,7 @@ export function useMealPlanStream() {
         isSandbox: false,
         queued: false,
         runHandle: null,
+        publicAccessToken: null,
       });
     }
   }, []);
@@ -266,6 +358,7 @@ export function useMealPlanStream() {
       isSandbox: false,
       queued: false,
       runHandle: null,
+      publicAccessToken: null,
     });
   }, []);
 

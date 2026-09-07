@@ -65,7 +65,13 @@ export async function POST(request: Request) {
       sessionCookie: `saf_session=${sessionCookie}`,
     });
 
-    return NextResponse.json({ success: true, handle: handle.id });
+    // `publicAccessToken` lets the browser subscribe to this run's realtime
+    // updates via useRealtimeRun without exposing any secret key.
+    return NextResponse.json({
+      success: true,
+      handle: handle.id,
+      publicAccessToken: handle.publicAccessToken,
+    });
   } catch (err) {
     console.error("[MealPlanEnqueue] Failed to trigger background task:", err);
     return NextResponse.json(
