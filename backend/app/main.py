@@ -187,12 +187,25 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json" if not settings.is_production else None,
     )
 
+    # CORS: allow_origins comes from the CORS_ORIGINS env var (which also
+    # carries sensible localhost + production defaults via the config).
+    # Vercel preview deployments live on ephemeral *.vercel.app hosts that
+    # cannot be enumerated statically, so allow_origin_regex (starlette
+    # full-matches it against the request Origin) keeps credential-carrying
+    # requests working for every preview — plus the production apex/www —
+    # even if CORS_ORIGINS is misconfigured on Render. Requests are still
+    # authenticated by the session cookie; CORS only governs browser reads.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
+        allow_origin_regex=(
+            r"https://(?:[\w-]+\.vercel\.app"
+            r"|southasianfitness\.com"
+            r"|www\.southasianfitness\.com)"
+        ),
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Content-Type", "Accept", "X-CSRF-Token"],
+        allow_headers=["Content-Type", "Accept", "X-CSRF-Token", "Authorization"],
     )
 
     register_exception_handlers(app)

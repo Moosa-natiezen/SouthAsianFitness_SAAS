@@ -48,14 +48,13 @@ services:
         sync: false
 
       # ── CORS / Frontend URL ────────────────────────────────────────────
+      # Frontend lives on Vercel (not a Render service), so the origins must
+      # be explicit. The backend also regex-allows *.vercel.app preview hosts
+      # at runtime, so preview deployments are covered without config.
       - key: CORS_ORIGINS
-        fromService:
-          name: south-asian-fitness-web
-          property: url
+        value: https://southasianfitness.com,https://www.southasianfitness.com
       - key: FRONTEND_URL
-        fromService:
-          name: south-asian-fitness-web
-          property: url
+        value: https://southasianfitness.com
 
       # ── OpenAI (set as secret) ─────────────────────────────────────────
       - key: OPENAI_API_KEY

@@ -58,7 +58,12 @@ class Settings(BaseSettings):
     login_rate_limit_window_seconds: int = 300
     login_rate_limit_max_requests: int = 10
 
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = (
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000,"
+        "https://southasianfitness.com,"
+        "https://www.southasianfitness.com"
+    )
 
     # ── OpenAI ────────────────────────────────────────────────────────
     openai_api_key: str = ""
