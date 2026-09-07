@@ -11,11 +11,12 @@ Covers:
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import hmac
 import json
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi import Depends
 
@@ -536,6 +537,211 @@ def test_webhook_missing_user_id():
     )
     # Should still return 200 — we just skip processing
     assert resp.status_code == 200
+
+
+def test_webhook_forwards_to_n8n():
+    """Verify a validated webhook is forwarded to n8n with the event summary."""
+    client = make_client()
+    api_register(client)
+
+    user_id = get_user_id_from_db("billing@example.com")
+    assert user_id is not None
+
+    payload = {
+        "meta": {
+            "event_name": "subscription_created",
+            "custom_data": {"user_id": str(user_id)},
+        },
+        "data": {
+            "type": "subscriptions",
+            "id": "ls_sub_n8n",
+            "attributes": {
+                "id": "ls_sub_n8n",
+                "customer_id": "ls_cust_n8n",
+                "status": "active",
+                "user_email": "billing@example.com",
+                "total": 4900,
+                "currency": "USD",
+                "created_at": "2026-09-07T00:00:00Z",
+            },
+        },
+    }
+
+    raw_body = json.dumps(payload).encode("utf-8")
+    signature = sign_payload(raw_body, settings.lemon_squeezy_webhook_secret)
+
+    with patch(
+        "app.api.routes.billing.forward_webhook_to_n8n",
+        new_callable=AsyncMock,
+    ) as mock_forward:
+        resp = client.post(
+            "/api/billing/webhook",
+            content=raw_body,
+            headers={
+                "Content-Type": "application/json",
+                "X-Signature": signature,
+            },
+        )
+
+    assert resp.status_code == 200, resp.text
+    assert resp.json() == {"status": "ok"}
+    mock_forward.assert_awaited_once()
+    sent = mock_forward.await_args.args[0]
+    assert sent["meta"]["event_name"] == "subscription_created"
+
+
+def test_webhook_n8n_failure_still_returns_200():
+    """Verify an n8n failure never turns the webhook response into an error."""
+    client = make_client()
+    api_register(client)
+
+    user_id = get_user_id_from_db("billing@example.com")
+    assert user_id is not None
+
+    payload = {
+        "meta": {
+            "event_name": "subscription_created",
+            "custom_data": {"user_id": str(user_id)},
+        },
+        "data": {
+            "type": "subscriptions",
+            "id": "ls_sub_n8n_fail",
+            "attributes": {
+                "id": "ls_sub_n8n_fail",
+                "customer_id": "ls_cust_n8n_fail",
+                "status": "active",
+                "user_email": "billing@example.com",
+                "total": 4900,
+            },
+        },
+    }
+
+    raw_body = json.dumps(payload).encode("utf-8")
+    signature = sign_payload(raw_body, settings.lemon_squeezy_webhook_secret)
+
+    with patch(
+        "app.api.routes.billing.forward_webhook_to_n8n",
+        new_callable=AsyncMock,
+        side_effect=RuntimeError("n8n unreachable"),
+    ):
+        resp = client.post(
+            "/api/billing/webhook",
+            content=raw_body,
+            headers={
+                "Content-Type": "application/json",
+                "X-Signature": signature,
+            },
+        )
+
+    assert resp.status_code == 200, resp.text
+    assert resp.json() == {"status": "ok"}
+
+    # The subscription still processes correctly even when n8n is down
+    db = db_session.SessionLocal()
+    user = db.query(User).filter(User.id == user_id).first()
+    assert user.subscription_tier == "pro"
+    db.close()
+
+
+def test_forward_webhook_to_n8n_posts_summary():
+    """Verify forward_webhook_to_n8n posts the expected summary to the URL."""
+    from app.services.billing_service import forward_webhook_to_n8n
+
+    calls: dict = {}
+
+    class FakeResponse:
+        status_code = 200
+
+        def raise_for_status(self) -> None:
+            return None
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return False
+
+        async def post(self, url, json=None):
+            calls["url"] = url
+            calls["json"] = json
+            return FakeResponse()
+
+    payload = {
+        "meta": {
+            "event_name": "order_created",
+            "custom_data": {"user_id": "abc-123"},
+        },
+        "data": {
+            "attributes": {
+                "user_email": "founder@example.com",
+                "total": 4900,
+                "currency": "USD",
+                "created_at": "2026-09-07T00:00:00Z",
+            },
+        },
+    }
+
+    with patch("app.services.billing_service.httpx.AsyncClient", FakeClient), patch.object(
+        settings, "n8n_webhook_url", "https://n8n.example.com/hook/test123"
+    ):
+        asyncio.run(forward_webhook_to_n8n(payload))
+
+    assert calls["url"] == "https://n8n.example.com/hook/test123"
+    body = calls["json"]
+    assert body["source"] == "lemonsqueezy"
+    assert body["event"] == "order_created"
+    assert body["email"] == "founder@example.com"
+    assert body["user_id"] == "abc-123"
+    assert body["amount"] == 49.0
+    assert body["currency"] == "USD"
+    assert body["payload"] is payload
+
+
+def test_forward_webhook_to_n8n_failure_is_swallowed():
+    """Verify forwarding failures are logged, not raised."""
+    from app.services.billing_service import forward_webhook_to_n8n
+
+    class BoomClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return False
+
+        async def post(self, url, json=None):
+            raise ConnectionError("n8n down")
+
+    with patch("app.services.billing_service.httpx.AsyncClient", BoomClient), patch.object(
+        settings, "n8n_webhook_url", "https://n8n.example.com/hook/test123"
+    ):
+        # Must not raise even though the transport blew up
+        asyncio.run(
+            forward_webhook_to_n8n(
+                {"meta": {"event_name": "subscription_created"}, "data": {"attributes": {}}}
+            )
+        )
+
+
+def test_forward_webhook_to_n8n_noop_without_url():
+    """Verify forwarding is a no-op when N8N_WEBHOOK_URL is not configured."""
+    from app.services.billing_service import forward_webhook_to_n8n
+
+    with patch.object(settings, "n8n_webhook_url", ""), patch(
+        "app.services.billing_service.httpx.AsyncClient",
+        side_effect=AssertionError("AsyncClient should not be constructed"),
+    ):
+        asyncio.run(
+            forward_webhook_to_n8n(
+                {"meta": {"event_name": "subscription_created"}, "data": {"attributes": {}}}
+            )
+        )
 
 
 def test_webhook_signature_verification():

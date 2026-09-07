@@ -299,3 +299,78 @@ def _parse_datetime(value: str) -> datetime | None:
         return dt
     except (ValueError, TypeError):
         return None
+
+
+def _extract_amount(attributes: dict) -> Any:
+    """Extract a human-friendly amount from webhook attributes.
+
+    Lemon Squeezy reports prices in cents (``total``/``subtotal``) and also
+    exposes ``total_formatted`` / ``total_usd`` for convenience.  Returns
+    None when no monetary field is present.
+    """
+    for key in ("total_formatted", "subtotal_formatted"):
+        value = attributes.get(key)
+        if value:
+            return value
+    for key in ("total_usd", "subtotal_usd"):
+        value = attributes.get(key)
+        if value is not None:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                continue
+    total = attributes.get("total") or attributes.get("subtotal")
+    if total is not None:
+        try:
+            return round(float(total) / 100, 2)
+        except (TypeError, ValueError):
+            pass
+    return None
+
+
+async def forward_webhook_to_n8n(payload: dict[str, Any]) -> None:
+    """Forward a validated Lemon Squeezy webhook event to n8n (best-effort).
+
+    Sends a small summary (event name, customer email, amount, user id) plus
+    the full original payload to ``settings.n8n_webhook_url``.  This is
+    strictly fire-and-forget: every failure (n8n down, network error, bad
+    config, non-2xx response) is logged as a warning and swallowed so the
+    webhook response to Lemon Squeezy is never delayed or turned into an
+    error.
+    """
+    webhook_url = settings.n8n_webhook_url
+    if not webhook_url:
+        return
+
+    meta = payload.get("meta", {}) or {}
+    event_name = meta.get("event_name", "")
+    data = payload.get("data", {}) or {}
+    attributes = data.get("attributes", {}) or {}
+    meta_custom = meta.get("custom_data", {}) or {}
+    attr_custom = attributes.get("custom_data", {}) or {}
+
+    body = {
+        "source": "lemonsqueezy",
+        "event": event_name,
+        "email": attributes.get("user_email"),
+        "user_id": meta_custom.get("user_id") or attr_custom.get("user_id"),
+        "amount": _extract_amount(attributes),
+        "currency": attributes.get("currency"),
+        "occurred_at": attributes.get("created_at") or attributes.get("updated_at"),
+        "payload": payload,
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.post(webhook_url, json=body)
+            resp.raise_for_status()
+        logger.info(
+            "Forwarded Lemon Squeezy event=%s to n8n (status=%s)",
+            event_name, resp.status_code,
+        )
+    except Exception:
+        logger.warning(
+            "Failed to forward Lemon Squeezy event=%s to n8n at %s",
+            event_name, webhook_url,
+            exc_info=True,
+        )

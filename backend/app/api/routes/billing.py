@@ -15,6 +15,7 @@ from app.models.user import User
 from app.services.billing_service import (
     create_checkout_url,
     create_portal_url,
+    forward_webhook_to_n8n,
     handle_webhook_event,
     verify_webhook_signature,
 )
@@ -133,5 +134,12 @@ async def webhook(
         return db
 
     handle_webhook_event(payload, user_lookup, session_factory)
+
+    # Forward to n8n for founder alerts — best-effort and non-blocking.
+    # Even if n8n is down, Lemon Squeezy always gets its 200 OK.
+    try:
+        await forward_webhook_to_n8n(payload)
+    except Exception:
+        logger.warning("Failed to forward webhook to n8n", exc_info=True)
 
     return {"status": "ok"}

@@ -76,6 +76,9 @@ class Settings(BaseSettings):
     lemon_squeezy_variant_id: str = ""
     frontend_url: str = "http://localhost:3000"
 
+    # ── n8n (internal founder alerts) ─────────────────────────────────
+    n8n_webhook_url: str = ""
+
     # ── Google OAuth ────────────────────────────────────────────────
     google_client_id: str = ""
 
