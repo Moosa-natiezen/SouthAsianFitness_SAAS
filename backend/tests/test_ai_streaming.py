@@ -415,7 +415,7 @@ def test_ai_generate_injects_user_context_into_system_prompt():
     system_msg = messages[0]["content"]
 
     # The merged prompt should contain the static prompt AND the user context
-    assert "South Asian fitness nutritionist" in system_msg
+    assert "South Asian sports nutritionist" in system_msg
     assert "USER CONTEXT" in system_msg
     assert "cutting" in system_msg  # WEIGHT_LOSS → cutting
     assert "2000 calories/day" in system_msg
@@ -446,7 +446,7 @@ def test_ai_generate_falls_back_to_generic_prompt_without_profile():
 
     # Falls back gracefully: static prompt always present, and no
     # personalisation details (no profile → no goal/targets injected)
-    assert "South Asian fitness nutritionist" in system_msg
+    assert "South Asian sports nutritionist" in system_msg
     assert "cutting" not in system_msg
     assert "2000 calories/day" not in system_msg
 
