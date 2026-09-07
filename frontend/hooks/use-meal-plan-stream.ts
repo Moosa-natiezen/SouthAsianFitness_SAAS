@@ -17,16 +17,22 @@ type MealPlanStreamState = {
   isStreaming: boolean;
   error: string | null;
   isSandbox: boolean;
+  /** True when generation was handed off to a background Trigger.dev task. */
+  queued: boolean;
+  /** Trigger.dev run handle for the queued background task. */
+  runHandle: string | null;
 };
 
 /**
- * Custom hook for streaming AI-generated meal plans via SSE.
+ * Custom hook for AI-generated meal plans.
  *
- * Usage:
- * ```ts
- * const { content, isStreaming, error, isSandbox, generate } = useMealPlanStream();
- * await generate({ target_calories: 2000, cuisine_type: "South Asian" });
- * ```
+ * Generation is attempted in two stages:
+ * 1. **Enqueue (preferred)** — POSTs to the same-origin `/api/meal-plans/enqueue`
+ *    route, which hands the job to a Trigger.dev background task and returns an
+ *    immediate run handle (no long-held SSE connection).
+ * 2. **Direct SSE fallback** — if the enqueue route is unavailable (Trigger.dev
+ *    not configured, missing session cookie, or a transient failure), streams
+ *    from the FastAPI backend exactly as before.
  */
 export function useMealPlanStream() {
   const [state, setState] = useState<MealPlanStreamState>({
@@ -34,6 +40,8 @@ export function useMealPlanStream() {
     isStreaming: false,
     error: null,
     isSandbox: false,
+    queued: false,
+    runHandle: null,
   });
   const abortRef = useRef<AbortController | null>(null);
 
@@ -43,8 +51,52 @@ export function useMealPlanStream() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setState({ content: "", isStreaming: true, error: null, isSandbox: false });
+    setState({
+      content: "",
+      isStreaming: true,
+      error: null,
+      isSandbox: false,
+      queued: false,
+      runHandle: null,
+    });
 
+    // ── Stage 1: try the background enqueue route ─────────────────────
+    try {
+      const enqueueRes = await fetch("/api/meal-plans/enqueue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const enqueueData = (await enqueueRes.json().catch(() => null)) as {
+        success?: boolean;
+        handle?: string;
+      } | null;
+
+      if (enqueueRes.ok && enqueueData?.success && enqueueData.handle) {
+        setState({
+          content: "",
+          isStreaming: false,
+          error: null,
+          isSandbox: false,
+          queued: true,
+          runHandle: enqueueData.handle,
+        });
+        return;
+      }
+
+      // Not configured / not authenticated / failed — fall through to SSE.
+      console.warn(
+        `[MealPlanStream] Enqueue route unavailable (${enqueueRes.status}) — falling back to direct SSE streaming.`,
+        enqueueData,
+      );
+    } catch (err) {
+      console.warn(
+        "[MealPlanStream] Enqueue request failed — falling back to direct SSE streaming:",
+        err,
+      );
+    }
+
+    // ── Stage 2: direct SSE streaming (existing behavior) ─────────────
     try {
       const response = await fetch(`${apiBaseUrl}/api/ai/meal-plans/generate`, {
         method: "POST",
@@ -74,6 +126,8 @@ export function useMealPlanStream() {
             isStreaming: false,
             error: "This feature requires a Pro subscription.",
             isSandbox: false,
+            queued: false,
+            runHandle: null,
           });
           return;
         }
@@ -83,6 +137,8 @@ export function useMealPlanStream() {
           isStreaming: false,
           error: `Access denied (${response.status}).`,
           isSandbox: false,
+          queued: false,
+          runHandle: null,
         });
         return;
       }
@@ -98,6 +154,8 @@ export function useMealPlanStream() {
           isStreaming: false,
           error: `Request failed with status ${response.status}`,
           isSandbox: false,
+          queued: false,
+          runHandle: null,
         });
         return;
       }
@@ -110,6 +168,8 @@ export function useMealPlanStream() {
           isStreaming: false,
           error: "Response body is not readable.",
           isSandbox: false,
+          queued: false,
+          runHandle: null,
         });
         return;
       }
@@ -186,6 +246,8 @@ export function useMealPlanStream() {
         isStreaming: false,
         error: err instanceof Error ? err.message : "Stream failed.",
         isSandbox: false,
+        queued: false,
+        runHandle: null,
       });
     }
   }, []);
@@ -197,7 +259,14 @@ export function useMealPlanStream() {
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setState({ content: "", isStreaming: false, error: null, isSandbox: false });
+    setState({
+      content: "",
+      isStreaming: false,
+      error: null,
+      isSandbox: false,
+      queued: false,
+      runHandle: null,
+    });
   }, []);
 
   return { ...state, generate, abort, reset };

@@ -211,7 +211,7 @@ export function AiWorkoutGenerator() {
         <div className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-4 py-3">
           <p className="flex items-center gap-2 text-sm font-medium text-[#F59E0B]">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
-            Using offline AI model (Sandbox mode) — add OPENAI_API_KEY for live generation
+            Using offline AI model (Sandbox mode) — live AI generation is temporarily unavailable
           </p>
         </div>
       )}

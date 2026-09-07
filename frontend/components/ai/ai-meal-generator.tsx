@@ -14,7 +14,7 @@ import { saveAiMealPlan } from "@/lib/api";
  * Dark luxury glass aesthetic with glowing cursor animation.
  */
 export function AiMealGenerator() {
-  const { content, isStreaming, error, isSandbox, generate, reset } =
+  const { content, isStreaming, error, isSandbox, queued, runHandle, generate, reset } =
     useMealPlanStream();
 
   const [targetCalories, setTargetCalories] = useState("");
@@ -133,7 +133,7 @@ export function AiMealGenerator() {
                 )}
               </button>
 
-              {(content || error) && (
+              {(content || error || queued) && (
                 <button
                   type="button"
                   onClick={reset}
@@ -153,7 +153,19 @@ export function AiMealGenerator() {
         <div className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-4 py-3">
           <p className="flex items-center gap-2 text-sm font-medium text-[#F59E0B]">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
-            Using offline AI model (Sandbox mode) — add OPENAI_API_KEY for live generation
+            Using offline AI model (Sandbox mode) — live AI generation is temporarily unavailable
+          </p>
+        </div>
+      )}
+
+      {/* ── Queued (background generation) Banner ────────────────────────── */}
+      {queued && (
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            Meal plan queued for background generation
+            {runHandle ? ` (run ${runHandle.slice(0, 8)})` : ""} — it will appear in your
+            saved plans when ready.
           </p>
         </div>
       )}
@@ -255,7 +267,7 @@ export function AiMealGenerator() {
       )}
 
       {/* ── Empty State ───────────────────────────────────────────────── */}
-      {!content && !isStreaming && !error && (
+      {!content && !isStreaming && !error && !queued && (
         <div className="rounded-2xl border border-dashed border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-900/[0.02] p-10 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-zinc-900/10">
             <svg className="h-6 w-6 text-stone-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

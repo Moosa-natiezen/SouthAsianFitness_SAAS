@@ -5,9 +5,11 @@ import { logger, task } from "@trigger.dev/sdk/v3";
  *
  * `user_id` identifies the user the plan is generated for (used for logging and
  * tracing — auth is passed separately via `sessionCookie`, never the user ID).
+ * Optional: callers that only hold the session cookie (e.g. the web enqueue
+ * route) can omit it; the worker logs it as "unknown".
  */
 export type GenerateMealPlanPayload = {
-  user_id: string;
+  user_id?: string;
   target_calories?: number | null;
   protein_g?: number | null;
   dietary_preferences?: string[];
@@ -44,7 +46,7 @@ export const generateMealPlanTask = task({
   // A single meal plan generation is a long-running job — allow up to 10 minutes.
   maxDuration: 600,
   run: async (payload: GenerateMealPlanPayload) => {
-    const { user_id, sessionCookie, ...generationParams } = payload;
+    const { user_id = "unknown", sessionCookie, ...generationParams } = payload;
     const backendUrl = resolveBackendUrl();
 
     logger.info("Starting AI meal plan generation", {
