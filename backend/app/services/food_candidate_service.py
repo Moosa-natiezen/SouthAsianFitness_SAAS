@@ -24,7 +24,7 @@ from app.models.enums import (
 from app.models.food import Food
 from app.models.tags import DietaryTag
 from app.models.user import UserFoodPreference
-from app.services.meal_plan_config import DIET_EXCLUSIONS
+from app.services.meal_plan_config import DIET_EXCLUSIONS, PANTY_EXCLUSIONS
 
 
 @dataclass
@@ -158,6 +158,12 @@ def get_candidate_foods(
 
     candidates = []
     for food in foods:
+        # Pantry/seasoning exclusion: raw spices, pure oils, and sweeteners
+        # are dataset entries but not meals — never select them standalone.
+        cat_slug = food.category.slug if food.category else ""
+        if cat_slug in PANTY_EXCLUSIONS.excluded_category_slugs:
+            continue
+
         # Diet pattern exclusion
         if _violates_diet_pattern(food, ctx.diet_pattern):
             continue
@@ -178,7 +184,6 @@ def get_candidate_foods(
         grams = float(food.grams_per_serving) if food.grams_per_serving else float(food.serving_size)
 
         cat_name = food.category.name if food.category else None
-        cat_slug = food.category.slug if food.category else None
 
         candidates.append(
             CandidateFood(

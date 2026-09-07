@@ -288,6 +288,11 @@ def generate_meal_plan(
     start = datetime.now(tz=UTC).date()
     generated_days: list[GeneratedDay] = []
 
+    # Cross-day variety: remember every food used on earlier days so later
+    # days rotate through the food library instead of repeating the exact
+    # same menu. Deterministic — same inputs always yield the same plan.
+    plan_used_slugs: dict[str, int] = {}
+
     for day_offset in range(days):
         current_date = start + timedelta(days=day_offset)
 
@@ -302,9 +307,14 @@ def generate_meal_plan(
             candidates=candidates,
             meal_slots=structure.slots,
             day_index=day_offset,
+            prior_day_slugs=plan_used_slugs,
         )
 
         day_result = optimize_day(opt_ctx)
+
+        for meal in day_result.meals:
+            for sf in meal.foods:
+                plan_used_slugs[sf.slug] = plan_used_slugs.get(sf.slug, 0) + 1
 
         generated_days.append(_convert_day_result(day_result, current_date))
 

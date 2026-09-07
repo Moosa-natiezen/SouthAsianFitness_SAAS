@@ -76,6 +76,19 @@ class PortionBounds:
         "butter": 30.0,
         "sugar": 30.0,
         "salt": 5.0,
+        # Seasoning safety net: even if a spice/condiment slips through
+        # category filtering, never allow more than a pinch as a portion.
+        "spice": 10.0,
+        "garlic": 10.0,
+        "pepper": 5.0,
+        "turmeric": 5.0,
+        "cumin": 10.0,
+        "chili": 10.0,
+        "coriander": 10.0,
+        "ginger": 10.0,
+        "cardamom": 5.0,
+        "cinnamon": 5.0,
+        "clove": 5.0,
         "fruit": 300.0,
         "vegetable": 400.0,
         "bread": 200.0,
@@ -84,6 +97,59 @@ class PortionBounds:
 
     # Minimum grams for a food to be included (skip trivial amounts)
     min_inclusion_grams: float = 10.0
+
+
+# ── Pantry / seasoning exclusion ─────────────────────────────────────────────
+# The deterministic engine composes meals from whole foods (it has no recipe
+# decomposition step), so raw seasonings, pure oils and sweeteners are NOT
+# meals. Selecting "Garlic (raw)" or "Black pepper" as a standalone meal item
+# is a product defect, so those categories are excluded from the candidate
+# pool entirely. They remain visible in the Food Library for macro lookup.
+# (Slug variants are listed defensively across environments/datasets.)
+
+
+@dataclass(frozen=True)
+class PantryExclusions:
+    """Category slugs that may never be selected as standalone meal foods."""
+
+    excluded_category_slugs: frozenset[str] = frozenset({
+        # Real dataset slugs
+        "spices", "sweeteners", "oils-fats",
+        # Variants used in test fixtures / other datasets
+        "spice", "condiments", "condiment", "sauces", "sauce",
+        "seasonings", "seasoning", "sweetener", "sugars", "sugar",
+        "oils", "oil", "herbs", "herb", "salt",
+    })
+
+
+PANTY_EXCLUSIONS = PantryExclusions()
+
+
+# ── Cross-day variety ────────────────────────────────────────────────────────
+
+
+@dataclass(frozen=True)
+class VarietyConfig:
+    """Knobs for deterministic cross-day meal rotation.
+
+    The optimizer is greedy and deterministic: for a single day the same
+    top-scoring foods win every time. Without cross-day pressure every day of
+    a multi-day plan is a carbon copy. These knobs add a per-food penalty
+    proportional to how many earlier days in the same plan already used that
+    food, so the greedy picks rotate through the library while still being
+    able to repeat a food when few alternatives exist.
+    """
+
+    # Extra cost per prior-day appearance. Roughly the magnitude of a large
+    # nutrition miss, so used foods lose to fresh equivalents when available.
+    cross_day_penalty_per_use: float = 0.5
+
+    # Prior uses above this window add no further penalty, guaranteeing a
+    # 30-day plan from a small library still fills every day.
+    max_penalty_window: int = 4
+
+
+VARIETY_CONFIG = VarietyConfig()
 
 
 # ── Meal structure ──────────────────────────────────────────────────────────
