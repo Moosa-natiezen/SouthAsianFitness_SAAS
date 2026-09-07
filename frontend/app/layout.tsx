@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
 import "./globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { LenisProvider } from "@/components/lenis-provider";
 // TEMPORARILY DISABLED — PostHog analytics paused (see provider POSTHOG_ENABLED flag).
 // import { PostHogProvider } from "@/components/providers/posthog-provider";
@@ -132,6 +133,7 @@ export default function RootLayout({
             </LenisProvider>
           </ThemeProvider>
           {/* </PostHogProvider> — TEMPORARILY DISABLED */}
+        <GoogleAnalytics gaId="G-XJ76SYV2L2" />
       </body>
     </html>
   );
