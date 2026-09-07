@@ -143,7 +143,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* ── Main Content ────────────────────────────────────────────── */}
-      <main className="pt-[52px] pb-24 md:pb-8">
+      {/* On desktop the side nav is a fixed 200px rail on the left, so the
+          main column needs an equal left offset to avoid overlap. */}
+      <main className="pt-[52px] pb-24 md:ml-[200px] md:pb-8">
         <div className="mx-auto max-w-5xl px-5 py-6 md:px-8">{children}</div>
       </main>
 

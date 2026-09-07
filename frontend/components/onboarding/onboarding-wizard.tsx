@@ -394,12 +394,12 @@ export function OnboardingWizard() {
                 onClick={() => updateField("fitness_goal", g.value as GoalValue)}
                 className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-300 ${
                   form.fitness_goal === g.value
-                    ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 shadow-[0_0_30px_rgba(220,20,60,0.15)]"
-                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-50 dark:bg-zinc-800"
+                    ? "border-emerald-600/50 bg-emerald-50/80 shadow-[0_0_30px_rgba(5,150,105,0.15)] dark:border-emerald-500/40 dark:bg-emerald-500/10"
+                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60"
                 }`}
               >
                 {form.fitness_goal === g.value && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-zinc-700/5 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent" />
                 )}
                 <div className="relative">
                   <div className="mb-3 text-3xl">{g.icon}</div>
@@ -465,7 +465,7 @@ export function OnboardingWizard() {
                     onClick={() => updateField("sex", s)}
                     className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
                       form.sex === s
-                        ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-900 dark:text-zinc-100"
+                        ? "border-emerald-600/50 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-400"
                         : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:border-stone-300"
                     }`}
                   >
@@ -516,8 +516,8 @@ export function OnboardingWizard() {
                 onClick={() => updateField("activity_level", a.value as ActivityValue)}
                 className={`w-full rounded-xl border p-4 text-left transition-all duration-200 ${
                   form.activity_level === a.value
-                    ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800"
-                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-50 dark:bg-zinc-800"
+                    ? "border-emerald-600/50 bg-emerald-50/80 dark:border-emerald-500/40 dark:bg-emerald-500/10"
+                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -627,8 +627,8 @@ export function OnboardingWizard() {
                 onClick={() => updateField("diet_pattern", d.value as DietValue)}
                 className={`rounded-xl border p-4 text-left transition-all duration-200 ${
                   form.diet_pattern === d.value
-                    ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800"
-                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-50 dark:bg-zinc-800"
+                    ? "border-emerald-600/50 bg-emerald-50/80 dark:border-emerald-500/40 dark:bg-emerald-500/10"
+                    : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60"
                 }`}
               >
                 <p className="font-medium text-stone-900 dark:text-zinc-100">{d.label}</p>
@@ -716,8 +716,8 @@ export function OnboardingWizard() {
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <FadeSlide className="text-center">
           <div className="relative mx-auto mb-8 h-24 w-24">
-            <div className="absolute inset-0 animate-spin rounded-full border-2 border-stone-300 border-t-[#DC143C]" />
-            <div className="absolute inset-2 animate-spin rounded-full border-2 border-zinc-700/20 border-b-[#7B61FF] [animation-direction:reverse] [animation-duration:1.5s]" />
+            <div className="absolute inset-0 animate-spin rounded-full border-2 border-stone-300 border-t-emerald-600" />
+            <div className="absolute inset-2 animate-spin rounded-full border-2 border-zinc-700/20 border-b-emerald-500/70 [animation-direction:reverse] [animation-duration:1.5s]" />
             <div className="absolute inset-0 flex items-center justify-center text-3xl">⚡</div>
           </div>
           <h2 className="font-serif text-3xl font-bold text-stone-900 dark:text-zinc-100">Calculating your plan</h2>
@@ -783,7 +783,7 @@ export function OnboardingWizard() {
             <div
               key={i}
               className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                i <= stepIndex ? "bg-white dark:bg-zinc-900" : "bg-stone-100 dark:bg-zinc-800"
+                i <= stepIndex ? "bg-emerald-600 dark:bg-emerald-500" : "bg-stone-100 dark:bg-zinc-800"
               }`}
             />
           ))}
@@ -822,7 +822,7 @@ export function OnboardingWizard() {
               type="button"
               onClick={handleNext}
               disabled={loading}
-              className="relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-700 to-zinc-800 px-8 py-2.5 text-sm font-semibold text-stone-900 dark:text-zinc-100 shadow-lg  transition-all hover: hover:brightness-110 disabled:opacity-50"
+              className="relative overflow-hidden rounded-xl bg-emerald-600 px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:bg-emerald-700 active:scale-[0.97] disabled:opacity-50"
             >
               {isLastStep ? "Calculate & Finish" : "Continue"}
             </button>

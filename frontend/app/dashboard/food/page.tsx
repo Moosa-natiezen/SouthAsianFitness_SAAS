@@ -223,6 +223,10 @@ export default function FoodLibraryPage() {
         setTotal(result.total);
         offsetRef.current = offset + result.items.length;
       } catch (err) {
+        console.error(
+          "[FoodLibrary] Failed to fetch foods — check NEXT_PUBLIC_API_URL / backend availability:",
+          err,
+        );
         setError(
           err instanceof Error ? err.message : "Failed to load foods.",
         );
@@ -243,6 +247,16 @@ export default function FoodLibraryPage() {
           fetchFoods("", null, true),
         ]);
         if (!cancelled) setCategories(cats);
+      } catch (err) {
+        console.error(
+          "[FoodLibrary] Initial load failed — check NEXT_PUBLIC_API_URL / backend availability:",
+          err,
+        );
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "Failed to load foods.",
+          );
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }

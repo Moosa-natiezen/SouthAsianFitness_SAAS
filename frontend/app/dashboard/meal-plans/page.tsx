@@ -31,6 +31,15 @@ type PlanState =
 const dayOptions = [1, 3, 7, 14, 30];
 const mealOptions = [2, 3, 4, 6];
 
+/* Shared chip styles — active state uses the emerald brand accent so the
+   selected chip is always visibly distinct from the rest. */
+const chipBase =
+  "rounded-lg border px-3 py-1.5 text-sm font-medium transition-all duration-200";
+const chipActive =
+  "border-emerald-600/50 bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-600/10 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-400";
+const chipInactive =
+  "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60";
+
 export default function MealPlansPage() {
   const [planDays, setPlanDays] = useState(1);
   const [mealCount, setMealCount] = useState(4);
@@ -153,20 +162,16 @@ export default function MealPlansPage() {
         <div className="mt-6 flex gap-2">
           <button
             onClick={() => setActiveTab("optimizer")}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-              activeTab === "optimizer"
-                ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
-                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 ${
+              activeTab === "optimizer" ? chipActive : chipInactive
             }`}
           >
             Deterministic Optimizer
           </button>
           <button
             onClick={() => setActiveTab("ai")}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-              activeTab === "ai"
-                ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
-                : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:bg-stone-50 dark:bg-zinc-800"
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 ${
+              activeTab === "ai" ? chipActive : chipInactive
             }`}
           >
             AI Generator ✨
@@ -201,10 +206,8 @@ export default function MealPlansPage() {
                 <button
                   key={d}
                   onClick={() => setPlanDays(d)}
-                  className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
-                    planDays === d
-                      ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
-                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 hover:bg-stone-50 dark:bg-zinc-800"
+                  className={`${chipBase} ${
+                    planDays === d ? chipActive : chipInactive
                   }`}
                   aria-pressed={planDays === d}
                 >
@@ -223,10 +226,8 @@ export default function MealPlansPage() {
                 <button
                   key={m}
                   onClick={() => setMealCount(m)}
-                  className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
-                    mealCount === m
-                      ? "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400"
-                      : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 hover:bg-stone-50 dark:bg-zinc-800"
+                  className={`${chipBase} ${
+                    mealCount === m ? chipActive : chipInactive
                   }`}
                   aria-pressed={mealCount === m}
                 >
