@@ -187,9 +187,27 @@ export default function FoodLibraryPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isWakingUp, setIsWakingUp] = useState(false);
 
   const offsetRef = useRef(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wakeUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* ── Cold-start wake-up detection ────────────────────────────────── */
+
+  // When loading starts, set a 2-second timer. If still loading after that,
+  // show a friendly "waking up" message instead of a bare skeleton.
+  useEffect(() => {
+    if (loading) {
+      wakeUpTimerRef.current = setTimeout(() => setIsWakingUp(true), 2_000);
+    } else {
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
+      setIsWakingUp(false);
+    }
+    return () => {
+      if (wakeUpTimerRef.current) clearTimeout(wakeUpTimerRef.current);
+    };
+  }, [loading]);
 
   /* ── Fetch foods ──────────────────────────────────────────────────── */
 
@@ -372,7 +390,18 @@ export default function FoodLibraryPage() {
         </div>
       )}
 
-      {/* Loading state */}
+      {/* Cold-start wake-up notice */}
+      {loading && isWakingUp && (
+        <div className="flex items-center gap-3 rounded-xl border border-amber-200 dark:border-amber-800/40 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+          <svg className="h-4 w-4 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <span>Waking up server, please wait a moment...</span>
+        </div>
+      )}
+
+      {/* Loading skeleton */}
       {loading && <SkeletonGrid />}
 
       {/* Food grid */}

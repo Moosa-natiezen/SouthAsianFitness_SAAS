@@ -32,82 +32,130 @@ function dispatchProRequired(): void {
 /** Default timeout for API requests (15 seconds). Prevents infinite hangs. */
 const API_TIMEOUT_MS = 15_000;
 
+/**
+ * Base delay (ms) for exponential backoff on retryable errors.
+ * Attempt 0 → 2 s, attempt 1 → 4 s, attempt 2 → 8 s.
+ */
+const RETRY_BASE_DELAY_MS = 2_000;
+const MAX_RETRIES = 3;
+
+/** Sleep helper. */
+function _sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const headers = new Headers(init.headers ?? {});
+  const method = (init.method ?? "GET").toUpperCase();
+  // Only retry safe, idempotent GET requests — never POST/PUT/PATCH/DELETE
+  const maxAttempts = method === "GET" ? MAX_RETRIES + 1 : 1;
 
-  if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const headers = new Headers(init.headers ?? {});
 
-  if (!headers.has("Accept")) {
-    headers.set("Accept", "application/json");
-  }
+    if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
 
-  // Create an AbortController with a timeout so requests never hang forever
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+    if (!headers.has("Accept")) {
+      headers.set("Accept", "application/json");
+    }
 
-  try {
-    const response = await fetch(`${apiBaseUrl}${path}`, {
-      ...init,
-      credentials: "include",
-      headers,
-      cache: "no-store",
-      signal: controller.signal,
-    });
-
-  if (!response.ok) {
-    let message = `Request failed with status ${response.status}`;
-    let detailObj: Record<string, unknown> | null = null;
+    // Create an AbortController with a timeout so requests never hang forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
     try {
-      const errorPayload = (await response.json()) as {
-        detail?: string | Array<{ msg?: string }> | Record<string, unknown>;
-      };
+      const response = await fetch(`${apiBaseUrl}${path}`, {
+        ...init,
+        credentials: "include",
+        headers,
+        cache: "no-store",
+        signal: controller.signal,
+      });
 
-      if (typeof errorPayload.detail === "string") {
-        message = errorPayload.detail;
-      } else if (Array.isArray(errorPayload.detail)) {
-        const item = errorPayload.detail[0];
-        if (item && typeof item.msg === "string") {
-          message = item.msg;
+      if (!response.ok) {
+        let message = `Request failed with status ${response.status}`;
+        let detailObj: Record<string, unknown> | null = null;
+
+        try {
+          const errorPayload = (await response.json()) as {
+            detail?: string | Array<{ msg?: string }> | Record<string, unknown>;
+          };
+
+          if (typeof errorPayload.detail === "string") {
+            message = errorPayload.detail;
+          } else if (Array.isArray(errorPayload.detail)) {
+            const item = errorPayload.detail[0];
+            if (item && typeof item.msg === "string") {
+              message = item.msg;
+            }
+          } else if (
+            typeof errorPayload.detail === "object" &&
+            errorPayload.detail !== null
+          ) {
+            detailObj = errorPayload.detail as Record<string, unknown>;
+            if (typeof detailObj.message === "string") {
+              message = detailObj.message;
+            }
+          }
+        } catch {
+          // Ignore JSON parse failures
         }
-      } else if (
-        typeof errorPayload.detail === "object" &&
-        errorPayload.detail !== null
-      ) {
-        detailObj = errorPayload.detail as Record<string, unknown>;
-        if (typeof detailObj.message === "string") {
-          message = detailObj.message;
+
+        // Intercept PRO_REQUIRED 403s globally
+        if (response.status === 403 && detailObj?.code === "PRO_REQUIRED") {
+          dispatchProRequired();
+          throw new ProRequiredError(message);
         }
+
+        // Retry on 5xx (server cold-start / transient errors) — but not on 4xx
+        if (response.status >= 500 && attempt < maxAttempts - 1) {
+          clearTimeout(timeoutId);
+          console.warn(
+            `[apiFetch] ${response.status} on ${path} — retrying (${attempt + 1}/${maxAttempts - 1})...`,
+          );
+          await _sleep(RETRY_BASE_DELAY_MS * 2 ** attempt);
+          continue;
+        }
+
+        throw new Error(message);
       }
-    } catch {
-      // Ignore JSON parse failures
-    }
 
-    // Intercept PRO_REQUIRED 403s globally
-    if (response.status === 403 && detailObj?.code === "PRO_REQUIRED") {
-      dispatchProRequired();
-      throw new ProRequiredError(message);
-    }
+      clearTimeout(timeoutId);
 
-    throw new Error(message);
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      return (await response.json()) as T;
+    } catch (err) {
+      clearTimeout(timeoutId);
+
+      // Retry on network errors (fetch TypeError) and timeouts (AbortError)
+      const isNetworkError = err instanceof TypeError;
+      const isTimeout =
+        err instanceof DOMException && err.name === "AbortError";
+
+      if ((isNetworkError || isTimeout) && attempt < maxAttempts - 1) {
+        console.warn(
+          `[apiFetch] ${isTimeout ? "timeout" : "network error"} on ${path} — retrying (${attempt + 1}/${maxAttempts - 1})...`,
+        );
+        await _sleep(RETRY_BASE_DELAY_MS * 2 ** attempt);
+        continue;
+      }
+
+      // Convert AbortError to a clear timeout message on final failure
+      if (isTimeout) {
+        throw new Error(
+          "Request timed out. The server may be waking up — please try again in a moment.",
+        );
+      }
+      throw err;
+    }
   }
 
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return (await response.json()) as T;
-  } catch (err) {
-    // Convert AbortError to a clear timeout message instead of a generic error
-    if (err instanceof DOMException && err.name === "AbortError") {
-      throw new Error("Request timed out. Please check your connection and try again.");
-    }
-    throw err;
-  } finally {
-    clearTimeout(timeoutId);
-  }
+  // Unreachable — TypeScript needs the control flow
+  throw new Error("Max retries exceeded");
 }
 
 /* ── Auth types ────────────────────────────────────────────────────────── */
