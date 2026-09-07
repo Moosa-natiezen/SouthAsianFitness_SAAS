@@ -102,6 +102,10 @@ export default function MealPlansPage() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to generate meal plan.";
+      console.error(
+        "[MealPlans] generateMealPlan failed — check CORS, backend availability, and NEXT_PUBLIC_API_URL:",
+        err,
+      );
       if (msg.includes("Free tier limit reached")) {
         setShowPaywall(true);
       } else {

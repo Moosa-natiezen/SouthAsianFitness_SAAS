@@ -49,7 +49,10 @@ export function useMealPlanStream() {
       const response = await fetch(`${apiBaseUrl}/api/ai/meal-plans/generate`, {
         method: "POST",
         body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+        },
         credentials: "include",
         signal: controller.signal,
       });
@@ -85,6 +88,11 @@ export function useMealPlanStream() {
       }
 
       if (!response.ok) {
+        const bodyPreview = await response.text().catch(() => "");
+        console.error(
+          `[MealPlanStream] Request failed (${response.status} ${response.statusText}) → ${apiBaseUrl}/api/ai/meal-plans/generate`,
+          bodyPreview || "(no response body)",
+        );
         setState({
           content: "",
           isStreaming: false,
@@ -169,6 +177,10 @@ export function useMealPlanStream() {
         // User aborted — no state update needed
         return;
       }
+      console.error(
+        "[MealPlanStream] Fetch/stream error — check CORS, backend availability, and NEXT_PUBLIC_API_URL:",
+        err,
+      );
       setState({
         content: "",
         isStreaming: false,

@@ -55,7 +55,10 @@ export function useWorkoutStream(): WorkoutStreamReturn {
         const response = await fetch(`${apiBaseUrl}/api/ai/workout/generate`, {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+          },
           body: JSON.stringify(payload),
           signal: controller.signal,
         });
@@ -83,6 +86,11 @@ export function useWorkoutStream(): WorkoutStreamReturn {
         }
 
         if (!response.ok) {
+          const bodyPreview = await response.text().catch(() => "");
+          console.error(
+            `[WorkoutStream] Request failed (${response.status} ${response.statusText}) → ${apiBaseUrl}/api/ai/workout/generate`,
+            bodyPreview || "(no response body)",
+          );
           throw new Error(`Request failed with status ${response.status}`);
         }
 
@@ -155,6 +163,10 @@ export function useWorkoutStream(): WorkoutStreamReturn {
           }));
           return;
         }
+        console.error(
+          "[WorkoutStream] Fetch/stream error — check CORS, backend availability, and NEXT_PUBLIC_API_URL:",
+          err,
+        );
         setState((prev) => ({
           ...prev,
           isStreaming: false,
