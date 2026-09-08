@@ -102,8 +102,13 @@ def search_foods(db: Session, req: FoodSearchRequest) -> tuple[list[Food], int]:
         .order_by(Food.name)
         .limit(req.limit)
         .offset(req.offset)
-        .distinct()
     )
+    # NOTE: No `.distinct()` here.  PostgreSQL raises
+    #   ProgrammingError: could not identify an equality operator for type json
+    # when DISTINCT operates across joined rows that include JSON columns
+    # (e.g. from dietary_tags / cuisine_tags).  SQLAlchemy's ORM-level
+    # hydration already deduplicates Food instances when joinedload is used,
+    # so the database-level DISTINCT is both unnecessary and unsafe here.
 
     items = q.all()
     return items, total
