@@ -188,6 +188,45 @@ def test_create_and_list_foods():
     db.close()
 
 
+def test_list_foods_answers_directly_no_redirect():
+    """GET /api/foods must return 200 in one hop.
+
+    Regression: the list route used to exist only as "/api/foods/", so
+    FastAPI answered the no-slash form with a 307 redirect whose Location is
+    built from the upstream host — through the Vercel rewrite proxy that
+    becomes a second cross-origin hop (observed as 307 then 500 in prod).
+    Both slash variants must be registered and answer directly.
+    """
+    client = make_client()
+    from app.db import session as db_session
+
+    db = db_session.SessionLocal()
+    basics = seed_basics(db)
+    create_food(
+        db,
+        slug="basmati-rice",
+        name="Basmati rice",
+        category=basics["category"],
+        serving_unit=basics["unit_g"],
+    )
+    db.commit()
+
+    resp_no_slash = client.get("/api/foods")
+    assert resp_no_slash.status_code == 200, resp_no_slash.text
+    # A 307 hop would leave a redirect entry in history before the 200.
+    assert resp_no_slash.history == [], (
+        f"Expected no redirect but got history: "
+        f"{[r.status_code for r in resp_no_slash.history]}"
+    )
+    assert resp_no_slash.json()["total"] == 1
+
+    resp_slash = client.get("/api/foods/")
+    assert resp_slash.status_code == 200, resp_slash.text
+    assert resp_slash.history == []
+
+    db.close()
+
+
 # ── Extended serialization tests ──────────────────────────────────────────
 
 

@@ -10,6 +10,7 @@ Pins two product requirements:
 from __future__ import annotations
 
 import os
+from typing import ClassVar
 
 os.environ.setdefault("DATABASE_URL", "sqlite://")
 os.environ.setdefault("SECRET_KEY", "test-secret-key-1234567890abcdefg")
@@ -31,6 +32,7 @@ from app.models.food import Food
 from app.models.tags import FoodCategory
 from app.models.unit import Unit
 from app.models.user import User, UserProfile
+from app.services.food_candidate_service import FilterContext, get_candidate_foods
 from app.services.meal_plan_service import generate_meal_plan
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -351,4 +353,118 @@ class TestCrossDayVariety:
                     assert f1.slug == f2.slug
                     assert f1.portion_grams == f2.portion_grams
                     assert f1.calories == f2.calories
+        db.close()
+
+
+# ── Meal-suitability exclusion (organ meats / plain white bread) ───────────
+
+
+def seed_suitability_dataset(db: Session) -> dict:
+    """A realistic whole-food set plus the offenders that must never be
+    generated as standalone meals: beef/chicken liver and plain white bread.
+
+    Liver is deliberately the most protein-dense food in the pool (135 kcal,
+    20 g protein per 100 g) so a macro-driven optimizer would otherwise reach
+    for it in every protein-heavy meal slot.
+    """
+    basics = seed_basics(db)
+    cats = basics["categories"]
+    g = basics["unit_g"]
+    pc = basics["unit_piece"]
+
+    foods = {}
+    foods["basmati-rice"] = create_food(db, slug="basmati-rice", name="Basmati Rice",
+        category=cats["grains"], calories=130, protein_g=2.7, carbs_g=28, fat_g=0.3, unit=g)
+    foods["roti"] = create_food(db, slug="roti", name="Roti", category=cats["breads"],
+        calories=105, protein_g=3.0, carbs_g=18, fat_g=2.5, serving_size=40, unit=g)
+    foods["chicken-curry"] = create_food(db, slug="chicken-curry", name="Chicken Curry",
+        category=cats["meats"], calories=180, protein_g=25, carbs_g=3, fat_g=8, unit=g)
+    foods["mutton-karahi"] = create_food(db, slug="mutton-karahi", name="Mutton Karahi",
+        category=cats["meats"], calories=250, protein_g=20, carbs_g=5, fat_g=16, unit=g)
+    foods["moong-dal"] = create_food(db, slug="moong-dal", name="Moong Dal",
+        category=cats["legumes"], calories=104, protein_g=7.0, carbs_g=18, fat_g=0.4, unit=g)
+    foods["masoor-dal"] = create_food(db, slug="masoor-dal", name="Masoor Dal",
+        category=cats["legumes"], calories=116, protein_g=9.0, carbs_g=20, fat_g=0.4, unit=g)
+    foods["yogurt"] = create_food(db, slug="yogurt", name="Plain Yogurt",
+        category=cats["dairy"], calories=60, protein_g=3.5, carbs_g=5, fat_g=3, unit=g)
+    foods["paneer"] = create_food(db, slug="paneer", name="Paneer",
+        category=cats["dairy"], calories=265, protein_g=18, carbs_g=4, fat_g=21, unit=g)
+    foods["palak-paneer"] = create_food(db, slug="palak-paneer", name="Palak Paneer",
+        category=cats["vegetables"], calories=140, protein_g=8, carbs_g=6, fat_g=9, unit=g)
+    foods["aloo-gobi"] = create_food(db, slug="aloo-gobi", name="Aloo Gobi",
+        category=cats["vegetables"], calories=110, protein_g=3.0, carbs_g=15, fat_g=4.5, unit=g)
+    foods["banana"] = create_food(db, slug="banana", name="Banana",
+        category=cats["fruits"], calories=89, protein_g=1.1, carbs_g=23, fat_g=0.3, unit=g)
+    foods["almonds"] = create_food(db, slug="almonds", name="Almonds",
+        category=cats["nuts-seeds"], calories=579, protein_g=21, carbs_g=22, fat_g=50,
+        serving_size=28, unit=g)
+    foods["boiled-egg"] = create_food(db, slug="boiled-egg", name="Boiled Egg",
+        category=cats["eggs"], calories=155, protein_g=13, carbs_g=1.1, fat_g=11,
+        serving_size=50, unit=pc)
+
+    # ── Offenders (verified + active, but must never be standalone meals) ──
+    foods["beef-liver"] = create_food(db, slug="beef-liver", name="Beef liver (cooked)",
+        category=cats["meats"], calories=135, protein_g=20.4, carbs_g=4, fat_g=3.6, unit=g)
+    foods["chicken-liver"] = create_food(db, slug="chicken-liver", name="Chicken liver (cooked)",
+        category=cats["meats"], calories=116, protein_g=16.9, carbs_g=0.9, fat_g=4.8, unit=g)
+    foods["white-bread"] = create_food(db, slug="white-bread", name="Bread (white)",
+        category=cats["grains"], calories=265, protein_g=9, carbs_g=49, fat_g=3.2, unit=g)
+
+    db.commit()
+    return {"foods": foods, "basics": basics}
+
+
+class TestMealSuitabilityExclusions:
+    """Organ meats and plain white bread must never appear in generated meals."""
+
+    OFFENDER_SLUGS: ClassVar[set[str]] = {"beef-liver", "chicken-liver", "white-bread"}
+
+    def test_offenders_excluded_from_candidate_pool(self):
+        """Even for an omnivore, liver and white bread never reach the
+        optimizer's candidate pool (they stay in the Food Library only)."""
+        reset_db()
+        db = db_session.SessionLocal()
+        seed_suitability_dataset(db)
+
+        ctx = FilterContext(diet_pattern=DietPattern.OMNIVORE)
+        candidates = get_candidate_foods(db, ctx)
+        slugs = {c.slug for c in candidates}
+
+        assert not (slugs & self.OFFENDER_SLUGS), (
+            f"Offenders leaked into the candidate pool: {slugs & self.OFFENDER_SLUGS}"
+        )
+        # The whole foods remain available.
+        assert {"chicken-curry", "basmati-rice", "moong-dal"} <= slugs
+        db.close()
+
+    def test_offenders_never_selected_across_plan_days(self):
+        """A generated plan must never contain liver or white bread on any day."""
+        reset_db()
+        db = db_session.SessionLocal()
+        seed_suitability_dataset(db)
+        user = create_user_with_profile(db)
+
+        result = generate_meal_plan(db, user_id=user.id, plan_days=7)
+        assert result.success
+        assert len(result.plan.days) == 7
+
+        for day_index, day_slugs in enumerate(plan_slugs(result.plan)):
+            assert not (day_slugs & self.OFFENDER_SLUGS), (
+                f"Day {day_index} contains unsuitable meal food(s) "
+                f"{day_slugs & self.OFFENDER_SLUGS}"
+            )
+        db.close()
+
+    def test_exclusion_still_yields_full_plan(self):
+        """Excluding offenders must not starve the generated plan."""
+        reset_db()
+        db = db_session.SessionLocal()
+        seed_suitability_dataset(db)
+        user = create_user_with_profile(db)
+
+        result = generate_meal_plan(db, user_id=user.id, plan_days=7)
+        assert result.success
+        for day in result.plan.days:
+            assert day.total_calories > 0
+            assert len(day.meals) == 4
         db.close()

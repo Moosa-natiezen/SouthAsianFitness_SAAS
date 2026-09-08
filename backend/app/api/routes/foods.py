@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
+from app.core.logging import get_logger
 from app.schemas.food import (
     CategoryOut,
     FoodListResponse,
@@ -20,6 +22,8 @@ from app.services.food_service import (
 )
 
 router = APIRouter(prefix="/foods", tags=["foods"])
+
+logger = get_logger(__name__)
 
 
 def _serialize_food(f) -> dict:
@@ -54,6 +58,12 @@ def _serialize_food(f) -> dict:
     }
 
 
+# Registered with BOTH slash variants so clients hitting "/api/foods" or
+# "/api/foods/" get a direct 200. A single "/" route makes FastAPI emit a
+# 307 redirect for the no-slash form, which breaks when the request arrives
+# through the Vercel proxy (the redirect Location is built from the upstream
+# host, causing a second cross-origin hop that can 500).
+@router.get("", response_model=FoodListResponse)
 @router.get("/", response_model=FoodListResponse)
 def list_foods(
     q: str | None = Query(None, max_length=120),
@@ -80,7 +90,18 @@ def list_foods(
         limit=limit,
         offset=offset,
     )
-    items, total = search_foods(db, req)
+    try:
+        items, total = search_foods(db, req)
+    except SQLAlchemyError as exc:
+        logger.exception("Food list query failed")
+        db.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "The food database is temporarily unavailable. "
+                "Please try again in a moment."
+            ),
+        ) from exc
 
     return FoodListResponse(
         items=[_serialize_food(i) for i in items], total=total, limit=limit, offset=offset
@@ -90,7 +111,18 @@ def list_foods(
 @router.get("/categories", response_model=list[CategoryOut])
 def list_categories(db: Session = Depends(get_db)):
     """Return all food categories sorted alphabetically by name."""
-    categories = get_food_categories(db)
+    try:
+        categories = get_food_categories(db)
+    except SQLAlchemyError as exc:
+        logger.exception("Food categories query failed")
+        db.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "The food database is temporarily unavailable. "
+                "Please try again in a moment."
+            ),
+        ) from exc
     return [
         CategoryOut(id=str(c.id), name=c.name, slug=c.slug)
         for c in categories

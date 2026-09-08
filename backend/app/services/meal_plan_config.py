@@ -125,6 +125,35 @@ class PantryExclusions:
 PANTY_EXCLUSIONS = PantryExclusions()
 
 
+# ── Meal-suitability food exclusions ─────────────────────────────────────────
+# A small set of foods that are legitimate database entries (and remain
+# searchable in the Food Library) but must NEVER be composed into a generated
+# meal. The deterministic engine picks purely by macro fit, so raw organ meats
+# (beef/chicken liver — extremely protein-dense per calorie) would otherwise be
+# selected for every protein-heavy meal slot, and plain white bread would slot
+# in as a generic carb filler. Both violate the product's cultural-authenticity
+# guardrails ("no plain white bread, no raw organ meats like beef liver").
+# Name keywords act as a defensive net for datasets with different slugs.
+
+
+@dataclass(frozen=True)
+class MealFoodExclusions:
+    """Foods that may never be selected as standalone generated meals."""
+
+    excluded_slugs: frozenset[str] = frozenset({
+        # Real dataset slugs
+        "beef-liver", "chicken-liver", "white-bread",
+    })
+
+    # Defensive keyword net (matched against lowercase food names)
+    name_keywords: frozenset[str] = frozenset({
+        "liver", "offal",
+    })
+
+
+MEAL_FOOD_EXCLUSIONS = MealFoodExclusions()
+
+
 # ── Cross-day variety ────────────────────────────────────────────────────────
 
 

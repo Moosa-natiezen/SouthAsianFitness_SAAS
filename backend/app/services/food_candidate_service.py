@@ -24,7 +24,11 @@ from app.models.enums import (
 from app.models.food import Food
 from app.models.tags import DietaryTag
 from app.models.user import UserFoodPreference
-from app.services.meal_plan_config import DIET_EXCLUSIONS, PANTY_EXCLUSIONS
+from app.services.meal_plan_config import (
+    DIET_EXCLUSIONS,
+    MEAL_FOOD_EXCLUSIONS,
+    PANTY_EXCLUSIONS,
+)
 
 
 @dataclass
@@ -164,6 +168,12 @@ def get_candidate_foods(
         if cat_slug in PANTY_EXCLUSIONS.excluded_category_slugs:
             continue
 
+        # Meal-suitability exclusion: organ meats and plain white bread are
+        # fine in the Food Library for macro lookup but never as standalone
+        # generated meals (see MealFoodExclusions).
+        if _is_unsuitable_meal_food(food):
+            continue
+
         # Diet pattern exclusion
         if _violates_diet_pattern(food, ctx.diet_pattern):
             continue
@@ -206,6 +216,19 @@ def get_candidate_foods(
         )
 
     return candidates
+
+
+def _is_unsuitable_meal_food(food: Food) -> bool:
+    """Return True when a food must never be composed into a generated meal.
+
+    Applies an explicit slug blocklist (real dataset slugs) plus a defensive
+    keyword net on the food name, so organ meats and plain white bread are
+    excluded even if a dataset names them differently.
+    """
+    if food.slug in MEAL_FOOD_EXCLUSIONS.excluded_slugs:
+        return True
+    name = (food.name or "").lower()
+    return any(k in name for k in MEAL_FOOD_EXCLUSIONS.name_keywords)
 
 
 def _violates_diet_pattern(food: Food, pattern: DietPattern) -> bool:
