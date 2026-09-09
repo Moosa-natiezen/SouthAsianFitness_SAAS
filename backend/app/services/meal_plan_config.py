@@ -138,16 +138,43 @@ PANTY_EXCLUSIONS = PantryExclusions()
 
 @dataclass(frozen=True)
 class MealFoodExclusions:
-    """Foods that may never be selected as standalone generated meals."""
+    """Foods that may never be selected as standalone generated meals.
+
+    Raw commodities, baking/pantry items, and raw flours/grains are legitimate
+    database entries (useful for macro lookup in the Food Library) but must
+    NEVER occupy an entire meal slot. The deterministic engine picks purely by
+    macro fit, so protein-dense items like condensed milk or carb-dense raw
+    grains would otherwise be selected for every slot.
+    """
 
     excluded_slugs: frozenset[str] = frozenset({
-        # Real dataset slugs
-        "beef-liver", "chicken-liver", "white-bread",
+        # Organ meats
+        "beef-liver", "chicken-liver",
+        # Plain bread
+        "white-bread",
+        # Raw grains & flours (never standalone meals)
+        "whole-wheat-flour", "all-purpose-flour", "corn-flour",
+        "rice-flour", "chickpea-flour",
+        "sorghum", "finger-millet", "bajra-millet", "buckwheat",
+        "bulgur-wheat",
+        # Raw rice (cooked rice is fine as a component)
+        "white-rice", "brown-rice",
+        # Raw legumes (cooked dal/chana are fine)
+        "lima-beans", "black-beans",
+        # Dairy ingredients (not standalone meals)
+        "condensed-milk", "ghee", "butter", "unsalted-butter",
+        # Raw proteins
+        "egg-raw", "rohu-fish-raw",
+        # Sugar / baking
+        "sugar",
     })
 
     # Defensive keyword net (matched against lowercase food names)
     name_keywords: frozenset[str] = frozenset({
         "liver", "offal",
+        "condensed milk",
+        "raw flour", "raw grain", "raw millet",
+        "baking powder", "baking soda",
     })
 
 

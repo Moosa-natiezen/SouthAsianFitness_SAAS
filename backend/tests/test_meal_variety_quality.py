@@ -468,3 +468,140 @@ class TestMealSuitabilityExclusions:
             assert day.total_calories > 0
             assert len(day.meals) == 4
         db.close()
+
+
+# ── Raw commodity exclusion (condensed milk, sorghum, ragi, flours, etc.) ──
+
+
+def seed_raw_commodity_dataset(db: Session) -> dict:
+    """A realistic whole-food set plus raw commodities that must never be
+    selected as standalone meals: condensed milk, sorghum, finger millet,
+    raw flours, ghee, butter, sugar, etc.
+
+    Raw commodities are deliberately high in a single macro (protein or carbs)
+    so a macro-driven optimizer would otherwise reach for them.
+    """
+    basics = seed_basics(db)
+    cats = basics["categories"]
+    g = basics["unit_g"]
+    pc = basics["unit_piece"]
+
+    # Add a raw-grains category for the raw items
+    raw_cat = FoodCategory(name="Raw Grains", slug="raw-grains")
+    db.add(raw_cat)
+    db.flush()
+
+    foods = {}
+    # Whole foods (must remain available)
+    foods["basmati-rice"] = create_food(db, slug="basmati-rice", name="Basmati Rice",
+        category=cats["grains"], calories=130, protein_g=2.7, carbs_g=28, fat_g=0.3, unit=g)
+    foods["roti"] = create_food(db, slug="roti", name="Roti", category=cats["breads"],
+        calories=105, protein_g=3.0, carbs_g=18, fat_g=2.5, serving_size=40, unit=g)
+    foods["chicken-curry"] = create_food(db, slug="chicken-curry", name="Chicken Curry",
+        category=cats["meats"], calories=180, protein_g=25, carbs_g=3, fat_g=8, unit=g)
+    foods["moong-dal"] = create_food(db, slug="moong-dal", name="Moong Dal",
+        category=cats["legumes"], calories=104, protein_g=7.0, carbs_g=18, fat_g=0.4, unit=g)
+    foods["yogurt"] = create_food(db, slug="yogurt", name="Plain Yogurt",
+        category=cats["dairy"], calories=60, protein_g=3.5, carbs_g=5, fat_g=3, unit=g)
+    foods["paneer"] = create_food(db, slug="paneer", name="Paneer",
+        category=cats["dairy"], calories=265, protein_g=18, carbs_g=4, fat_g=21, unit=g)
+    foods["palak-paneer"] = create_food(db, slug="palak-paneer", name="Palak Paneer",
+        category=cats["vegetables"], calories=140, protein_g=8, carbs_g=6, fat_g=9, unit=g)
+    foods["aloo-gobi"] = create_food(db, slug="aloo-gobi", name="Aloo Gobi",
+        category=cats["vegetables"], calories=110, protein_g=3.0, carbs_g=15, fat_g=4.5, unit=g)
+    foods["banana"] = create_food(db, slug="banana", name="Banana",
+        category=cats["fruits"], calories=89, protein_g=1.1, carbs_g=23, fat_g=0.3, unit=g)
+    foods["almonds"] = create_food(db, slug="almonds", name="Almonds",
+        category=cats["nuts-seeds"], calories=579, protein_g=21, carbs_g=22, fat_g=50,
+        serving_size=28, unit=g)
+    foods["boiled-egg"] = create_food(db, slug="boiled-egg", name="Boiled Egg",
+        category=cats["eggs"], calories=155, protein_g=13, carbs_g=1.1, fat_g=11,
+        serving_size=50, unit=pc)
+
+    # ── Raw commodities (verified + active, but must never be standalone meals) ──
+    foods["condensed-milk"] = create_food(db, slug="condensed-milk",
+        name="Condensed milk (sweetened)", category=cats["dairy"],
+        calories=321, protein_g=7.9, carbs_g=54, fat_g=8.7, unit=g)
+    foods["sorghum"] = create_food(db, slug="sorghum", name="Sorghum (jowar)",
+        category=raw_cat, calories=329, protein_g=10.4, carbs_g=72, fat_g=3.1, unit=g)
+    foods["finger-millet"] = create_food(db, slug="finger-millet",
+        name="Finger millet (ragi)", category=raw_cat,
+        calories=336, protein_g=11, carbs_g=72, fat_g=1.3, unit=g)
+    foods["whole-wheat-flour"] = create_food(db, slug="whole-wheat-flour",
+        name="Whole wheat flour (atta)", category=raw_cat,
+        calories=340, protein_g=13.2, carbs_g=72, fat_g=2.5, unit=g)
+    foods["all-purpose-flour"] = create_food(db, slug="all-purpose-flour",
+        name="All-purpose flour (maida)", category=raw_cat,
+        calories=364, protein_g=10.3, carbs_g=76, fat_g=1.0, unit=g)
+    foods["ghee"] = create_food(db, slug="ghee", name="Ghee (clarified butter)",
+        category=cats["dairy"], calories=900, protein_g=0, carbs_g=0, fat_g=100, unit=g)
+    foods["butter"] = create_food(db, slug="butter", name="Butter (salted)",
+        category=cats["dairy"], calories=717, protein_g=0.9, carbs_g=0.1, fat_g=81, unit=g)
+    foods["sugar"] = create_food(db, slug="sugar", name="Sugar (granulated)",
+        category=cats["sweeteners"], calories=387, protein_g=0, carbs_g=100, fat_g=0, unit=g)
+    foods["white-rice"] = create_food(db, slug="white-rice",
+        name="White rice (long-grain, raw)", category=raw_cat,
+        calories=130, protein_g=2.7, carbs_g=28, fat_g=0.3, unit=g)
+
+    db.commit()
+    return {"foods": foods, "basics": basics}
+
+
+RAW_COMMODITY_SLUGS: ClassVar[set[str]] = {
+    "condensed-milk", "sorghum", "finger-millet",
+    "whole-wheat-flour", "all-purpose-flour",
+    "ghee", "butter", "sugar", "white-rice",
+}
+
+
+class TestRawCommodityExclusions:
+    """Raw commodities, baking items, and non-meal ingredients must never
+    appear as standalone generated meals."""
+
+    def test_raw_commodities_excluded_from_candidate_pool(self):
+        """Raw commodities never reach the optimizer's candidate pool."""
+        reset_db()
+        db = db_session.SessionLocal()
+        seed_raw_commodity_dataset(db)
+
+        ctx = FilterContext(diet_pattern=DietPattern.OMNIVORE)
+        candidates = get_candidate_foods(db, ctx)
+        slugs = {c.slug for c in candidates}
+
+        leaked = slugs & RAW_COMMODITY_SLUGS
+        assert not leaked, f"Raw commodities leaked into candidate pool: {leaked}"
+        # Whole foods remain available
+        assert {"chicken-curry", "basmati-rice", "moong-dal"} <= slugs
+        db.close()
+
+    def test_raw_commodities_never_selected_across_plan_days(self):
+        """A generated plan must never contain raw commodities on any day."""
+        reset_db()
+        db = db_session.SessionLocal()
+        seed_raw_commodity_dataset(db)
+        user = create_user_with_profile(db)
+
+        result = generate_meal_plan(db, user_id=user.id, plan_days=7)
+        assert result.success
+        assert len(result.plan.days) == 7
+
+        for day_index, day_slugs in enumerate(plan_slugs(result.plan)):
+            leaked = day_slugs & RAW_COMMODITY_SLUGS
+            assert not leaked, (
+                f"Day {day_index} contains raw commodity(s) {leaked} selected standalone"
+            )
+        db.close()
+
+    def test_exclusion_still_yields_full_plan(self):
+        """Excluding raw commodities must not starve the generated plan."""
+        reset_db()
+        db = db_session.SessionLocal()
+        seed_raw_commodity_dataset(db)
+        user = create_user_with_profile(db)
+
+        result = generate_meal_plan(db, user_id=user.id, plan_days=7)
+        assert result.success
+        for day in result.plan.days:
+            assert day.total_calories > 0
+            assert len(day.meals) == 4
+        db.close()
