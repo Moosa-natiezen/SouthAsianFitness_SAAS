@@ -33,7 +33,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const SITE_URL = "https://southasianfitness.com";
+// Canonical origin MUST match Vercel's primary domain (www redirects from
+// the apex). Mismatched URLs here make Google crawl apex URLs that 308-redirect
+// to www, which shows up in Search Console as "Page with redirect" and splits
+// canonical signals.
+const SITE_URL = "https://www.southasianfitness.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -87,9 +91,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  alternates: {
-    canonical: SITE_URL,
-  },
+  // NOTE: no root-level alternates.canonical — a canonical set here would be
+  // inherited by every page and point them all at the homepage. Pages that
+  // need a canonical tag should declare their own in their local metadata.
 };
 
 export default function RootLayout({

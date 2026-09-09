@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://southasianfitness.com";
+// Canonical origin MUST match Vercel's primary domain (www). Apex URLs
+// 308-redirect to www, and Google flags redirecting URLs as "Page with
+// redirect" in Search Console instead of indexing them directly.
+const BASE_URL = "https://www.southasianfitness.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
