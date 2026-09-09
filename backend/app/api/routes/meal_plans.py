@@ -125,6 +125,12 @@ def _build_plan_response(result) -> MealPlanResponse | MealPlanFailureResponse:
     )
 
 
+# Registered with BOTH slash variants so clients hitting "/api/meal-plans"
+# or "/api/meal-plans/" get a direct 200. A single "/" route makes FastAPI
+# emit a 307 redirect for the no-slash form, which breaks when the request
+# arrives through the Vercel proxy (the redirect Location is built from the
+# upstream host, causing a second cross-origin hop that can 500).
+@router.get("", response_model=MealPlanListResponse)
 @router.get("/", response_model=MealPlanListResponse)
 def list_plans(
     limit: int = Query(20, ge=1, le=100),
