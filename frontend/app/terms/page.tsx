@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "Terms of Service for South Asian Fitness. Read the terms governing your use of our platform.",
+  alternates: { canonical: "https://www.southasianfitness.com/terms" },
 };
 
 export default function TermsPage() {

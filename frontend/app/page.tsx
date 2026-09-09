@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { LandingPage } from "@/components/landing-page";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://www.southasianfitness.com" },
+};
 
 /* Below-fold sections: dynamically imported to reduce initial JS bundle */
 const LeadMagnetSection = dynamic(
