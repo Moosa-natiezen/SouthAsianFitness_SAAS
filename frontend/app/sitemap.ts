@@ -8,30 +8,15 @@ const BASE_URL = "https://www.southasianfitness.com";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
+  // Only crawlable, indexable public routes. /pricing is an on-page anchor
+  // of the homepage (no standalone route), and /auth/* is disallowed in
+  // robots.ts — neither belongs in a sitemap.
   return [
     {
       url: BASE_URL,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
-    },
-    {
-      url: `${BASE_URL}/pricing`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/auth/login`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/auth/signup`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
     },
     {
       url: `${BASE_URL}/privacy`,
