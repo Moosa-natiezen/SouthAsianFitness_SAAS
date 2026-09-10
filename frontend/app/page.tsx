@@ -26,6 +26,16 @@ const FAQSection = dynamic(
     import("@/components/sections/faq-section").then((m) => m.FAQSection),
 );
 
+const MobileStickyCTA = dynamic(
+  () => import("@/components/ui/mobile-sticky-cta").then((m) => m.MobileStickyCTA),
+  { ssr: false },
+);
+
+const BackToTop = dynamic(
+  () => import("@/components/ui/back-to-top").then((m) => m.BackToTop),
+  { ssr: false },
+);
+
 export default function Home() {
   return (
     <>
@@ -33,6 +43,8 @@ export default function Home() {
       <LeadMagnetSection />
       <TestimonialsSection />
       <FAQSection />
+      <MobileStickyCTA />
+      <BackToTop />
     </>
   );
 }

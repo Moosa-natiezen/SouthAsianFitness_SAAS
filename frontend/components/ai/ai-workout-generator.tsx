@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { Button } from "@/components/ui/button";
+import { WorkoutPlanSkeleton } from "@/components/ui/skeletons/workout-plan-skeleton";
 import { saveAiWorkout, type SaveWorkoutPlanPayload } from "@/lib/api";
 import { useWorkoutStream } from "@/hooks/use-workout-stream";
 
@@ -246,9 +247,7 @@ export function AiWorkoutGenerator() {
 
           {/* Content */}
           <div className="max-h-[600px] overflow-y-auto p-6">
-            {isStreaming && !hasContent && (
-              <p className="text-sm text-stone-500 dark:text-zinc-500">Generating your workout program...</p>
-            )}
+            {isStreaming && !hasContent && <WorkoutPlanSkeleton />}
             {hasContent && (
               <div className="prose prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>

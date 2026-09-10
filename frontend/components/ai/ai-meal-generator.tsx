@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
+import { MealPlanSkeleton } from "@/components/ui/skeletons/meal-plan-skeleton";
 import { useMealPlanStream } from "@/hooks/use-meal-plan-stream";
 import { saveAiMealPlan } from "@/lib/api";
 
@@ -197,15 +198,20 @@ export function AiMealGenerator() {
               </div>
             </div>
 
-            {/* Markdown content with streaming cursor */}
-            <div className={`prose prose-sm prose-invert prose-zinc max-w-none ${isStreaming ? "streaming-cursor" : ""}`}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
-              </ReactMarkdown>
-            </div>
+            {/* Skeleton while waiting for first content chunk */}
+            {isStreaming && !content && <MealPlanSkeleton />}
 
-            {/* Loading dots */}
-            {isStreaming && (
+            {/* Markdown content with streaming cursor */}
+            {content && (
+              <div className={`prose prose-sm prose-invert prose-zinc max-w-none ${isStreaming ? "streaming-cursor" : ""}`}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {content}
+                </ReactMarkdown>
+              </div>
+            )}
+
+            {/* Loading dots (shown once content starts arriving) */}
+            {isStreaming && content && (
               <div className="mt-4 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white dark:bg-zinc-900 [animation-delay:0ms]" />
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white dark:bg-zinc-900 [animation-delay:150ms]" />

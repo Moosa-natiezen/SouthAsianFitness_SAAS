@@ -7,30 +7,30 @@ import { useState } from "react";
 const faqs = [
   {
     question:
-      "How does the app customize workouts and diets for South Asian lifestyles?",
+      "Are the meal plans entirely South Asian?",
     answer:
-      "During onboarding, we collect your body stats (height, weight, age), activity level, fitness goals, dietary preferences, and cuisine type. Our TDEE engine uses the Mifflin-St Jeor equation to calculate your exact calorie and macro targets. The AI then generates meal plans using foods from our 215+ South Asian food library — so your plan includes foods like roti, daal, biryani, and karahi instead of generic Western meals.",
+      "Yes. We generate authentic, macro-balanced Desi dishes — Biryani, Parathas, Daal, Karahi, Tikka, and more. Every meal in your plan comes from our 215+ South Asian food library with accurate macros per serving. No generic Western substitutes, ever.",
+  },
+  {
+    question: "Do I need a gym membership?",
+    answer:
+      "No. Our AI workout generator customizes routines based on your available equipment — including full bodyweight-only programs. Whether you have a full gym, just dumbbells, or nothing at all, the plan adapts to what you have.",
   },
   {
     question:
-      "Can I track traditional foods like roti, biryani, and curries?",
+      "Are vegetarian/vegan options available?",
     answer:
-      "Absolutely. We have a searchable food library of 215+ pre-loaded South Asian dishes — including roti, paratha, biryani, butter chicken, daal chawal, paneer tikka, gulab jamun, and many more. Every dish includes accurate macros per standard serving. You can search by name, filter by category (curries, rice, breads, sweets), and log them directly to your daily meal plan.",
-  },
-  {
-    question: "How does the subscription and billing work?",
-    answer:
-      "South Asian Fitness is free to start. The Free tier includes 3 AI meal plans per month, full access to the food library, and progress tracking. Pro ($9/month) unlocks unlimited AI meal plans, the AI workout generator, saved plans archive, and priority support. Billing is handled securely through Lemon Squeezy — we never see or store your payment information.",
+      "Absolutely. We include extensive plant-based proteins like Paneer, Lentils (Masoor, Moong, Chana), Tofu, and Chana Masala. During onboarding you can set dietary preferences and the AI will tailor every meal around them.",
   },
   {
     question: "Can I cancel my subscription anytime?",
     answer:
-      "Yes, you can cancel your Pro subscription at any time from your account settings. Your access continues until the end of your current billing period. There are no cancellation fees and no questions asked. If you cancel, you'll be downgraded to the Free tier with all your data preserved.",
+      "Yes, you can cancel your Pro subscription at any time from your account settings. Your access continues until the end of your current billing period. No cancellation fees, no questions asked.",
   },
   {
     question: "Is my health data private and secure?",
     answer:
-      "Yes. Your profile and health data are stored securely with industry-standard encryption (bcrypt password hashing, HttpOnly session cookies, CSRF protection, TLS in transit). We never sell, share, or monetize your personal data. You can delete your account and all associated data at any time from the Settings page.",
+      "Yes. Your data is stored with industry-standard encryption (bcrypt hashing, HttpOnly session cookies, CSRF protection, TLS in transit). We never sell or share your personal data. You can delete your account and all data at any time.",
   },
 ];
 
