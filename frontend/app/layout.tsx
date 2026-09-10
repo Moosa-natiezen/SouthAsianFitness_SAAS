@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { CookieBanner } from "@/components/ui/cookie-banner";
 import { LenisProvider } from "@/components/lenis-provider";
 // TEMPORARILY DISABLED — PostHog analytics paused (see provider POSTHOG_ENABLED flag).
 // import { PostHogProvider } from "@/components/providers/posthog-provider";
@@ -129,6 +130,7 @@ export default function RootLayout({
               </div>
             </div>
             </LenisProvider>
+            <CookieBanner />
           </ThemeProvider>
           {/* </PostHogProvider> — TEMPORARILY DISABLED */}
         <GoogleAnalytics gaId="G-XJ76SYV2L2" />
