@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import require_auth, require_csrf
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.core.rate_limit import login_rate_limiter
 from app.core.security import generate_token
 from app.db.session import get_db
 from app.models.user import User
@@ -84,6 +85,14 @@ def login(
     response: Response,
     db: Annotated[Session, Depends(get_db)],
 ):
+    # ── Rate limit: 10 attempts per 5 min per IP ────────────────────
+    client_ip = request.client.host if request.client else "unknown"
+    if not login_rate_limiter.allow(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many login attempts. Please try again later.",
+        )
+
     user, token = login_user(db, payload.email, payload.password, request)
     response.set_cookie(
         key=settings.session_cookie_name,
