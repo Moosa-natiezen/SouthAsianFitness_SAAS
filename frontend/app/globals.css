@@ -457,3 +457,36 @@ html.transitioning *::after {
   transition-duration: 0.3s !important;
   transition-timing-function: ease !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PRINT STYLES
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Override dark-mode prose vars for print */
+  .prose {
+    --tw-prose-body: #1C1917 !important;
+    --tw-prose-headings: #1C1917 !important;
+    --tw-prose-bold: #1C1917 !important;
+    --tw-prose-links: #059669 !important;
+    --tw-prose-bullets: #57534E !important;
+  }
+
+  /* Ensure glass cards print with white bg */
+  .glass {
+    background: white !important;
+    border: 1px solid #e5e5e5 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Hide everything marked print:hidden via Tailwind */
+  .print\:hidden {
+    display: none !important;
+  }
+}

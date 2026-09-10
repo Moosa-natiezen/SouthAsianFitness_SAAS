@@ -246,10 +246,10 @@ export function AiWorkoutGenerator() {
           </div>
 
           {/* Content */}
-          <div className="max-h-[600px] overflow-y-auto p-6">
+          <div className="max-h-[600px] overflow-y-auto p-6 print:max-h-none print:overflow-visible">
             {isStreaming && !hasContent && <WorkoutPlanSkeleton />}
             {hasContent && (
-              <div className="prose prose-invert max-w-none">
+              <div className="prose prose-invert max-w-none print:w-full print:text-black print:bg-white">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {content}
                 </ReactMarkdown>
@@ -259,7 +259,7 @@ export function AiWorkoutGenerator() {
 
           {/* Action toolbar */}
           {hasContent && !isStreaming && (
-            <div className="flex items-center gap-3 border-t border-stone-200 dark:border-zinc-700 px-5 py-3">
+            <div className="flex items-center gap-3 border-t border-stone-200 dark:border-zinc-700 px-5 py-3 print:hidden">
               <Button
                 onClick={handleSave}
                 disabled={saving}
@@ -267,6 +267,9 @@ export function AiWorkoutGenerator() {
                 className="btn-chrome-accent"
               >
                 {saving ? "Saving..." : "Save to Archive"}
+              </Button>
+              <Button onClick={() => window.print()} variant="outline" size="sm" className="border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800">
+                Print Plan
               </Button>
               <Button onClick={handleCopy} variant="outline" size="sm" className="border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800">
                 Copy Markdown

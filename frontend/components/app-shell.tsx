@@ -105,7 +105,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
-      <header className="sticky top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-stone-200/50 dark:bg-zinc-900/80 dark:border-zinc-800/50">
+      <header className="sticky top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-stone-200/50 dark:bg-zinc-900/80 dark:border-zinc-800/50 print:hidden">
         <div className="flex items-center justify-between px-5 py-3 md:px-6">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-[10px] font-bold text-white shadow-sm shadow-emerald-600/20 dark:bg-emerald-500 dark:shadow-emerald-500/20">
@@ -150,7 +150,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* ── Bottom Nav (mobile) / Side Nav (desktop) ──────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-stone-200/50 dark:bg-zinc-900/80 dark:border-zinc-800/50 md:bottom-auto md:top-[52px] md:left-0 md:right-auto md:h-[calc(100vh-52px)] md:w-[200px] md:border-t-0 md:border-r md:border-stone-200/50 dark:md:border-zinc-800/50">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-stone-200/50 dark:bg-zinc-900/80 dark:border-zinc-800/50 md:bottom-auto md:top-[52px] md:left-0 md:right-auto md:h-[calc(100vh-52px)] md:w-[200px] md:border-t-0 md:border-r md:border-stone-200/50 dark:md:border-zinc-800/50 print:hidden">
         <div className="flex items-center justify-around gap-1 px-2 py-2 md:flex-col md:items-stretch md:gap-0.5 md:px-3 md:pt-4">
           {navItems.map((item) => {
             const isActive =

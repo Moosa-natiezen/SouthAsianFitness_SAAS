@@ -7,7 +7,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen overflow-hidden bg-background">
       {/* ── Nav ──────────────────────────────────────────────────────── */}
-      <header className="fixed inset-x-0 top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-stone-200 dark:border-zinc-700/50">
+      <header className="fixed inset-x-0 top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-stone-200 dark:border-zinc-700/50 print:hidden">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-xs font-bold text-stone-900 dark:text-zinc-100 shadow-sm shadow-emerald-600/20">
@@ -640,7 +640,7 @@ export function LandingPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
-      <footer className="bg-zinc-900 dark:bg-zinc-950 border-t border-stone-200 dark:border-zinc-700 py-8">
+      <footer className="bg-zinc-900 dark:bg-zinc-950 border-t border-stone-200 dark:border-zinc-700 py-8 print:hidden">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 text-sm text-stone-500 dark:text-zinc-500 md:flex-row md:items-center md:justify-between">
           <p>&copy; 2026 South Asian Fitness.</p>
           <div className="flex gap-6">

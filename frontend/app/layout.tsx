@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { CookieBanner } from "@/components/ui/cookie-banner";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { LenisProvider } from "@/components/lenis-provider";
 // TEMPORARILY DISABLED — PostHog analytics paused (see provider POSTHOG_ENABLED flag).
 // import { PostHogProvider } from "@/components/providers/posthog-provider";
@@ -123,6 +124,7 @@ export default function RootLayout({
             >
               Skip to content
             </a>
+            <ScrollProgress />
             <LenisProvider>
               <div id="main-content" className="flex-1 flex flex-col relative">
                 <div className="relative z-10">

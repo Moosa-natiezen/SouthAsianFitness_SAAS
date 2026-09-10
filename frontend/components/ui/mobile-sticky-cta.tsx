@@ -8,7 +8,7 @@ import Link from "next/link";
  */
 export function MobileStickyCTA() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden print:hidden">
       <div className="mx-auto max-w-lg px-4 pb-4">
         <Link
           href="/auth/signup"
