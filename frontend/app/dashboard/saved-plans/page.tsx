@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   deleteSavedAiMealPlan,
@@ -22,6 +23,7 @@ export default function SavedPlansPage() {
 
   const [selectedPlan, setSelectedPlan] = useState<SavedMealPlanItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteMsg, setDeleteMsg] = useState<{ type: "info" | "error"; text: string } | null>(null);
 
   const fetchPlans = () => {
@@ -115,7 +117,7 @@ export default function SavedPlansPage() {
               key={plan.id}
               plan={plan}
               onSelect={setSelectedPlan}
-              onDelete={handleDelete}
+              onDelete={setDeleteConfirmId}
               deleting={deleteId === plan.id}
             />
           ))}
@@ -126,6 +128,22 @@ export default function SavedPlansPage() {
       {selectedPlan && (
         <PlanModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
       )}
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleteConfirmId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmId(null);
+        }}
+        onConfirm={() => {
+          if (deleteConfirmId) handleDelete(deleteConfirmId);
+          setDeleteConfirmId(null);
+        }}
+        title="Delete this saved plan?"
+        description="This permanently removes the plan from your archive. This can't be undone."
+        confirmLabel="Delete plan"
+        confirming={deleteId !== null}
+      />
     </div>
   );
 }

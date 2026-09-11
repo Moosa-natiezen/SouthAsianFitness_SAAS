@@ -13,6 +13,7 @@ import {
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   createProgressEntry,
@@ -57,6 +58,7 @@ export default function ProgressPage() {
     text: string;
   } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const loadSummary = () => {
     getProgressSummary()
@@ -152,8 +154,24 @@ export default function ProgressPage() {
       {/* History */}
       <HistorySection
         state={history}
-        onDelete={handleDelete}
+        onDelete={setDeleteConfirmId}
         deletingId={deletingId}
+      />
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleteConfirmId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmId(null);
+        }}
+        onConfirm={() => {
+          if (deleteConfirmId) handleDelete(deleteConfirmId);
+          setDeleteConfirmId(null);
+        }}
+        title="Delete this entry?"
+        description="This permanently removes the progress entry. This can't be undone."
+        confirmLabel="Delete entry"
+        confirming={deletingId !== null}
       />
     </div>
   );

@@ -54,7 +54,12 @@ def register(
     response: Response,
     db: Annotated[Session, Depends(get_db)],
 ):
-    user = register_user(db, payload.email, payload.password, payload.display_name)
+    utm_params = {
+        "utm_source": payload.utm_source,
+        "utm_medium": payload.utm_medium,
+        "utm_campaign": payload.utm_campaign,
+    }
+    user = register_user(db, payload.email, payload.password, payload.display_name, utm_params)
     token = create_session_for_user(db, user, request)
     response.set_cookie(
         key=settings.session_cookie_name,

@@ -24,6 +24,7 @@ declare global {
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getStoredUtms, trackSignupIntent } from "@/lib/utm";
 
 const initialState = {
   displayName: "",
@@ -50,6 +51,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   // Refs to track timeouts so we can clean them up
   const googleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const promptTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Honeypot field (signup only). Left uncontrolled on purpose: the value is
+  // only read at submit time from the DOM, so any bot that fills the field
+  // programmatically is caught without triggering React re-renders.
+  const honeypotRef = useRef<HTMLInputElement | null>(null);
 
   const isSignup = mode === "signup";
 
@@ -86,6 +92,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       return;
     }
 
+    // ── Bot protection: the honeypot is visually hidden, so only bots fill it.
+    // Abort silently and fake a successful signup (redirect like a real
+    // submission) without ever hitting the backend.
+    if (isSignup && honeypotRef.current?.value) {
+      console.warn("[auth] Honeypot field populated — signup request suppressed.");
+      router.push("/onboarding");
+      router.refresh();
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -93,10 +109,15 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       const { loginUser, registerUser } = await import("@/lib/api");
 
       if (isSignup) {
+        // Attach marketing attribution captured on landing, and fire a
+        // GA event so signups can be analyzed even without the DB columns.
+        const utmParams = getStoredUtms();
+        trackSignupIntent();
         await registerUser({
           email: form.email.trim(),
           password: form.password,
           display_name: form.displayName.trim(),
+          ...utmParams,
         });
       } else {
         await loginUser({
@@ -289,6 +310,20 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {isSignup ? (
+              // ── Honeypot: hidden from humans, irresistible to bots ──
+              <input
+                ref={honeypotRef}
+                type="text"
+                id="phone_number_extra"
+                name="phone_number_extra"
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
+            ) : null}
+
             {isSignup ? (
               <div className="space-y-2">
                 <label htmlFor="displayName" className="text-sm font-medium text-stone-500 dark:text-zinc-400">

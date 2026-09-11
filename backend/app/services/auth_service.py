@@ -53,7 +53,13 @@ def ensure_dietary_tag(db: Session, slug: str, name: str, kind: DietaryTagKind) 
     return tag
 
 
-def register_user(db: Session, email: str, password: str, display_name: str) -> User:
+def register_user(
+    db: Session,
+    email: str,
+    password: str,
+    display_name: str,
+    utm_params: dict[str, str | None] | None = None,
+) -> User:
     normalized_email = normalize_email(email)
     existing = db.query(User).filter(User.email == normalized_email).first()
     if existing:
@@ -75,6 +81,7 @@ def register_user(db: Session, email: str, password: str, display_name: str) -> 
         password_changed_at=datetime.now(UTC),
         is_onboarded=False,
         is_active=True,
+        **(utm_params or {}),
     )
     db.add(user)
     db.flush()

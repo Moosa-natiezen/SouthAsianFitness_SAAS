@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Breadcrumbs } from "@/components/dashboard/breadcrumbs";
 import { getCurrentUser, logoutUser, type AuthUser } from "@/lib/api";
 import { setUserState } from "@/lib/user-state";
 
@@ -80,6 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   useEffect(() => {
     getCurrentUser()
@@ -132,7 +135,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
               </div>
               <button
-                onClick={handleLogout}
+                onClick={() => setLogoutConfirmOpen(true)}
                 className="text-xs text-stone-400 hover:text-stone-700 transition-colors duration-300 dark:text-zinc-500 dark:hover:text-zinc-300"
               >
                 Log out
@@ -146,7 +149,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* On desktop the side nav is a fixed 200px rail on the left, so the
           main column needs an equal left offset to avoid overlap. */}
       <main className="pt-[52px] pb-24 md:ml-[200px] md:pb-8">
-        <div className="mx-auto max-w-5xl px-5 py-6 md:px-8">{children}</div>
+        <div className="mx-auto max-w-5xl px-5 pt-4 pb-6 md:px-8">
+          <Breadcrumbs className="mb-4" />
+          {children}
+        </div>
       </main>
 
       {/* ── Bottom Nav (mobile) / Side Nav (desktop) ──────────────── */}
@@ -177,6 +183,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+
+      {/* Log out confirmation */}
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onOpenChange={setLogoutConfirmOpen}
+        onConfirm={handleLogout}
+        title="Log out?"
+        description="You'll need to sign in again to access your dashboard."
+        confirmLabel="Log out"
+      />
     </div>
   );
 }

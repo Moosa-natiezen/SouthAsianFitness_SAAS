@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -50,6 +51,8 @@ export default function MealPlansPage() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [regenerateConfirmOpen, setRegenerateConfirmOpen] = useState(false);
   const [deleteMsg, setDeleteMsg] = useState<{
     type: "info" | "error";
     text: string;
@@ -242,8 +245,24 @@ export default function MealPlansPage() {
           </div>
         </div>
 
+        {/* Regenerating replaces the current plan, so confirm first. */}
+        {state.status === "ready" && regenerateConfirmOpen ? (
+          <ConfirmDialog
+            open
+            onOpenChange={setRegenerateConfirmOpen}
+            onConfirm={handleGenerate}
+            title="Regenerate your plan?"
+            description="Your current plan will be replaced with a newly generated one."
+            confirmLabel="Regenerate"
+          />
+        ) : null}
+
         <Button
-          onClick={handleGenerate}
+          onClick={
+            state.status === "ready"
+              ? () => setRegenerateConfirmOpen(true)
+              : handleGenerate
+          }
           disabled={state.status === "loading"}
           className="mt-6"
           size="lg"
@@ -344,6 +363,22 @@ export default function MealPlansPage() {
         <AlertBanner variant={deleteMsg.type} message={deleteMsg.text} />
       )}
 
+      {/* Delete confirmation for plan history */}
+      <ConfirmDialog
+        open={deleteConfirmId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmId(null);
+        }}
+        onConfirm={() => {
+          if (deleteConfirmId) handleDelete(deleteConfirmId);
+          setDeleteConfirmId(null);
+        }}
+        title="Delete this meal plan?"
+        description="This permanently removes the plan and its meals. This can't be undone."
+        confirmLabel="Delete plan"
+        confirming={deleteId !== null}
+      />
+
       {/* ── Plan History ──────────────────────────────────────────── */}
       <div className="rounded-2xl glass p-6">
         <h2 className="text-lg font-semibold text-stone-900 dark:text-zinc-100">
@@ -376,7 +411,7 @@ export default function MealPlansPage() {
               <PlanHistoryCard
                 key={plan.id}
                 plan={plan}
-                onDelete={handleDelete}
+                onConfirmDelete={setDeleteConfirmId}
                 deleting={deleteId === plan.id}
               />
             ))}
@@ -391,11 +426,11 @@ export default function MealPlansPage() {
 
 function PlanHistoryCard({
   plan,
-  onDelete,
+  onConfirmDelete,
   deleting,
 }: {
   plan: MealPlanSummary;
-  onDelete: (id: string) => void;
+  onConfirmDelete: (id: string) => void;
   deleting: boolean;
 }) {
   const createdDate = formatDate(plan.created_at);
@@ -426,7 +461,7 @@ function PlanHistoryCard({
         <Button
           variant="destructive"
           size="sm"
-          onClick={() => onDelete(plan.id)}
+          onClick={() => onConfirmDelete(plan.id)}
           disabled={deleting}
         >
           {deleting ? "..." : "Delete"}

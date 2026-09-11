@@ -91,6 +91,11 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_onboarded: Mapped[bool] = mapped_column(nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
+    # ── Marketing attribution (UTM) ──────────────────────────────────
+    utm_source: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    utm_medium: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    utm_campaign: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
     # ── Google OAuth ─────────────────────────────────────────────────
     google_id: Mapped[str | None] = mapped_column(
         String(255), nullable=True, unique=True, index=True

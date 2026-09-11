@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AiWorkoutGenerator } from "@/components/ai/ai-workout-generator";
 import {
@@ -36,6 +37,7 @@ export default function WorkoutsPage() {
   const [archiveLoading, setArchiveLoading] = useState(true);
   const [archiveError, setArchiveError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [viewing, setViewing] = useState<SavedWorkoutPlanItem | null>(null);
 
   const fetchArchive = () => {
@@ -182,7 +184,7 @@ export default function WorkoutsPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setDeleteConfirmId(item.id)}
                       disabled={deleteId === item.id}
                     >
                       {deleteId === item.id ? "..." : "Delete"}
@@ -194,6 +196,22 @@ export default function WorkoutsPage() {
           )}
         </div>
       )}
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleteConfirmId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmId(null);
+        }}
+        onConfirm={() => {
+          if (deleteConfirmId) handleDelete(deleteConfirmId);
+          setDeleteConfirmId(null);
+        }}
+        title="Delete this workout?"
+        description="This permanently removes the workout from your archive. This can't be undone."
+        confirmLabel="Delete workout"
+        confirming={deleteId !== null}
+      />
 
       {/* Workout Viewer Modal */}
       {viewing && (

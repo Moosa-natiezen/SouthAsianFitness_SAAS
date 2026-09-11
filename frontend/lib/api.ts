@@ -191,6 +191,10 @@ export type RegisterRequest = {
   email: string;
   password: string;
   display_name: string;
+  /** Marketing attribution captured client-side (optional, best-effort). */
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
 };
 
 export type OnboardingRequest = {
