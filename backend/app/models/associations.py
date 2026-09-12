@@ -16,6 +16,7 @@ food_regions = Table(
         Uuid(as_uuid=True),
         ForeignKey("regions.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
 
@@ -33,6 +34,7 @@ food_cuisine_tags = Table(
         Uuid(as_uuid=True),
         ForeignKey("cuisine_tags.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
 
@@ -50,6 +52,7 @@ food_dietary_tags = Table(
         Uuid(as_uuid=True),
         ForeignKey("dietary_tags.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
 
@@ -67,6 +70,7 @@ user_profile_dietary_tags = Table(
         Uuid(as_uuid=True),
         ForeignKey("dietary_tags.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
 
@@ -84,6 +88,7 @@ user_preference_dietary_tags = Table(
         Uuid(as_uuid=True),
         ForeignKey("dietary_tags.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
 
@@ -101,6 +106,7 @@ user_preference_cuisine_tags = Table(
         Uuid(as_uuid=True),
         ForeignKey("cuisine_tags.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
 
@@ -118,5 +124,6 @@ user_preference_regions = Table(
         Uuid(as_uuid=True),
         ForeignKey("regions.id", ondelete="CASCADE"),
         primary_key=True,
+        index=True,
     ),
 )
