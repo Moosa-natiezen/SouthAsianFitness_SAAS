@@ -26,14 +26,16 @@ const FAQSection = dynamic(
     import("@/components/sections/faq-section").then((m) => m.FAQSection),
 );
 
+/* Note: no `ssr: false` here — that option is not allowed with `next/dynamic`
+ * in Server Components (Next 15). Both components are client components that
+ * guard their browser-only APIs (window / scroll listeners) inside effects,
+ * so server-rendering them is safe and keeps the dynamic code-splitting. */
 const MobileStickyCTA = dynamic(
   () => import("@/components/ui/mobile-sticky-cta").then((m) => m.MobileStickyCTA),
-  { ssr: false },
 );
 
 const BackToTop = dynamic(
   () => import("@/components/ui/back-to-top").then((m) => m.BackToTop),
-  { ssr: false },
 );
 
 export default function Home() {

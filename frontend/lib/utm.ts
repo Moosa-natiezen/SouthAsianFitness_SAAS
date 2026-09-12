@@ -27,6 +27,35 @@ function sanitize(raw: UtmParams): UtmParams {
 }
 
 /**
+ * SSR-safe storage helpers.
+ *
+ * Every read/write goes through these so no browser-only API can execute
+ * during the server render pass: the `typeof window` check makes them
+ * no-ops on the server, and the try/catch tolerates private-mode quota
+ * errors and browsers that throw on storage *access* itself.
+ */
+function safeSetItem(key: string, value: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    // sessionStorage scopes attribution to this browsing session;
+    // localStorage mirrors it so returning visits keep the first touch.
+    window.sessionStorage.setItem(key, value);
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Storage unavailable (private mode / blocked cookies) — non-fatal.
+  }
+}
+
+function safeGetItem(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(key) ?? window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Reads UTM parameters from a query string and persists them.
  * Safe to call on every route change — only writes storage when
  * parameters are actually present. Returns the captured params (if any).
@@ -47,14 +76,7 @@ export function captureUtms(search: string = ""): UtmParams {
   const clean = sanitize(found);
   if (Object.keys(clean).length === 0) return {};
 
-  try {
-    // sessionStorage scopes attribution to this browsing session;
-    // localStorage mirrors it so returning visits keep the first touch.
-    sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(clean));
-    localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(clean));
-  } catch {
-    // Storage can be unavailable (private mode / blocked cookies) — non-fatal.
-  }
+  safeSetItem(UTM_STORAGE_KEY, JSON.stringify(clean));
   return clean;
 }
 
@@ -64,17 +86,15 @@ export function captureUtms(search: string = ""): UtmParams {
  * localStorage for the original first-touch attribution.
  */
 export function getStoredUtms(): UtmParams {
-  if (typeof window === "undefined") return {};
+  const raw = safeGetItem(UTM_STORAGE_KEY);
+  if (!raw) return {};
 
-  for (const store of [sessionStorage, localStorage]) {
-    try {
-      const raw = store.getItem(UTM_STORAGE_KEY);
-      if (!raw) continue;
-      const clean = sanitize(JSON.parse(raw) as UtmParams);
-      if (Object.keys(clean).length > 0) return clean;
-    } catch {
-      // Corrupt entry — fall through to the next store.
-    }
+  try {
+    const clean = sanitize(JSON.parse(raw) as UtmParams);
+    if (Object.keys(clean).length > 0) return clean;
+  } catch {
+    // Corrupt entry — treat as absent. Both stores are written with the
+    // identical payload, so there is nothing useful to fall back to.
   }
   return {};
 }
