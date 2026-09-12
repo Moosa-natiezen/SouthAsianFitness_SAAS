@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.api.deps import require_auth, require_csrf
@@ -28,6 +36,7 @@ from app.services.auth_service import (
     logout_user,
     register_user,
 )
+from app.services.notification_service import notify_new_signup
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -52,6 +61,7 @@ def register(
     payload: RegisterRequest,
     request: Request,
     response: Response,
+    background_tasks: BackgroundTasks,
     db: Annotated[Session, Depends(get_db)],
 ):
     utm_params = {
@@ -79,7 +89,16 @@ def register(
         samesite=settings.cookie_samesite,
         path="/",
     )
+    # Commit first so the user row is durable before the response triggers
+    # the fire-and-forget n8n signup alert (runs after the 201 is sent).
     db.commit()
+    background_tasks.add_task(
+        notify_new_signup,
+        user_id=str(user.id),
+        email=user.email,
+        display_name=user.display_name,
+        method="password",
+    )
     return AuthSession(user=AuthUser(**_user_response(user)), csrf_token=csrf_token)
 
 
@@ -148,6 +167,7 @@ def get_current_user_data(user: Annotated[User, Depends(require_auth)]):
 async def google_auth(
     request: Request,
     response: Response,
+    background_tasks: BackgroundTasks,
     db: Annotated[Session, Depends(get_db)],
 ):
     """Authenticate or register a user via Google OAuth ID token.
@@ -191,7 +211,7 @@ async def google_auth(
         )
 
     try:
-        user = google_login_or_register(db, id_token_str)
+        user, is_new_user = google_login_or_register(db, id_token_str)
         token = create_session_for_user(db, user, request)
     except HTTPException:
         # Re-raise known HTTP errors (401, 400) directly — they carry
@@ -236,6 +256,17 @@ async def google_auth(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Authentication failed. Please try again.",
+        )
+
+    # Non-critical: founder alert via n8n runs after the response is sent.
+    # Only alert on genuine first-time signups, not returning logins.
+    if is_new_user:
+        background_tasks.add_task(
+            notify_new_signup,
+            user_id=str(user.id),
+            email=user.email,
+            display_name=user.display_name,
+            method="google",
         )
 
     return AuthSession(user=AuthUser(**_user_response(user)), csrf_token=csrf_token)

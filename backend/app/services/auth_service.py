@@ -205,11 +205,16 @@ def change_password(db: Session, user: User, current_password: str, new_password
     logger.info("Password changed for user %s", user.id)
 
 
-def google_login_or_register(db: Session, id_token: str) -> User:
+def google_login_or_register(db: Session, id_token: str) -> tuple[User, bool]:
     """Verify a Google ID token and log in or register the user.
 
     Uses the google-auth library to verify the token against Google's
     public keys.
+
+    Returns:
+        A ``(user, is_new_user)`` tuple — ``is_new_user`` is True when this
+        call created a brand-new account (a signup), False for a returning
+        login or an account link.
 
     Account-linking logic:
     1. If no user exists with this email → create a new Google-only user.
@@ -307,6 +312,7 @@ def google_login_or_register(db: Session, id_token: str) -> User:
         db.add(user)
         db.flush()
         logger.info("Registered new Google OAuth user %s (%s)", user.id, normalized_email)
+        is_new_user = True
     else:
         # ── Case 2: Existing user — check for collision ────────────────
         #
@@ -328,8 +334,9 @@ def google_login_or_register(db: Session, id_token: str) -> User:
         user.last_login_at = datetime.now(UTC)
         db.flush()
         logger.info("Google OAuth login for user %s (%s)", user.id, normalized_email)
+        is_new_user = False
 
-    return user
+    return user, is_new_user
 
 
 def submit_onboarding(db: Session, user: User, payload: dict) -> User:
