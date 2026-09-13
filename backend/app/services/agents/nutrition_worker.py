@@ -43,54 +43,11 @@ _CONTEXT_HEADER = "# USER CONTEXT — Persistent facts. Always respect these con
 
 # ── System Prompt ──────────────────────────────────────────────────────────
 
-NUTRITION_SYSTEM_PROMPT = """You are an expert South Asian sports nutritionist. Generate detailed,
-practical meal plans based on the user's requirements using ONLY authentic South
-Asian (Pakistani, Indian, Bangladeshi) cuisine — real dishes people cook and eat
-at home, not generic Western stand-ins.
-
-STRICT CULINARY GUARDRAILS:
-- NEVER suggest plain white bread, plain boiled chicken, or weird raw ingredients
-  like beef liver. All meals must be flavorful and culturally accurate.
-- Breakfasts should include items like Anda Bhurji (spiced scrambled eggs),
-  Moong Dal Chilla, Paneer Paratha, or Masala Oats.
-- Lunches/dinners should include items like Chicken Tikka, Keema (minced meat),
-  Rajma (kidney beans), Chana Masala, Dal Makhani, Palak Paneer, Roti, and
-  Basmati Rice.
-- Snacks should be culturally relevant or macro-friendly: roasted chana
-  (chickpeas), Greek yogurt, fruit, almonds, or protein shakes.
-- Keep the exact same JSON/Markdown output structure as before — ONLY change the
-  culinary content of the meals.
-
-For each meal, provide:
-- Meal name and type (breakfast, lunch, dinner, snack)
-- Specific foods with portion sizes
-- Approximate calories, protein, carbs, and fat per food
-- Daily totals
-
-Format your response as structured JSON inside a Markdown code block:
-```json
-{
-  "meals": [
-    {
-      "type": "breakfast",
-      "name": "...",
-      "foods": [
-        {"name": "...", "portion": "...", "calories": 0, "protein_g": 0, "carbs_g": 0, "fat_g": 0}
-      ],
-      "meal_calories": 0,
-      "meal_protein_g": 0,
-      "meal_carbs_g": 0,
-      "meal_fat_g": 0
-    }
-  ],
-  "daily_totals": {"calories": 0, "protein_g": 0, "carbs_g": 0, "fat_g": 0},
-  "tips": ["..."]
-}
-```
-
-Be specific with portions (e.g., "1 cup cooked rice", "150g chicken breast").
-Always include at least one meal of each type: breakfast, lunch, dinner.
-"""
+# Single source of truth for the meal-plan system prompt lives in
+# ai_service.SYSTEM_PROMPT (with the strict South Asian / Desi mandate).
+# Importing it here keeps the /ai streaming route and the orchestrator
+# worker from drifting apart.
+from app.services.ai_service import SYSTEM_PROMPT as NUTRITION_SYSTEM_PROMPT
 
 # ── Sandbox Mock Content ───────────────────────────────────────────────────
 
@@ -318,6 +275,10 @@ class NutritionWorker(BaseWorker):
             parts.append(f"- Allergies to exclude: {', '.join(kwargs['allergies'])}")
         if kwargs.get("cuisine_type"):
             parts.append(f"- Preferred cuisine: {kwargs['cuisine_type']}")
+        else:
+            # Always pin the cuisine explicitly — an omitted field must never
+            # leave the model free to drift toward generic Western meals.
+            parts.append("- Preferred cuisine: South Asian (Desi)")
 
         if parts:
             return "Create a 1-day meal plan with the following requirements:\n" + "\n".join(parts) + "\n\n" + raw_message

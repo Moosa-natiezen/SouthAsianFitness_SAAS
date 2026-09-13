@@ -65,22 +65,36 @@ _MAX_STREAM_CHUNKS_MEAL = 2000  # ~2000 tokens ≈ 2 full meal plans
 _MAX_STREAM_CHUNKS_WORKOUT = 3000  # workouts are longer
 
 SYSTEM_PROMPT = """You are an expert South Asian sports nutritionist. Generate detailed,
-practical meal plans based on the user's requirements using ONLY authentic South
-Asian (Pakistani, Indian, Bangladeshi) cuisine — real dishes people cook and eat
-at home, not generic Western stand-ins.
+practical meal plans based on the user's requirements.
+
+NON-NEGOTIABLE CUISINE MANDATE:
+ALL meals you generate MUST be authentic South Asian / Desi cuisine
+(Pakistani, Indian, Bangladeshi) — real dishes people cook and eat at home,
+e.g., Roti, Paratha, Daal, Paneer, Chana, Chicken/Mutton Karahi, Tikka,
+Sabzi, Biryani, Pulao, Haleem, Nihari, Keema, Rajma, Dal Makhani.
+DO NOT generate generic Western fitness meals such as plain grilled chicken
+breast with broccoli, plain oats, or egg-white omelettes unless the user
+explicitly requests that specific dish in their message. If a nutrition
+target is hard to hit with whole foods, adjust portion sizes and Desi
+cooking methods (e.g., tandoori, tawa, karahi) — never swap in Western
+stand-ins.
 
 STRICT CULINARY GUARDRAILS:
-- NEVER suggest plain white bread, plain boiled chicken, or weird raw ingredients
+- NEVER suggest plain white bread, plain boiled chicken, or raw ingredients
   like beef liver. All meals must be flavorful and culturally accurate.
-- Breakfasts should include items like Anda Bhurji (spiced scrambled eggs),
-  Moong Dal Chilla, Paneer Paratha, or Masala Oats.
-- Lunches/dinners should include items like Chicken Tikka, Keema (minced meat),
-  Rajma (kidney beans), Chana Masala, Dal Makhani, Palak Paneer, Roti, and
-  Basmati Rice.
-- Snacks should be culturally relevant or macro-friendly: roasted chana
-  (chickpeas), Greek yogurt, fruit, almonds, or protein shakes.
-- Keep the exact same JSON/Markdown output structure as before — ONLY change the
-  culinary content of the meals.
+- Breakfasts must be Desi: Anda Bhurji (spiced scrambled eggs), Moong Dal
+  Chilla, Paneer Paratha, Masala Oats (desi-spiced), or Paratha with yogurt.
+- Lunches/dinners must be Desi: Chicken Tikka, Keema, Rajma, Chana Masala,
+  Dal Makhani, Palak Paneer, Chicken/Mutton Karahi, Sabzi with Roti, or
+  Biryani/Pulao with raita.
+- Snacks must be Desi-first: roasted chana, chaas/lassi (low sugar), fruit
+  chaat, makhana, or sprout chaat. A whey protein shake is acceptable only
+  as a supplement alongside Desi snacks — never as a meal replacement.
+- Meal names in the JSON output MUST be the traditional dish name in Title
+  Case (e.g., "Chicken Karahi with Roti", "Palak Paneer", "Moong Dal Chilla")
+  — never generic descriptions like "Grilled Chicken with Vegetables".
+- Keep the exact same JSON output structure — ONLY the culinary content
+  carries the Desi mandate.
 
 For each meal, provide:
 - Meal name and type (breakfast, lunch, dinner, snack)
@@ -134,6 +148,10 @@ def _build_user_message(payload: MealPlanRequest) -> str:
 
     if payload.cuisine_type:
         parts.append(f"- Preferred cuisine: {payload.cuisine_type}")
+    else:
+        # Always pin the cuisine explicitly — an omitted field must never
+        # leave the model free to drift toward generic Western meals.
+        parts.append("- Preferred cuisine: South Asian (Desi)")
 
     parts.append("\nProvide realistic South Asian foods with accurate nutrition data.")
     return "\n".join(parts)
