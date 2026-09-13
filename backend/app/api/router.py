@@ -14,6 +14,7 @@ from app.api.routes import (
     progress,
     settings,
 )
+from app.api.whatsapp import router as whatsapp_router
 
 api_router = APIRouter()
 api_router.include_router(health.router)
@@ -28,3 +29,4 @@ api_router.include_router(progress.router)
 api_router.include_router(settings.router)
 api_router.include_router(billing.router)
 api_router.include_router(ai.router)
+api_router.include_router(whatsapp_router)
