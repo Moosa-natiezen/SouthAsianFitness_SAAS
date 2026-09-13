@@ -12,8 +12,14 @@ import type { MealPlanStreamRequest } from "@/hooks/use-meal-plan-stream";
  * (`trigger/generate-meal-plan.ts`) forwards the authenticated session cookie
  * to the FastAPI backend and accumulates the generated markdown.
  *
+ * Graceful degradation: the background queue is an optional enhancement. When
+ * it is not provisioned (env vars missing/placeholder) this endpoint returns
+ * a structured 200 `{ success: false, reason: "queue_not_provisioned" }` —
+ * NOT a 503 — so the client can quietly fall back to direct SSE streaming
+ * without surfacing an error. Real enqueue failures still return 500.
+ *
  * Requires:
- *  - `TRIGGER_PROJECT_ID` (project ref from cloud.trigger.dev)
+ *  - `TRIGGER_PROJECT_ID` + `TRIGGER_SECRET_KEY` (from cloud.trigger.dev)
  *  - A valid `saf_session` cookie (same-origin in production via the Vercel
  *    rewrite proxy, so the worker can authenticate to the backend).
  */
@@ -22,7 +28,8 @@ export const dynamic = "force-dynamic";
 
 const TRIGGER_UNCONFIGURED =
   !process.env.TRIGGER_PROJECT_ID ||
-  process.env.TRIGGER_PROJECT_ID.startsWith("proj_replace");
+  process.env.TRIGGER_PROJECT_ID.startsWith("proj_replace") ||
+  !process.env.TRIGGER_SECRET_KEY;
 
 export async function POST(request: Request) {
   let body: MealPlanStreamRequest;
@@ -36,13 +43,13 @@ export async function POST(request: Request) {
   }
 
   if (TRIGGER_UNCONFIGURED) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Trigger.dev is not configured (TRIGGER_PROJECT_ID is not set).",
-      },
-      { status: 503 },
-    );
+    // Expected operating state when the queue isn't provisioned yet — not a
+    // server error. The client falls back to direct SSE streaming.
+    return NextResponse.json({
+      success: false,
+      reason: "queue_not_provisioned",
+      error: "Background queue is not configured; using direct streaming.",
+    });
   }
 
   // The session token is opaque (server-side hashed), so we forward the raw
@@ -73,10 +80,13 @@ export async function POST(request: Request) {
       publicAccessToken: handle.publicAccessToken,
     });
   } catch (err) {
+    // Log server-side with full detail; give the client a stable, non-leaky
+    // message. The client treats any non-success as "use direct SSE".
     console.error("[MealPlanEnqueue] Failed to trigger background task:", err);
     return NextResponse.json(
       {
         success: false,
+        reason: "enqueue_failed",
         error:
           err instanceof Error
             ? err.message

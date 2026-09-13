@@ -156,6 +156,7 @@ export function useMealPlanStream() {
         success?: boolean;
         handle?: string;
         publicAccessToken?: string;
+        reason?: string;
       } | null;
 
       if (enqueueRes.ok && enqueueData?.success && enqueueData.handle) {
@@ -171,14 +172,16 @@ export function useMealPlanStream() {
         return;
       }
 
-      // Not configured / not authenticated / failed — fall through to SSE.
+      // Queue unavailable (not provisioned, auth missing, or enqueue failed).
+      // This is an expected, non-fatal condition — the background queue is an
+      // optional enhancement. Log a simple warning and fall through to direct
+      // SSE streaming; never surface an error to the user for this.
       console.warn(
-        `[MealPlanStream] Enqueue route unavailable (${enqueueRes.status}) — falling back to direct SSE streaming.`,
-        enqueueData,
+        `[MealPlanStream] Background queue unavailable (${enqueueData?.reason ?? enqueueRes.status}) — using direct SSE streaming.`,
       );
     } catch (err) {
       console.warn(
-        "[MealPlanStream] Enqueue request failed — falling back to direct SSE streaming:",
+        "[MealPlanStream] Enqueue request failed — using direct SSE streaming:",
         err,
       );
     }
