@@ -18,6 +18,7 @@ from app.api.deps import (
     require_auth,
     require_pro,
 )
+from app.core.ai_metrics import ai_metrics
 from app.core.logging import get_logger
 from app.core.rate_limit import generation_ip_limiter
 from app.models.meal_plan import SavedMealPlan
@@ -66,6 +67,31 @@ async def generate_ai_meal_plan(
     """
     user_context = get_user_ai_context(user.id, db)
     generation_ip_limiter.allow(ip)
+
+    # ── Local math routing: never bill LLM tokens for arithmetic. When the
+    # client omits a calorie/protein target, compute it here with the same
+    # deterministic engine the optimizer uses, and record the saving.
+    # The prompt's "calculate based on goals" instruction is then a no-op.
+    if body.target_calories is None or body.protein_g is None:
+        from app.services.nutrition_service import calculate_nutrition_targets
+
+        profile = user.profile
+        if profile is not None:
+            targets = calculate_nutrition_targets(
+                sex=profile.sex.value if profile.sex else "other",
+                age=profile.age_years,
+                height_cm=float(profile.height_cm),
+                weight_kg=float(profile.weight_kg),
+                activity_level=profile.activity_level.value if profile.activity_level else "sedentary",
+                goal=profile.fitness_goal.value if profile.fitness_goal else "general_fitness",
+            )
+            if body.target_calories is None:
+                body.target_calories = float(targets.calorie_target)
+                ai_metrics.record_local_math("calorie target (BMR/TDEE via Python)")
+            if body.protein_g is None:
+                body.protein_g = float(targets.protein_g)
+                ai_metrics.record_local_math("protein target (macro math via Python)")
+
     return StreamingResponse(
         generate_meal_plan_stream(body, user_context=user_context),
         media_type="text/event-stream",
