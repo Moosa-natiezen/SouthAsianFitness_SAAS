@@ -19,6 +19,8 @@ from openai import (
     RateLimitError,
 )
 
+from app.core.ai_cache import AICache, get_ai_cache
+from app.core.ai_metrics import ai_metrics
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.ai_context import UserAIContext
@@ -157,6 +159,17 @@ def _build_user_message(payload: MealPlanRequest) -> str:
     return "\n".join(parts)
 
 
+async def _stream_cached_chunks(text: str) -> AsyncGenerator[str, None]:
+    """Yield a cached response as SSE chunks (no sandbox flag, no delay).
+
+    Cache hits should feel *faster* than a real generation, so unlike the
+    sandbox stream there is no artificial delay between chunks.
+    """
+    chunk_size = 64
+    for i in range(0, len(text), chunk_size):
+        yield _sse_chunk({"text": text[i : i + chunk_size]})
+
+
 async def _stream_sandbox_chunks(
     text: str,
     sandbox_label: str = "sandbox",
@@ -212,6 +225,32 @@ async def generate_meal_plan_stream(
     user_message = _build_user_message(payload)
     system_prompt = _merge_system_prompt(SYSTEM_PROMPT, user_context)
 
+    # ── Cache lookup: identical targets/cuisine/prefs within the cache
+    # window are served without spending LLM tokens. ─────────────────────
+    cache = get_ai_cache()
+    cache_key = AICache.build_key(
+        target_calories=payload.target_calories,
+        protein_g=payload.protein_g,
+        cuisine_type=payload.cuisine_type,
+        dietary_preferences=payload.dietary_preferences,
+        allergies=payload.allergies,
+        user_context=user_context,
+    )
+    cached = cache.get(cache_key)
+    if cached is not None:
+        cached_text, served_as_variation = cached
+        if served_as_variation:
+            cached_text = (
+                f"{cached_text}\n\n---\n*Variation note: this plan was regenerated from a "
+                "recently created plan for your exact targets. Adjust spices/portions "
+                "to taste — or change a target slightly for a fresh plan.*"
+            )
+        ai_metrics.record_cache_hit(len(cached_text))
+        async for chunk in _stream_cached_chunks(cached_text):
+            yield chunk
+        yield "data: [DONE]\n\n"
+        return
+
     logger.info(
         "Streaming AI meal plan: calories=%s protein=%s cuisine=%s context=%s",
         payload.target_calories,
@@ -221,6 +260,8 @@ async def generate_meal_plan_stream(
     )
 
     guard = AgentLoopGuard(max_iterations=_MAX_STREAM_CHUNKS_MEAL)
+    full_response_parts: list[str] = []
+    stream_ok = True
     try:
         stream = await client.chat.completions.create(
             model=model,
@@ -232,6 +273,7 @@ async def generate_meal_plan_stream(
             temperature=0.7,
             max_tokens=2000,
         )
+        ai_metrics.record_llm_call()
 
         async for chunk in stream:
             try:
@@ -245,12 +287,15 @@ async def generate_meal_plan_stream(
                     "error": True,
                     "message": "Generation terminated: maximum output length reached",
                 })
+                stream_ok = False
                 break
             delta = chunk.choices[0].delta if chunk.choices else None
             if delta and delta.content:
+                full_response_parts.append(delta.content)
                 yield _sse_chunk({"text": delta.content})
 
     except _OPENAI_ERRORS as exc:
+        stream_ok = False
         logger.exception(
             "OpenAI meal plan API unavailable (%s) — streaming sandbox fallback",
             type(exc).__name__,
@@ -259,9 +304,17 @@ async def generate_meal_plan_stream(
             yield chunk
 
     except Exception:
+        stream_ok = False
         logger.exception("Unexpected error during OpenAI meal plan streaming")
         async for chunk in _stream_sandbox_chunks(_MOCK_MEAL_PLAN, "meal-plan"):
             yield chunk
+
+    # Only cache complete, non-empty generations — partial streams and
+    # sandbox fallbacks must never poison the cache.
+    if stream_ok:
+        full_response = "".join(full_response_parts)
+        if full_response.strip():
+            cache.put(cache_key, full_response)
 
     yield "data: [DONE]\n\n"
 

@@ -19,6 +19,8 @@ from openai import (
     RateLimitError,
 )
 
+from app.core.ai_cache import AICache, get_ai_cache
+from app.core.ai_metrics import ai_metrics
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.ai_context import UserAIContext
@@ -199,6 +201,32 @@ class NutritionWorker(BaseWorker):
         system_prompt = self._merge_context(NUTRITION_SYSTEM_PROMPT, user_context)
         user_content = self._build_user_content(user_message, kwargs)
 
+        # ── Cache lookup: identical targets/cuisine/prefs within the cache
+        # window are served without spending LLM tokens. ───────────────────
+        cache = get_ai_cache()
+        cache_key = AICache.build_key(
+            target_calories=kwargs.get("target_calories"),
+            protein_g=kwargs.get("protein_g"),
+            cuisine_type=kwargs.get("cuisine_type"),
+            dietary_preferences=kwargs.get("dietary_preferences"),
+            allergies=kwargs.get("allergies"),
+            user_context=user_context,
+        )
+        cached = cache.get(cache_key)
+        if cached is not None:
+            cached_text, served_as_variation = cached
+            if served_as_variation:
+                cached_text = (
+                    f"{cached_text}\n\n---\n*Variation note: this plan was regenerated from a "
+                    "recently created plan for your exact targets. Adjust spices/portions "
+                    "to taste — or change a target slightly for a fresh plan.*"
+                )
+            ai_metrics.record_cache_hit(len(cached_text))
+            async for chunk in self._stream_cached(cached_text):
+                yield chunk
+            yield "data: [DONE]\n\n"
+            return
+
         logger.info(
             "[NutritionWorker] Streaming: calories=%s protein=%s context=%s",
             kwargs.get("target_calories"),
@@ -208,6 +236,8 @@ class NutritionWorker(BaseWorker):
 
         guard = AgentLoopGuard(max_iterations=_MAX_STREAM_CHUNKS)
         client = AsyncOpenAI(api_key=api_key)
+        full_response_parts: list[str] = []
+        stream_ok = True
 
         try:
             stream = await client.chat.completions.create(
@@ -220,6 +250,7 @@ class NutritionWorker(BaseWorker):
                 temperature=0.7,
                 max_tokens=2000,
             )
+            ai_metrics.record_llm_call()
 
             async for chunk in stream:
                 try:
@@ -230,12 +261,15 @@ class NutritionWorker(BaseWorker):
                         guard.current,
                     )
                     yield self._sse({"error": True, "message": "Generation terminated: maximum output length reached"})
+                    stream_ok = False
                     break
                 delta = chunk.choices[0].delta if chunk.choices else None
                 if delta and delta.content:
+                    full_response_parts.append(delta.content)
                     yield self._sse({"text": delta.content})
 
         except _OPENAI_ERRORS as exc:
+            stream_ok = False
             logger.exception(
                 "[NutritionWorker] OpenAI API unavailable (%s) — sandbox fallback",
                 type(exc).__name__,
@@ -244,9 +278,17 @@ class NutritionWorker(BaseWorker):
                 yield chunk
 
         except Exception:
+            stream_ok = False
             logger.exception("[NutritionWorker] Unexpected error during streaming")
             async for chunk in self._stream_sandbox(_MOCK_MEAL_PLAN):
                 yield chunk
+
+        # Only cache complete, non-empty generations — partial streams and
+        # sandbox fallbacks must never poison the cache.
+        if stream_ok:
+            full_response = "".join(full_response_parts)
+            if full_response.strip():
+                cache.put(cache_key, full_response)
 
         yield "data: [DONE]\n\n"
 
@@ -283,6 +325,12 @@ class NutritionWorker(BaseWorker):
         if parts:
             return "Create a 1-day meal plan with the following requirements:\n" + "\n".join(parts) + "\n\n" + raw_message
         return raw_message
+
+    async def _stream_cached(self, text: str) -> AsyncGenerator[str, None]:
+        """Yield a cached response as SSE chunks (fast — no artificial delay)."""
+        chunk_size = 64
+        for i in range(0, len(text), chunk_size):
+            yield self._sse({"text": text[i : i + chunk_size]})
 
     async def _stream_sandbox(self, text: str) -> AsyncGenerator[str, None]:
         """Yield text in chunks for mock streaming."""

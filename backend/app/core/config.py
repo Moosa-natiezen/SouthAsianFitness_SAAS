@@ -62,6 +62,13 @@ class Settings(BaseSettings):
     # blocks IP rotation across throwaway free accounts).
     generation_ip_limit_window_seconds: int = 60 * 60 * 24
     generation_ip_limit_max_requests: int = 10
+    # AI response cache: identical generation requests within the fresh
+    # window are served from cache (zero LLM tokens); within the variation
+    # window they get the cached plan with a variation note. Disabling is a
+    # one-env-var operation (set fresh window to 0).
+    ai_cache_fresh_window_seconds: int = 60 * 60
+    ai_cache_variation_window_seconds: int = 60 * 60 * 6
+    ai_cache_max_entries: int = 256
 
     cors_origins: str = (
         "http://localhost:3000,"
