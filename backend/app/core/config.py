@@ -70,6 +70,21 @@ class Settings(BaseSettings):
     ai_cache_variation_window_seconds: int = 60 * 60 * 6
     ai_cache_max_entries: int = 256
 
+    # ── WhatsApp Cloud API (chat-based meal logging) ─────────────────
+    # Verify token: any string you choose; must match what you enter in the
+    # Meta App Dashboard when subscribing the webhook.
+    whatsapp_verify_token: str = ""
+    # Access token: permanent token from a Meta system user with
+    # whatsapp_business_messaging permission.
+    whatsapp_access_token: str = ""
+    # App secret (from Meta App Dashboard → Settings → Basic). Used to verify
+    # the X-Hub-Signature-256 HMAC on inbound webhook payloads. Empty = skip
+    # verification (dev only — always set in production).
+    whatsapp_app_secret: str = ""
+    # Phone number ID of the WhatsApp business number sending replies.
+    whatsapp_phone_number_id: str = ""
+    whatsapp_api_version: str = "v20.0"
+
     cors_origins: str = (
         "http://localhost:3000,"
         "http://127.0.0.1:3000,"

@@ -18,6 +18,7 @@ from app.models.progress import ProgressEntry
 from app.models.tags import CuisineTag, DietaryTag, FoodCategory
 from app.models.unit import Unit
 from app.models.user import User, UserFoodPreference, UserPreferences, UserProfile, UserSession
+from app.models.whatsapp import FoodLogEntry, WhatsAppLink
 from app.models.workout import SavedWorkoutPlan
 
 __all__ = [
@@ -45,6 +46,8 @@ __all__ = [
     "UserPreferences",
     "UserProfile",
     "UserSession",
+    "FoodLogEntry",
+    "WhatsAppLink",
     "food_cuisine_tags",
     "food_dietary_tags",
     "food_regions",

@@ -96,6 +96,10 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     utm_medium: Mapped[str | None] = mapped_column(String(200), nullable=True)
     utm_campaign: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
+    # ── WhatsApp chat logging ─────────────────────────────────────────
+    # E.164 digits-only (e.g. 923001234567) — matches Meta's wa_id format.
+    whatsapp_phone: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
+
     # ── Google OAuth ─────────────────────────────────────────────────
     google_id: Mapped[str | None] = mapped_column(
         String(255), nullable=True, unique=True, index=True
