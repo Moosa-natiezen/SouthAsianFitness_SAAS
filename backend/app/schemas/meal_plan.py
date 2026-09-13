@@ -21,6 +21,14 @@ class MealPlanGenerateRequest(BaseModel):
         None, ge=1, le=6,
         description="Number of meals per day (1-6). Default: 4",
     )
+    calorie_target: int | None = Field(
+        None, ge=1, le=50000,
+        description=(
+            "Manual calorie target override (kcal). When provided it replaces "
+            "the BMR/TDEE-computed target; macros are recalculated from it. "
+            "Values outside 1000-6000 are clamped with a warning."
+        ),
+    )
 
 
 # ── Response sub-schemas ─────────────────────────────────────────────────────

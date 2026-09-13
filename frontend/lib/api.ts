@@ -377,6 +377,8 @@ export type MealPlanFailure = {
 export type MealPlanGenerateRequest = {
   plan_days?: number | null;
   meal_count?: number | null;
+  /** Manual calorie target override (kcal). Omitted = use BMR/TDEE-computed target. */
+  calorie_target?: number | null;
 };
 
 /* ── Locations API ─────────────────────────────────────────────────────── */
@@ -479,10 +481,12 @@ export async function getEligibleFoods(): Promise<FoodEligibilityResponse> {
 export async function generateMealPlan(
   planDays?: number,
   mealCount?: number,
+  calorieTarget?: number,
 ): Promise<MealPlanResponse | MealPlanFailure> {
   const body: MealPlanGenerateRequest = {};
   if (planDays !== undefined) body.plan_days = planDays;
   if (mealCount !== undefined) body.meal_count = mealCount;
+  if (calorieTarget !== undefined) body.calorie_target = calorieTarget;
 
   const csrfToken = await getCsrfToken();
   return apiFetch<MealPlanResponse | MealPlanFailure>("/api/meal-plans/generate", {

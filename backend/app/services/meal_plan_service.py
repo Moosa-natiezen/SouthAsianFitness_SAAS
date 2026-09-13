@@ -168,10 +168,14 @@ def generate_meal_plan(
     user_id: UUID,
     plan_days: int | None = None,
     meal_count: int | None = None,
+    calorie_target_override: float | None = None,
 ) -> GenerationResult:
     """Generate a meal plan for a user.
 
     This is the main entry point for meal plan generation.
+
+    ``calorie_target_override`` lets the user manually replace the
+    BMR/TDEE-computed calorie target; macros are recalculated from it.
     """
     all_warnings: list[str] = []
 
@@ -230,6 +234,7 @@ def generate_meal_plan(
         weight_kg=float(profile.weight_kg),
         activity_level=profile.activity_level.value if profile.activity_level else "sedentary",
         goal=profile.fitness_goal.value if profile.fitness_goal else "general_fitness",
+        calorie_override=calorie_target_override,
     )
 
     all_warnings.extend(nutrition.warnings)

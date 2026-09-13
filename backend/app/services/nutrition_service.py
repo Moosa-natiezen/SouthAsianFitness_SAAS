@@ -189,11 +189,17 @@ def calculate_nutrition_targets(
     weight_kg: float,
     activity_level: str,
     goal: str,
+    *,
+    calorie_override: float | None = None,
 ) -> NutritionTarget:
     """Calculate complete nutrition targets from user profile.
 
     Validates inputs, calculates BMR → TDEE → calorie target → macros.
     Returns a NutritionTarget with all results and warnings.
+
+    When ``calorie_override`` is provided it replaces the goal-adjusted TDEE
+    target (manual user override); it is still safety-clamped to
+    [min_calories, max_calories] and macros are recalculated from it.
     """
     all_warnings: list[str] = []
 
@@ -232,6 +238,29 @@ def calculate_nutrition_targets(
     # Calorie target
     calorie_target, adjustment, is_bounded, cal_warnings = calculate_calorie_target(tdee, goal)
     all_warnings.extend(cal_warnings)
+
+    # Manual override: user-provided calorie target replaces the computed one.
+    # Still clamped to safety bounds (extreme values would starve or flood
+    # the optimizer). The recomputed macros replace the profile-derived ones.
+    if calorie_override is not None:
+        min_cal = SAFETY_BOUNDS.min_calories
+        max_cal = SAFETY_BOUNDS.max_calories
+        if calorie_override < min_cal:
+            all_warnings.append(
+                f"Manual calorie target {calorie_override:.0f} kcal is below "
+                f"minimum {min_cal:.0f} kcal. Using {min_cal:.0f} kcal."
+            )
+            calorie_override = min_cal
+            is_bounded = True
+        elif calorie_override > max_cal:
+            all_warnings.append(
+                f"Manual calorie target {calorie_override:.0f} kcal exceeds "
+                f"maximum {max_cal:.0f} kcal. Using {max_cal:.0f} kcal."
+            )
+            calorie_override = max_cal
+            is_bounded = True
+        calorie_target = float(calorie_override)
+        adjustment = 0.0  # override replaces the goal adjustment
 
     # Macros
     protein_g, carbs_g, fat_g, macro_warnings = calculate_macros(
