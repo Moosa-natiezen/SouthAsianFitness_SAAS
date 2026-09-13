@@ -29,6 +29,29 @@ function dispatchProRequired(): void {
   }
 }
 
+/**
+ * Thrown when the backend returns 402 — the free-tier generation limit
+ * (e.g. 3 meal plans/month) has been reached. Listeners can catch this to
+ * show the upgrade/paywall flow.
+ */
+export class FreeTrialLimitError extends Error {
+  readonly code = "FREE_TRIAL_LIMIT" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "FreeTrialLimitError";
+  }
+}
+
+/**
+ * Dispatched on `window` whenever a 402 free-trial-limit error is caught.
+ * The global ProUpgradeModal listens for this event.
+ */
+function dispatchFreeTrialLimit(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("free-trial-limit"));
+  }
+}
+
 /** Default timeout for API requests (15 seconds). Prevents infinite hangs. */
 const API_TIMEOUT_MS = 15_000;
 
@@ -106,6 +129,18 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
         if (response.status === 403 && detailObj?.code === "PRO_REQUIRED") {
           dispatchProRequired();
           throw new ProRequiredError(message);
+        }
+
+        // Intercept free-tier limit 402s globally (402 = Payment Required →
+        // upsell). 429s (IP-level abuse block) are NOT intercepted: they are
+        // transient network-level blocks and surface as regular errors.
+        if (response.status === 402) {
+          dispatchFreeTrialLimit();
+          throw new FreeTrialLimitError(
+            message.startsWith("Request failed")
+              ? "Free trial limit reached. Please upgrade to Pro for unlimited generations."
+              : message,
+          );
         }
 
         // Retry on 5xx (server cold-start / transient errors) — but not on 4xx

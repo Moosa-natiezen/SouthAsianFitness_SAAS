@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     login_lockout_minutes: int = 15
     login_rate_limit_window_seconds: int = 300
     login_rate_limit_max_requests: int = 10
+    # Abuse prevention: LLM generation endpoints are expensive, so cap the
+    # number of generations per client IP per day (fraud/abuse architecture —
+    # blocks IP rotation across throwaway free accounts).
+    generation_ip_limit_window_seconds: int = 60 * 60 * 24
+    generation_ip_limit_max_requests: int = 10
 
     cors_origins: str = (
         "http://localhost:3000,"

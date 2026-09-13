@@ -8,12 +8,18 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_auth, require_pro
+from app.api.deps import (
+    enforce_generation_ip_limit,
+    get_db,
+    require_auth,
+    require_pro,
+)
 from app.core.logging import get_logger
+from app.core.rate_limit import generation_ip_limiter
 from app.models.meal_plan import SavedMealPlan
 from app.models.user import User
 from app.schemas.agent_chat import AgentChatRequest
@@ -44,8 +50,10 @@ _orchestrator = OrchestratorAgent()
 @router.post("/meal-plans/generate")
 async def generate_ai_meal_plan(
     body: MealPlanRequest,
+    request: Request,
     user: Annotated[User, Depends(require_pro)],
     db: Session = Depends(get_db),
+    ip: str = Depends(enforce_generation_ip_limit),
 ) -> StreamingResponse:
     """Stream an AI-generated meal plan using GPT-4o-mini.
 
@@ -53,8 +61,11 @@ async def generate_ai_meal_plan(
     Personalises the system prompt with the user's persistent AI context
     (goals, dietary preferences, allergies) when available.
     Requires an active Pro subscription.
+
+    Abuse prevention: per-IP daily generation cap (10/24h) → 429.
     """
     user_context = get_user_ai_context(user.id, db)
+    generation_ip_limiter.allow(ip)
     return StreamingResponse(
         generate_meal_plan_stream(body, user_context=user_context),
         media_type="text/event-stream",
@@ -181,8 +192,10 @@ def delete_saved_ai_meal_plan(
 @router.post("/chat")
 async def orchestrator_chat(
     body: AgentChatRequest,
+    request: Request,
     user: Annotated[User, Depends(require_pro)],
     db: Session = Depends(get_db),
+    ip: str = Depends(enforce_generation_ip_limit),
 ) -> StreamingResponse:
     """Orchestrator-driven chat endpoint for multi-domain AI generation.
 
@@ -194,6 +207,8 @@ async def orchestrator_chat(
     and synthesizes the results.
 
     Requires an active Pro subscription.
+
+    Abuse prevention: per-IP daily generation cap (10/24h) → 429.
     """
     user_context = get_user_ai_context(user.id, db)
 
@@ -223,6 +238,7 @@ async def orchestrator_chat(
         user.id, len(body.message), list(kwargs.keys()),
     )
 
+    generation_ip_limiter.allow(ip)
     return StreamingResponse(
         _orchestrator.dispatch(
             body.message,
@@ -248,8 +264,10 @@ async def orchestrator_chat(
 @router.post("/workout/generate")
 async def generate_ai_workout(
     body: WorkoutGenerateRequest,
+    request: Request,
     user: Annotated[User, Depends(require_pro)],
     db: Session = Depends(get_db),
+    ip: str = Depends(enforce_generation_ip_limit),
 ) -> StreamingResponse:
     """Stream an AI-generated workout plan using GPT-4o-mini.
 
@@ -257,8 +275,11 @@ async def generate_ai_workout(
     Personalises the system prompt with the user's persistent AI context
     (goals, dietary preferences, allergies) when available.
     Requires an active Pro subscription.
+
+    Abuse prevention: per-IP daily generation cap (10/24h) → 429.
     """
     user_context = get_user_ai_context(user.id, db)
+    generation_ip_limiter.allow(ip)
     return StreamingResponse(
         generate_workout_stream(
             goal=body.goal,

@@ -39,7 +39,8 @@ def check_meal_plan_limit(db: Session, user: User) -> None:
     Pro users have unlimited generations.
     Free users are limited to FREE_MONTHLY_MEAL_PLAN_LIMIT plans per calendar month.
 
-    Raises HTTPException 403 if the limit is exceeded.
+    Raises HTTPException 402 (Payment Required) when the limit is exceeded so
+    the frontend can trigger the upgrade/paywall flow.
     """
     if user.subscription_tier == "pro":
         return
@@ -62,8 +63,8 @@ def check_meal_plan_limit(db: Session, user: User) -> None:
         from fastapi import HTTPException, status
 
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Free tier limit reached. Please upgrade to Pro to generate more meal plans.",
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Free trial limit reached. Please upgrade to Pro for unlimited generations.",
         )
 from app.services.budget_service import BudgetTarget, calculate_budget_targets
 from app.services.food_candidate_service import (
