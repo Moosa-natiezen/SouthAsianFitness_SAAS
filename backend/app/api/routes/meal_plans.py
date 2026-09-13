@@ -5,11 +5,17 @@ All endpoints require authentication.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_auth, require_csrf
+from app.api.deps import (
+    enforce_generation_ip_limit,
+    get_db,
+    require_auth,
+    require_csrf,
+)
 from app.core.logging import get_logger
+from app.core.rate_limit import generation_ip_limiter
 from app.models.user import User
 from app.schemas.meal_plan import (
     MealPlanFailureResponse,
@@ -215,15 +221,23 @@ def get_today_plan(
     response_model=MealPlanResponse | MealPlanFailureResponse,
 )
 def generate(
+    request: Request,
     body: MealPlanGenerateRequest | None = None,
     user: User = Depends(require_csrf),
     db: Session = Depends(get_db),
+    ip: str = Depends(enforce_generation_ip_limit),
 ):
     """Generate a meal plan for the authenticated user.
 
     Uses server-side nutrition targets (not client-provided).
     All foods are verified-only. Respects diet pattern, allergies, and dislikes.
     Requires CSRF token for this mutating POST endpoint.
+
+    Abuse prevention (two layers):
+    - User-level: free tier is capped at 3 plans/month → 402 triggers upgrade.
+    - IP-level: max 10 generations/day per client IP → 429 (set up by the
+      ``enforce_generation_ip_limit`` dependency; quota is consumed below
+      only after a successful generation).
     """
     # Enforce free-tier usage limit before any heavy computation
     check_meal_plan_limit(db, user)
@@ -240,6 +254,10 @@ def generate(
 
     if not result.success or result.failure is not None:
         return _build_plan_response(result)
+
+    # Generation succeeded — consume this IP's daily generation quota.
+    # (peek() pre-checked in the dependency; failed generations don't count.)
+    generation_ip_limiter.allow(ip)
 
     # Persist the generated plan so it can be retrieved later
     try:

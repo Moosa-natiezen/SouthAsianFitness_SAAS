@@ -13,6 +13,7 @@ import { MealPlanView } from "@/components/meal-plan/meal-plan-view";
 import {
   createCheckoutSession,
   deleteMealPlan,
+  FreeTrialLimitError,
   generateMealPlan,
   getTodaysMealPlan,
   listMealPlans,
@@ -109,7 +110,9 @@ export default function MealPlansPage() {
         "[MealPlans] generateMealPlan failed — check CORS, backend availability, and NEXT_PUBLIC_API_URL:",
         err,
       );
-      if (msg.includes("Free tier limit reached")) {
+      if (err instanceof FreeTrialLimitError) {
+        // Global ProUpgradeModal (listening for "free-trial-limit") already
+        // opened; the inline paywall panel is the page-level fallback.
         setShowPaywall(true);
       } else {
         setState({ status: "error", message: msg });

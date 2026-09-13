@@ -5,7 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { createCheckoutSession } from "@/lib/api";
 
 /**
- * Global upgrade modal triggered by PRO_REQUIRED 403 errors.
+ * Global upgrade modal triggered by PRO_REQUIRED 403 errors and free-trial
+ * 402 errors (generation limit reached).
  * Cyber-Premium glass aesthetic with indigo/violet accents.
  */
 export function ProUpgradeModal() {
@@ -40,8 +41,14 @@ export function ProUpgradeModal() {
   }, []);
 
   useEffect(() => {
+    // Open on PRO_REQUIRED 403s AND free-tier 402s (generation limit hit)
+    const onFreeTrialLimit = () => handleOpen();
     window.addEventListener("pro-required", handleOpen);
-    return () => window.removeEventListener("pro-required", handleOpen);
+    window.addEventListener("free-trial-limit", onFreeTrialLimit);
+    return () => {
+      window.removeEventListener("pro-required", handleOpen);
+      window.removeEventListener("free-trial-limit", onFreeTrialLimit);
+    };
   }, [handleOpen]);
 
   if (!open) return null;

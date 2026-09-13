@@ -31,6 +31,7 @@ os.environ.setdefault("FRONTEND_URL", "http://localhost:3000")
 import importlib
 
 from app.core.config import get_settings
+from app.core.rate_limit import generation_ip_limiter
 
 get_settings.cache_clear()
 import app.core.config
@@ -64,6 +65,7 @@ def reset_db() -> None:
     db_session.SessionLocal = sessionmaker(
         bind=engine, autocommit=False, autoflush=False, class_=Session
     )
+    generation_ip_limiter.clear()
 
 
 def make_client() -> TestClient:

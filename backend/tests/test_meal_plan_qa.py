@@ -19,6 +19,7 @@ os.environ.setdefault("CSRF_SECRET_KEY", "test-csrf-secret-key-1234567890abcdef"
 os.environ.setdefault("ENVIRONMENT", "testing")
 
 from app import models as app_models  # noqa: F401
+from app.core.rate_limit import generation_ip_limiter
 from app.db import session as db_session
 from app.db.base import Base
 from app.models.enums import (
@@ -62,6 +63,7 @@ def reset_db():
     db_session.SessionLocal = sessionmaker(
         bind=engine, autocommit=False, autoflush=False, class_=Session
     )
+    generation_ip_limiter.clear()
     return engine
 
 

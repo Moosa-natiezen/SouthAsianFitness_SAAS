@@ -394,7 +394,8 @@ class TestMealPlanUsageLimit:
         db.close()
 
     def test_free_user_exceeds_limit(self) -> None:
-        """Verify a free user gets 403 when attempting to generate a 4th plan."""
+        """Verify a free user gets 402 (Payment Required → upsell) when
+        attempting to generate a 4th plan."""
         from app.services.meal_plan_service import check_meal_plan_limit
         from fastapi import HTTPException
 
@@ -423,13 +424,13 @@ class TestMealPlanUsageLimit:
         db.commit()
 
         user = db.query(User).filter(User.id == user_id).first()
-        # Should raise HTTPException 403
+        # Should raise HTTPException 402 (upsell signal for the frontend)
         try:
             check_meal_plan_limit(db, user)
-            assert False, "Expected HTTPException 403"
+            assert False, "Expected HTTPException 402"
         except HTTPException as exc:
-            assert exc.status_code == 403
-            assert "Free tier limit reached" in exc.detail
+            assert exc.status_code == 402
+            assert "Free trial limit reached" in exc.detail
         db.close()
 
     def test_free_user_old_plans_dont_count(self) -> None:

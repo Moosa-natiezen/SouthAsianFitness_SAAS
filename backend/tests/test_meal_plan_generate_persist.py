@@ -15,7 +15,7 @@ os.environ.setdefault("ENVIRONMENT", "testing")
 
 from app import models as app_models  # noqa: F401
 from app.core.config import settings
-from app.core.rate_limit import login_rate_limiter
+from app.core.rate_limit import generation_ip_limiter, login_rate_limiter
 from app.db import session as db_session
 from app.db.base import Base
 from app.main import app
@@ -49,6 +49,7 @@ def reset_db() -> None:
 def make_client() -> TestClient:
     reset_db()
     login_rate_limiter.clear()
+    generation_ip_limiter.clear()
     return TestClient(app)
 
 
