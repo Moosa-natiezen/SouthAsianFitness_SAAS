@@ -68,7 +68,7 @@ export function AiMealGenerator() {
     generate({
       target_calories: targetCalories ? Number(targetCalories) : undefined,
       protein_g: proteinG ? Number(proteinG) : undefined,
-      cuisine_type: cuisineType || undefined,
+      cuisine_type: cuisineType.trim() || "South Asian",
     });
   };
 
@@ -282,7 +282,7 @@ export function AiMealGenerator() {
                     generate({
                       target_calories: targetCalories ? Number(targetCalories) : undefined,
                       protein_g: proteinG ? Number(proteinG) : undefined,
-                      cuisine_type: cuisineType || undefined,
+                      cuisine_type: cuisineType.trim() || "South Asian",
                     });
                   }}
                   className="flex items-center gap-2 rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-2.5 text-sm font-medium text-stone-500 dark:text-zinc-500 transition-all hover:bg-stone-50 dark:bg-zinc-800 hover:text-stone-900 dark:text-zinc-100 print:hidden"
