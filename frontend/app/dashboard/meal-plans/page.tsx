@@ -45,6 +45,8 @@ const chipInactive =
 export default function MealPlansPage() {
   const [planDays, setPlanDays] = useState(1);
   const [mealCount, setMealCount] = useState(4);
+  // Manual calorie override; empty string = use the profile-computed target.
+  const [calorieTarget, setCalorieTarget] = useState("");
   const [state, setState] = useState<PlanState>({ status: "idle" });
 
   /* ── Plan history state ──────────────────────────────────────────── */
@@ -97,7 +99,11 @@ export default function MealPlansPage() {
   const handleGenerate = async () => {
     setState({ status: "loading" });
     try {
-      const result = await generateMealPlan(planDays, mealCount);
+      const result = await generateMealPlan(
+        planDays,
+        mealCount,
+        calorieTarget.trim() === "" ? undefined : Number(calorieTarget),
+      );
       if ("success" in result && !result.success) {
         setState({ status: "failure", data: result as MealPlanFailure });
       } else {
@@ -206,7 +212,7 @@ export default function MealPlansPage() {
         </p>
 
         {/* Controls */}
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <label className="text-sm font-medium text-stone-600 dark:text-zinc-400">
               Number of days
@@ -245,6 +251,32 @@ export default function MealPlansPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Manual calorie target — editable override of the computed
+              BMR/TDEE target. Empty = auto (profile-derived). */}
+          <div className="space-y-2">
+            <label
+              htmlFor="calorie-target"
+              className="text-sm font-medium text-stone-600 dark:text-zinc-400"
+            >
+              Calorie target (kcal)
+            </label>
+            <input
+              id="calorie-target"
+              type="number"
+              inputMode="numeric"
+              min={1000}
+              max={6000}
+              step={50}
+              placeholder="Auto (from profile)"
+              value={calorieTarget}
+              onChange={(e) => setCalorieTarget(e.target.value)}
+              className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2 text-sm text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30"
+            />
+            <p className="text-xs text-stone-400 dark:text-zinc-600">
+              Leave empty to use your profile target (clamped to 1000–6000).
+            </p>
           </div>
         </div>
 

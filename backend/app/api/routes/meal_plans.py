@@ -244,12 +244,14 @@ def generate(
 
     plan_days = body.plan_days if body else None
     meal_count = body.meal_count if body else None
+    calorie_override = body.calorie_target if body else None
 
     result = generate_meal_plan(
         db=db,
         user_id=user.id,
         plan_days=plan_days,
         meal_count=meal_count,
+        calorie_target_override=calorie_override,
     )
 
     if not result.success or result.failure is not None:
