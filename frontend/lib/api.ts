@@ -714,6 +714,35 @@ export async function changePassword(
   });
 }
 
+/* ── WhatsApp link API ───────────────────────────────────────────────── */
+
+export type WhatsAppLinkResponse = {
+  status: string;
+  linked: boolean;
+  whatsapp_phone: string | null;
+};
+
+export async function getWhatsAppLink(): Promise<{
+  linked: boolean;
+  whatsapp_phone: string | null;
+}> {
+  return apiFetch<{
+    linked: boolean;
+    whatsapp_phone: string | null;
+  }>("/api/users/me/whatsapp");
+}
+
+export async function updateWhatsAppPhone(
+  whatsappPhone: string | null,
+): Promise<WhatsAppLinkResponse> {
+  const csrfToken = await getCsrfToken();
+  return apiFetch<WhatsAppLinkResponse>("/api/users/me/whatsapp", {
+    method: "PATCH",
+    headers: { "X-CSRF-Token": csrfToken },
+    body: JSON.stringify({ whatsapp_phone: whatsappPhone }),
+  });
+}
+
 /* ── Food Library API ────────────────────────────────────────────────── */
 
 export type FoodNutrition = {

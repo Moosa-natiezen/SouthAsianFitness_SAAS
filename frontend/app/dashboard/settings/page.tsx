@@ -20,8 +20,10 @@ import {
   getCurrentUser,
   getSettings,
   getUserProfile,
+  getWhatsAppLink,
   updateProfile,
   updatePreferences,
+  updateWhatsAppPhone,
   changePassword,
   type AuthUser,
   type CountryData,
@@ -131,6 +133,16 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  /* ── WhatsApp link form ──────────────────────────────────────────── */
+  const [whatsappPhone, setWhatsappPhone] = useState("");
+  const [whatsappLinkedPhone, setWhatsappLinkedPhone] = useState<string | null>(null);
+  const [whatsappLoading, setWhatsappLoading] = useState(true);
+  const [whatsappSaving, setWhatsappSaving] = useState(false);
+  const [whatsappMsg, setWhatsappMsg] = useState<{
+    type: "info" | "warning" | "error";
+    text: string;
+  } | null>(null);
 
   /* ── UI state ────────────────────────────────────────────────────── */
   const [profileSaving, setProfileSaving] = useState(false);
@@ -417,6 +429,71 @@ export default function SettingsPage() {
       });
     } finally {
       setPasswordSaving(false);
+    }
+  };
+
+  /* ── WhatsApp link ────────────────────────────────────────────────── */
+
+  const loadWhatsAppLink = useCallback(async () => {
+    try {
+      const data = await getWhatsAppLink();
+      setWhatsappLinkedPhone(data.linked ? data.whatsapp_phone : null);
+      setWhatsappPhone(data.whatsapp_phone ?? "");
+    } catch {
+      // Non-fatal: the section still renders with the connect form.
+    } finally {
+      setWhatsappLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount, mirrors the main load effect above
+    void loadWhatsAppLink();
+  }, [loadWhatsAppLink]);
+
+  const handleConnectWhatsApp = async () => {
+    setWhatsappMsg(null);
+    const trimmed = whatsappPhone.trim();
+    if (!trimmed) {
+      setWhatsappMsg({
+        type: "warning",
+        text: "Enter your WhatsApp number (with country code), or leave it empty and press Save to unlink.",
+      });
+      return;
+    }
+    setWhatsappSaving(true);
+    try {
+      const result = await updateWhatsAppPhone(trimmed);
+      setWhatsappLinkedPhone(result.whatsapp_phone);
+      setWhatsappMsg({
+        type: "info",
+        text: `✅ WhatsApp connected! Send any food message (e.g. "2 roti and a bowl of daal") to our number and it'll be logged automatically.`,
+      });
+    } catch (err) {
+      setWhatsappMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to connect WhatsApp.",
+      });
+    } finally {
+      setWhatsappSaving(false);
+    }
+  };
+
+  const handleDisconnectWhatsApp = async () => {
+    setWhatsappMsg(null);
+    setWhatsappSaving(true);
+    try {
+      await updateWhatsAppPhone(null);
+      setWhatsappLinkedPhone(null);
+      setWhatsappPhone("");
+      setWhatsappMsg({ type: "info", text: "WhatsApp disconnected." });
+    } catch (err) {
+      setWhatsappMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to disconnect WhatsApp.",
+      });
+    } finally {
+      setWhatsappSaving(false);
     }
   };
 
@@ -869,6 +946,88 @@ export default function SettingsPage() {
               {prefsSaving ? "Saving..." : "Save Budget"}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* ── WhatsApp Integration Card ───────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle>WhatsApp Integration</CardTitle>
+          <CardDescription>
+            Log meals by chat: send what you ate (e.g. &quot;2 roti and a bowl of
+            daal&quot;) to our WhatsApp number and the AI logs the macros for you.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {whatsappMsg && (
+            <AlertBanner variant={whatsappMsg.type} message={whatsappMsg.text} />
+          )}
+
+          {whatsappLinkedPhone && (
+            <div
+              className="flex items-center justify-between rounded-xl border border-emerald-600/30 bg-emerald-600/10 px-4 py-3"
+              role="status"
+            >
+              <div className="flex items-center gap-3">
+                <span aria-hidden className="text-xl">✅</span>
+                <div>
+                  <p className="text-sm font-medium text-stone-900 dark:text-zinc-100">
+                    Connected
+                  </p>
+                  <p className="text-xs text-stone-500 dark:text-zinc-500">
+                    +{whatsappLinkedPhone}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleDisconnectWhatsApp}
+                disabled={whatsappSaving}
+              >
+                {whatsappSaving ? "Disconnecting..." : "Disconnect"}
+              </Button>
+            </div>
+          )}
+
+          {whatsappLoading ? (
+            <Skeleton className="h-12 w-full" />
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1 md:col-span-2">
+                <label htmlFor="whatsapp_phone" className={labelClass}>
+                  WhatsApp number (with country code)
+                </label>
+                <input
+                  id="whatsapp_phone"
+                  type="tel"
+                  value={whatsappPhone}
+                  onChange={(e) => setWhatsappPhone(e.target.value)}
+                  className={inputClass}
+                  placeholder="+92 300 1234567"
+                  autoComplete="tel"
+                />
+                <p className="text-xs text-stone-500 dark:text-zinc-500">
+                  Include your country code (e.g. +92 for Pakistan, +91 for India).
+                  Only digits and &quot;+&quot; are stored.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!whatsappLoading && (
+            <div className="flex justify-end pt-2">
+              <Button
+                onClick={handleConnectWhatsApp}
+                disabled={whatsappSaving || !whatsappPhone.trim()}
+              >
+                {whatsappSaving
+                  ? "Connecting..."
+                  : whatsappLinkedPhone
+                    ? "Update Number"
+                    : "Connect WhatsApp"}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
