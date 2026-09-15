@@ -13,6 +13,7 @@ from app.api.routes import (
     onboarding,
     progress,
     settings,
+    vapi,
     whatsapp_link,
 )
 from app.api.whatsapp import router as whatsapp_router
@@ -29,6 +30,7 @@ api_router.include_router(locations.router)
 api_router.include_router(progress.router)
 api_router.include_router(settings.router)
 api_router.include_router(whatsapp_link.router)
+api_router.include_router(vapi.router)
 api_router.include_router(billing.router)
 api_router.include_router(ai.router)
 api_router.include_router(whatsapp_router)
