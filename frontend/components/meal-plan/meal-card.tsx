@@ -17,31 +17,31 @@ export function MealCard({ meal, currency }: MealCardProps) {
     <article className="rounded-2xl glass p-5">
       {/* Meal header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-stone-900">
+        <h3 className="font-semibold text-stone-900 dark:text-zinc-100">
           {mealEmoji[meal.meal_type] ?? "🍽️"}{" "}
           {meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}
         </h3>
-        <span className="text-sm font-medium text-stone-500">
+        <span className="text-sm font-medium text-stone-500 dark:text-zinc-400">
           {Math.round(meal.subtotal_calories)} kcal
         </span>
       </div>
 
       {/* Foods */}
-      <ul className="mt-3 divide-y divide-white/8">
+      <ul className="mt-3 divide-y divide-stone-200 dark:divide-white/8">
         {meal.foods.map((food) => (
           <li key={food.food_id} className="flex items-center justify-between py-2 text-sm">
             <div>
-              <span className="font-medium text-stone-900">{food.name}</span>
-              <span className="ml-2 text-stone-500">
+              <span className="font-medium text-stone-900 dark:text-zinc-100">{food.name}</span>
+              <span className="ml-2 text-stone-500 dark:text-zinc-400">
                 {food.serving_quantity > 0
                   ? `${food.serving_quantity} ${food.serving_unit_code}`
                   : `${food.portion_grams}g`}
               </span>
             </div>
-            <div className="flex items-center gap-3 text-stone-500">
+            <div className="flex items-center gap-3 text-stone-500 dark:text-zinc-400">
               <span>{Math.round(food.calories)} kcal</span>
               {food.cost_available && food.estimated_cost !== null && currency && (
-                <span className="text-stone-500">
+                <span className="text-stone-500 dark:text-zinc-400">
                   {currency} {Number(food.estimated_cost).toFixed(0)}
                 </span>
               )}
@@ -51,14 +51,14 @@ export function MealCard({ meal, currency }: MealCardProps) {
       </ul>
 
       {/* Subtotals */}
-      <div className="mt-3 flex items-center justify-between border-t border-stone-200 pt-3">
-        <div className="flex gap-3 text-xs text-stone-500">
+      <div className="mt-3 flex items-center justify-between border-t border-stone-200 pt-3 dark:border-zinc-800">
+        <div className="flex gap-3 text-xs text-stone-500 dark:text-zinc-400">
           <span>P {Math.round(meal.subtotal_protein_g)}g</span>
           <span>C {Math.round(meal.subtotal_carbs_g)}g</span>
           <span>F {Math.round(meal.subtotal_fat_g)}g</span>
         </div>
         {meal.subtotal_estimated_cost !== null && currency && (
-          <span className="text-sm text-stone-500">
+          <span className="text-sm text-stone-500 dark:text-zinc-400">
             {currency} {Number(meal.subtotal_estimated_cost).toLocaleString()}
           </span>
         )}
