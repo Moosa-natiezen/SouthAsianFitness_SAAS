@@ -85,6 +85,13 @@ class Settings(BaseSettings):
     whatsapp_phone_number_id: str = ""
     whatsapp_api_version: str = "v20.0"
 
+    # ── Vapi.ai (voice AI nutritionist) ─────────────────────────────
+    # Secret used to authenticate inbound Vapi tool-calls webhooks via the
+    # ``x-vapi-secret`` header. Set the same value in the Vapi dashboard
+    # ( Assistant → Server Messages → Server Secret ). Empty = skip
+    # verification (dev only — always set in production).
+    vapi_server_secret: str = ""
+
     cors_origins: str = (
         "http://localhost:3000,"
         "http://127.0.0.1:3000,"
