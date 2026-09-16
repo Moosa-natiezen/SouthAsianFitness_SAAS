@@ -70,7 +70,7 @@ export function TodayPlanCard() {
   if (state.status === "loading") {
     return (
       <div className="glass rounded-2xl p-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">Today&apos;s Plan</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">Today&apos;s Plan</p>
         <div className="mt-4 space-y-3">
           <Skeleton className="h-20 w-full rounded-xl bg-stone-100 dark:bg-zinc-800" />
           <Skeleton className="h-20 w-full rounded-xl bg-stone-100 dark:bg-zinc-800" />
@@ -83,7 +83,7 @@ export function TodayPlanCard() {
   if (state.status === "error") {
     return (
       <div className="glass rounded-2xl p-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">Today&apos;s Plan</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">Today&apos;s Plan</p>
         <AlertBanner variant="error" message={state.message} className="mt-4" />
         <Button variant="outline" size="sm" className="mt-3" onClick={fetchPlan}>
           Try again
@@ -95,7 +95,7 @@ export function TodayPlanCard() {
   if (state.status === "failure") {
     return (
       <div className="glass rounded-2xl p-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">Today&apos;s Plan</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">Today&apos;s Plan</p>
         <AlertBanner variant="warning" message={state.data.reason} className="mt-4" />
         {state.data.suggestions.length > 0 && (
           <ul className="mt-2 list-inside list-disc text-sm text-stone-500 dark:text-zinc-500">
@@ -114,8 +114,8 @@ export function TodayPlanCard() {
   return (
     <div className="glass rounded-2xl p-6 card-hover">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">Today&apos;s Plan</p>
-        <Link href="/dashboard/meal-plans" className="text-xs text-stone-400 dark:text-zinc-500 hover:text-emerald-600 transition-colors duration-300">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">Today&apos;s Plan</p>
+        <Link href="/dashboard/meal-plans" className="text-xs text-stone-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors duration-300">
           View full plan →
         </Link>
       </div>
@@ -158,8 +158,8 @@ export function TodayPlanCard() {
               ))}
             </div>
             <div className="mt-2.5 flex gap-3 text-xs">
-              <span className="text-emerald-600">P {Math.round(meal.subtotal_protein_g)}g</span>
-              <span className="text-emerald-600">C {Math.round(meal.subtotal_carbs_g)}g</span>
+              <span className="text-amber-600 dark:text-amber-400">P {Math.round(meal.subtotal_protein_g)}g</span>
+              <span className="text-amber-600 dark:text-amber-400">C {Math.round(meal.subtotal_carbs_g)}g</span>
               <span className="text-amber-600">F {Math.round(meal.subtotal_fat_g)}g</span>
             </div>
           </div>
@@ -173,8 +173,8 @@ export function TodayPlanCard() {
           <p className="text-sm font-semibold tabular-nums text-stone-900 dark:text-zinc-100">{Math.round(day.total_calories)} kcal</p>
         </div>
         <div className="mt-2 flex gap-4 text-xs">
-          <span className="text-emerald-600 tabular-nums">Protein {Math.round(day.total_protein_g)}g</span>
-          <span className="text-emerald-600 tabular-nums">Carbs {Math.round(day.total_carbs_g)}g</span>
+          <span className="text-amber-600 dark:text-amber-400 tabular-nums">Protein {Math.round(day.total_protein_g)}g</span>
+          <span className="text-amber-600 dark:text-amber-400 tabular-nums">Carbs {Math.round(day.total_carbs_g)}g</span>
           <span className="text-amber-600 tabular-nums">Fat {Math.round(day.total_fat_g)}g</span>
         </div>
         {plan.nutrition && (

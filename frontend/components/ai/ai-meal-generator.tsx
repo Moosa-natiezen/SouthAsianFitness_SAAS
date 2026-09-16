@@ -76,8 +76,8 @@ export function AiMealGenerator() {
     <div className="space-y-5">
       {/* ── Form ─────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl glass p-6">
-        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-700/5 blur-[40px]" />
-        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-emerald-600/5 blur-[40px]" />
+        <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-700/5 blur-[40px]" />
+        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-amber-500/5 blur-[40px]" />
 
         <div className="relative">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-600">
@@ -173,9 +173,9 @@ export function AiMealGenerator() {
 
       {/* ── Queued (background generation) Banner ────────────────────────── */}
       {queued && (
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3">
-          <p className="flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
+            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
             Meal plan is generating in the background
             {runHandle ? ` (run ${runHandle.slice(0, 8)})` : ""} — it will appear here
             automatically when ready.
@@ -193,7 +193,7 @@ export function AiMealGenerator() {
       {/* ── Streaming Output ──────────────────────────────────────────── */}
       {(content || isStreaming) && (
         <div className="relative overflow-hidden rounded-2xl glass p-6">
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-700/5 blur-[40px]" />
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-700/5 blur-[40px]" />
 
           <div className="relative">
             <div className="mb-4 flex items-center justify-between">
@@ -358,7 +358,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 transition-all focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30 disabled:opacity-50"
+        className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 transition-all focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30 disabled:opacity-50"
       />
     </div>
   );

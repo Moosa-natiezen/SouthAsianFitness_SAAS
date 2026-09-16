@@ -111,7 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-stone-200/50 dark:bg-zinc-900/80 dark:border-zinc-800/50 print:hidden">
         <div className="flex items-center justify-between px-5 py-3 md:px-6">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-[10px] font-bold text-white shadow-sm shadow-emerald-600/20 dark:bg-emerald-500 dark:shadow-emerald-500/20">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-[10px] font-bold text-zinc-950 shadow-sm shadow-amber-500/30">
               SA
             </div>
             <span className="hidden text-sm font-semibold text-stone-800 dark:text-zinc-100 sm:inline">South Asian Fitness</span>
@@ -123,7 +123,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span
                 className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-all duration-500 ${
                   isPro
-                    ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/20 animate-glow-ring dark:bg-emerald-400 dark:text-emerald-950"
+                    ? "bg-gradient-to-r from-amber-400 to-orange-500 text-zinc-950 shadow-sm shadow-amber-500/30 animate-glow-ring"
                     : "bg-stone-100 text-stone-500 border border-stone-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700"
                 }`}
               >
@@ -131,7 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             )}
             <div className="hidden items-center gap-3 md:flex">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/10 text-[10px] font-medium text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/10 text-[10px] font-medium text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30">
                 {user?.display_name?.charAt(0)?.toUpperCase() || "?"}
               </div>
               <button
@@ -170,11 +170,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={isActive ? "page" : undefined}
                 className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 md:gap-3 ${
                   isActive
-                    ? "bg-emerald-500/8 text-emerald-700 font-medium border border-emerald-200/60 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800/60"
+                    ? "bg-amber-500/8 text-amber-700 font-medium border border-amber-200/60 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30"
                     : "text-stone-400 hover:text-stone-700 hover:bg-stone-50 dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-800/50"
                 }`}
               >
-                <span className={`shrink-0 transition-colors duration-200 ${isActive ? "text-emerald-500 dark:text-emerald-400" : ""}`}>
+                <span className={`shrink-0 transition-colors duration-200 ${isActive ? "text-amber-500 dark:text-amber-400" : ""}`}>
                   {item.icon}
                 </span>
                 <span className="text-[13px]">{item.label}</span>
