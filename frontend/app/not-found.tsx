@@ -12,18 +12,18 @@ export default function NotFound() {
       {/* Soft brand glows, matching the landing page aesthetic */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-emerald-600/10 blur-3xl"
+        className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-emerald-600/10 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl"
       />
 
-      <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-600 text-2xl font-bold text-white shadow-lg shadow-emerald-600/20">
+      <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-600 text-2xl font-bold text-white shadow-lg shadow-amber-600/20">
         SA
       </div>
 
-      <p className="mt-8 text-xs font-medium uppercase tracking-[0.25em] text-emerald-600">
+      <p className="mt-8 text-xs font-medium uppercase tracking-[0.25em] text-amber-600">
         404 — Page not found
       </p>
 
@@ -39,13 +39,13 @@ export default function NotFound() {
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/"
-          className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all duration-200 hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/30 active:scale-[0.97]"
+          className="inline-flex items-center justify-center rounded-full bg-amber-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-amber-600/20 transition-all duration-200 hover:bg-amber-500 hover:shadow-xl hover:shadow-amber-600/30 active:scale-[0.97]"
         >
           Go to homepage
         </Link>
         <Link
           href="/dashboard"
-          className="inline-flex items-center justify-center rounded-full border border-stone-200 bg-white px-8 py-3.5 text-sm font-semibold text-stone-900 shadow-sm transition-all duration-200 hover:border-emerald-600/40 hover:text-emerald-700 active:scale-[0.97]"
+          className="inline-flex items-center justify-center rounded-full border border-stone-200 bg-white px-8 py-3.5 text-sm font-semibold text-stone-900 shadow-sm transition-all duration-200 hover:border-amber-600/40 hover:text-amber-700 active:scale-[0.97]"
         >
           Go to dashboard
         </Link>

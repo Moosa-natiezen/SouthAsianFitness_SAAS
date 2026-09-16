@@ -29,6 +29,7 @@ export function ConfirmDialog({
   cancelLabel = "Cancel",
   confirmDisabled = false,
   confirming = false,
+  destructive = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,6 +40,10 @@ export function ConfirmDialog({
   cancelLabel?: string;
   confirmDisabled?: boolean;
   confirming?: boolean;
+  /** Red destructive styling for irreversible actions (logout, delete);
+   *  default amber matches the brand CTA for reversible confirms
+   *  (e.g. "Regenerate Plan"). */
+  destructive?: boolean;
 }) {
   const handleConfirm = () => {
     onConfirm();
@@ -82,7 +87,12 @@ export function ConfirmDialog({
               onClick={handleConfirm}
               disabled={confirmDisabled || confirming}
               autoFocus
-              className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-red-700 active:scale-[0.98] disabled:opacity-50 dark:bg-red-500 dark:hover:bg-red-400"
+              className={cn(
+                "rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] disabled:opacity-50",
+                destructive
+                  ? "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400"
+                  : "bg-amber-600 text-white hover:bg-amber-500 dark:bg-amber-500 dark:text-amber-950 dark:hover:bg-amber-400",
+              )}
             >
               {confirming ? "Working..." : confirmLabel}
             </button>

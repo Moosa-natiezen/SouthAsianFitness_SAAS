@@ -10,7 +10,7 @@ export function MealPlanSkeleton() {
       {/* Header skeleton */}
       <div className="flex items-center gap-3">
         <Skeleton className="h-3 w-24 rounded-full bg-stone-200 dark:bg-zinc-800" />
-        <Skeleton className="h-5 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30" />
+        <Skeleton className="h-5 w-16 rounded-full bg-amber-100 dark:bg-amber-900/30" />
       </div>
 
       {/* Day heading skeleton */}
@@ -30,7 +30,7 @@ export function MealPlanSkeleton() {
 
           {/* Macro pills */}
           <div className="flex gap-2">
-            <Skeleton className="h-6 w-16 rounded-lg bg-emerald-50 dark:bg-emerald-900/20" />
+            <Skeleton className="h-6 w-16 rounded-lg bg-amber-50 dark:bg-amber-900/20" />
             <Skeleton className="h-6 w-16 rounded-lg bg-stone-100 dark:bg-zinc-800" />
             <Skeleton className="h-6 w-16 rounded-lg bg-stone-100 dark:bg-zinc-800" />
           </div>
@@ -47,7 +47,7 @@ export function MealPlanSkeleton() {
       <div className="rounded-xl bg-stone-50 dark:bg-zinc-800 p-4">
         <Skeleton className="h-3 w-28 rounded-full bg-stone-200 dark:bg-zinc-700" />
         <div className="mt-3 flex gap-4">
-          <Skeleton className="h-8 w-16 rounded-lg bg-emerald-50 dark:bg-emerald-900/20" />
+          <Skeleton className="h-8 w-16 rounded-lg bg-amber-50 dark:bg-amber-900/20" />
           <Skeleton className="h-8 w-16 rounded-lg bg-stone-100 dark:bg-zinc-700" />
           <Skeleton className="h-8 w-16 rounded-lg bg-stone-100 dark:bg-zinc-700" />
           <Skeleton className="h-8 w-16 rounded-lg bg-stone-100 dark:bg-zinc-700" />
@@ -56,9 +56,9 @@ export function MealPlanSkeleton() {
 
       {/* Pulsing loading indicator */}
       <div className="flex items-center justify-center gap-2 py-3">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 [animation-delay:0ms]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 [animation-delay:150ms]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 [animation-delay:300ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-amber-500 [animation-delay:0ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-amber-500 [animation-delay:150ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-amber-500 [animation-delay:300ms]" />
         <span className="ml-2 text-xs font-medium text-stone-400 dark:text-zinc-500">
           Generating your plan...
         </span>

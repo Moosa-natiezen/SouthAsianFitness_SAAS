@@ -52,7 +52,7 @@ export default function TermsPage() {
               our{" "}
               <Link
                 href="/privacy"
-                className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
               >
                 Privacy Policy
               </Link>
@@ -164,7 +164,7 @@ export default function TermsPage() {
                   href="https://www.lemonsqueezy.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                  className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                 >
                   Lemon Squeezy
                 </a>
@@ -199,7 +199,7 @@ export default function TermsPage() {
                   href="https://www.lemonsqueezy.com/terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                  className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                 >
                   Lemon Squeezy&apos;s Terms of Service
                 </a>
@@ -386,7 +386,7 @@ export default function TermsPage() {
                 Email:{" "}
                 <a
                   href="mailto:support@southasianfitness.com"
-                  className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                  className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                 >
                   support@southasianfitness.com
                 </a>

@@ -32,7 +32,7 @@ function Stars() {
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
-          className="h-4 w-4 text-emerald-600"
+          className="h-4 w-4 text-amber-500"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -48,7 +48,7 @@ export function TestimonialsSection() {
     <section className="bg-white dark:bg-zinc-900 py-28 md:py-36">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-16 md:mb-20 text-center">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-600">
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-amber-600">
             Testimonials
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-stone-900 dark:text-zinc-100 md:text-4xl font-serif">
@@ -69,7 +69,7 @@ export function TestimonialsSection() {
                 &quot;{t.quote}&quot;
               </p>
               <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-600 text-sm font-bold text-white">
                   {t.initials}
                 </div>
                 <div>

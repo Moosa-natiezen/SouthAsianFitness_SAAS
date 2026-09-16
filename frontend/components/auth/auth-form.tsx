@@ -336,7 +336,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, displayName: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/30"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-amber-400 dark:focus:ring-amber-400/30"
                   placeholder="Your name"
                   autoComplete="name"
                 />
@@ -353,7 +353,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/30"
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-amber-400 dark:focus:ring-amber-400/30"
                 placeholder="you@example.com"
                 autoComplete={isSignup ? "email" : "username"}
               />
@@ -372,7 +372,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, password: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 pr-10 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/30"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 pr-10 text-stone-900 placeholder:text-stone-500 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-amber-400 dark:focus:ring-amber-400/30"
                   placeholder="Enter an 8+ character password"
                   autoComplete={isSignup ? "new-password" : "current-password"}
                 />
@@ -403,7 +403,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
               </div>
             ) : null}
 
-            <Button type="submit" className="w-full bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-md transition-all duration-200 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400 active:scale-[0.98]" disabled={loading}>
+            <Button type="submit" className="w-full bg-amber-600 text-white hover:bg-amber-500 hover:shadow-md transition-all duration-200 dark:bg-amber-500 dark:text-amber-950 dark:hover:bg-amber-400 active:scale-[0.98]" disabled={loading}>
               {loading ? (isSignup ? "Creating account..." : "Signing in...") : isSignup ? "Create account" : "Sign in"}
             </Button>
           </form>

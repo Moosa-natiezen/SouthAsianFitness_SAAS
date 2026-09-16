@@ -80,7 +80,7 @@ export function FAQSection() {
     <section className="py-28 md:py-36 bg-background">
       <div className="mx-auto max-w-3xl px-6">
         <div className="mb-14 text-center">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-600">
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-amber-600">
             FAQ
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-stone-900 dark:text-zinc-100 md:text-4xl font-serif">
