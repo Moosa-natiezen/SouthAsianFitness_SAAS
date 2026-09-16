@@ -12,7 +12,7 @@ export function LandingPage() {
     <div className="min-h-screen overflow-x-clip bg-zinc-950 text-zinc-100 antialiased">
       {/* Ambient glow backdrop */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -top-32 left-1/2 h-105 w-[52rem] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute -top-32 left-1/2 h-105 w-[52rem] -translate-x-1/2 rounded-full bg-amber-500/10 blur-3xl" />
         <div className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-amber-500/8 blur-3xl" />
         <div className="absolute bottom-0 -left-40 h-96 w-96 rounded-full bg-orange-600/6 blur-3xl" />
       </div>
@@ -296,7 +296,7 @@ function FeatureGrid() {
 
           {/* Card 2 — WhatsApp logging */}
           <div className="card-hover rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
-            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-xl">
+            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/10 text-xl">
               💬
             </div>
             <h3 className="font-serif text-xl font-semibold text-zinc-100">

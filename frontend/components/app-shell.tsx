@@ -192,6 +192,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         title="Log out?"
         description="You'll need to sign in again to access your dashboard."
         confirmLabel="Log out"
+        destructive
       />
     </div>
   );

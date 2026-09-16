@@ -183,7 +183,7 @@ export default function PrivacyPage() {
                     href="https://policies.google.com/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                    className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                   >
                     Google&apos;s Privacy Policy
                   </a>
@@ -202,7 +202,7 @@ export default function PrivacyPage() {
                     href="https://www.lemonsqueezy.com/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                    className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                   >
                     Lemon Squeezy&apos;s Privacy Policy
                   </a>
@@ -221,7 +221,7 @@ export default function PrivacyPage() {
                     href="https://posthog.com/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                    className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                   >
                     PostHog&apos;s Privacy Policy
                   </a>
@@ -242,7 +242,7 @@ export default function PrivacyPage() {
                     href="https://openai.com/policies/privacy-policy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                    className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                   >
                     OpenAI&apos;s Privacy Policy
                   </a>
@@ -332,7 +332,7 @@ export default function PrivacyPage() {
                 Email:{" "}
                 <a
                   href="mailto:support@southasianfitness.com"
-                  className="text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                  className="text-amber-600 underline underline-offset-2 hover:text-amber-700"
                 >
                   support@southasianfitness.com
                 </a>

@@ -15,11 +15,11 @@ export default function OpengraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "#FCFBF7",
+          background: "#09090B",
           position: "relative",
         }}
       >
-        {/* Soft emerald corner glows */}
+        {/* Soft amber corner glows */}
         <div
           style={{
             position: "absolute",
@@ -28,7 +28,7 @@ export default function OpengraphImage() {
             width: 420,
             height: 420,
             borderRadius: 9999,
-            background: "rgba(5,150,105,0.10)",
+            background: "rgba(245,158,11,0.14)",
           }}
         />
         <div
@@ -39,7 +39,7 @@ export default function OpengraphImage() {
             width: 420,
             height: 420,
             borderRadius: 9999,
-            background: "rgba(5,150,105,0.10)",
+            background: "rgba(245,158,11,0.14)",
           }}
         />
 
@@ -52,11 +52,11 @@ export default function OpengraphImage() {
             width: 96,
             height: 96,
             borderRadius: 24,
-            background: "#059669",
-            color: "#ffffff",
+            background: "linear-gradient(135deg, #FBBF24, #F97316)",
+            color: "#09090B",
             fontSize: 36,
             fontWeight: 700,
-            boxShadow: "0 12px 32px rgba(5,150,105,0.25)",
+            boxShadow: "0 12px 32px rgba(245,158,11,0.35)",
           }}
         >
           SA
@@ -68,7 +68,7 @@ export default function OpengraphImage() {
             marginTop: 40,
             fontSize: 68,
             fontWeight: 700,
-            color: "#1C1917",
+            color: "#FAFAFA",
             letterSpacing: -1,
           }}
         >
@@ -80,21 +80,21 @@ export default function OpengraphImage() {
           style={{
             marginTop: 16,
             fontSize: 30,
-            color: "#78716C",
+            color: "#A1A1AA",
             display: "flex",
           }}
         >
           AI meal plans for the food you actually eat.
         </div>
 
-        {/* Emerald accent rule */}
+        {/* Amber accent rule */}
         <div
           style={{
             marginTop: 36,
             width: 120,
             height: 6,
             borderRadius: 9999,
-            background: "#059669",
+            background: "linear-gradient(90deg, #FBBF24, #F97316)",
           }}
         />
       </div>

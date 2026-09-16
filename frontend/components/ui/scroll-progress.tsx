@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 /**
- * Thin emerald gradient bar fixed at the top of the viewport.
+ * Thin amber gradient bar fixed at the top of the viewport.
  * Width tracks scroll position from 0 % → 100 %.
  */
 export function ScrollProgress() {
@@ -32,7 +32,7 @@ export function ScrollProgress() {
       className="fixed top-0 left-0 right-0 z-[100] h-[3px] bg-transparent print:hidden"
     >
       <div
-        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-[width] duration-150 ease-out"
+        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-[width] duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>

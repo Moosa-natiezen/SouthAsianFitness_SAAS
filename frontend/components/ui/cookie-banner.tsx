@@ -49,7 +49,7 @@ export function CookieBanner() {
             understand how you use South Asian Fitness.{" "}
             <a
               href="/privacy"
-              className="underline underline-offset-2 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+              className="underline underline-offset-2 text-amber-600 hover:text-amber-700 dark:text-amber-400"
             >
               Privacy Policy
             </a>
@@ -64,7 +64,7 @@ export function CookieBanner() {
           </button>
           <button
             onClick={handleAccept}
-            className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-semibold text-white shadow-sm shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-md active:scale-[0.97]"
+            className="rounded-xl bg-amber-600 px-5 py-2 text-xs font-semibold text-white shadow-sm shadow-amber-600/20 transition-all hover:bg-amber-500 hover:shadow-md active:scale-[0.97]"
           >
             Accept
           </button>

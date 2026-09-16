@@ -23,7 +23,7 @@ export function WorkoutPlanSkeleton() {
       {/* Day headings + exercise rows */}
       {[1, 2, 3].map((day) => (
         <div key={day} className="px-6 space-y-2">
-          <Skeleton className="h-4 w-28 rounded-md bg-emerald-50 dark:bg-emerald-900/20" />
+          <Skeleton className="h-4 w-28 rounded-md bg-amber-50 dark:bg-amber-900/20" />
           <div className="space-y-1.5 pl-2">
             {[1, 2, 3, 4].map((ex) => (
               <div key={ex} className="flex items-center gap-3">
@@ -39,9 +39,9 @@ export function WorkoutPlanSkeleton() {
 
       {/* Pulsing loading indicator */}
       <div className="flex items-center justify-center gap-2 py-3">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 [animation-delay:0ms]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 [animation-delay:150ms]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-500 [animation-delay:300ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-amber-500 [animation-delay:0ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-amber-500 [animation-delay:150ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-amber-500 [animation-delay:300ms]" />
         <span className="ml-2 text-xs font-medium text-stone-400 dark:text-zinc-500">
           Building your workout...
         </span>

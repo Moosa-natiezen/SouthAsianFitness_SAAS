@@ -12,7 +12,7 @@ export function MobileStickyCTA() {
       <div className="mx-auto max-w-lg px-4 pb-4">
         <Link
           href="/auth/signup"
-          className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 backdrop-blur transition-all duration-200 hover:bg-emerald-700 hover:shadow-xl active:scale-[0.97]"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-amber-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-amber-600/30 backdrop-blur transition-all duration-200 hover:bg-amber-500 hover:shadow-xl active:scale-[0.97]"
         >
           Get Started — It&apos;s Free
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
