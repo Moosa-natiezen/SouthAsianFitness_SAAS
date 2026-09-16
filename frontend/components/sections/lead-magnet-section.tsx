@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 
-/* ── Lead Magnet — Email Capture ───────────────────────────────── */
+/* ── Lead Magnet — Email Capture (dark zinc + amber system) ───── */
 
 export function LeadMagnetSection() {
   const [email, setEmail] = useState("");
@@ -50,26 +50,30 @@ export function LeadMagnetSection() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-emerald-600 py-20 md:py-24">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15)_0%,transparent_50%)]" />
+    <section className="relative overflow-hidden border-y border-zinc-800 bg-zinc-900 py-20 md:py-24">
+      {/* Amber accent hairline + faint glow */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent"
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-0 h-64 w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/8 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-3xl px-6 text-center">
-        <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-emerald-100/80">
+        <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-amber-400">
           Free Resource
         </p>
-        <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl font-serif">
+        <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-50 md:text-4xl">
           Get the Free South Asian Macro &amp; Diet Cheat Sheet
         </h2>
-        <p className="mt-4 text-lg text-emerald-50/80 max-w-xl mx-auto">
+        <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">
           Learn how to track roti, biryani, and curries without guessing your
           macros. Delivered instantly to your inbox.
         </p>
 
         {status === "success" ? (
-          <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-white/20 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm">
+          <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-300">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -100,19 +104,17 @@ export function LeadMagnetSection() {
                   if (status === "error") setStatus("idle");
                 }}
                 placeholder="Enter your email address..."
-                className="w-full rounded-full bg-white px-5 py-3 text-sm text-stone-900 placeholder:text-stone-400 shadow-lg ring-1 ring-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
+                className="w-full rounded-full border border-zinc-800 bg-zinc-950 px-5 py-3 text-sm text-zinc-100 shadow-lg shadow-black/20 transition-all placeholder:text-zinc-500 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                 disabled={status === "loading"}
               />
               {status === "error" && errorMsg && (
-                <p className="mt-2 text-left text-xs text-emerald-100">
-                  {errorMsg}
-                </p>
+                <p className="mt-2 text-left text-xs text-amber-300">{errorMsg}</p>
               )}
             </div>
             <button
               type="submit"
               disabled={status === "loading"}
-              className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-7 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:bg-stone-800 hover:shadow-xl active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-7 py-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-amber-500/40 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === "loading" ? (
                 <>
@@ -144,7 +146,7 @@ export function LeadMagnetSection() {
           </form>
         )}
 
-        <p className="mt-4 text-xs text-emerald-100/60">
+        <p className="mt-4 text-xs text-zinc-500">
           No spam. Unsubscribe anytime. We respect your inbox.
         </p>
       </div>
