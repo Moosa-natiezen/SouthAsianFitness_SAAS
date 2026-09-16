@@ -72,7 +72,7 @@ export default function DashboardPage() {
       {showUpgradeBanner && !upgradeDismissed && (
         <div className="glass rounded-xl px-5 py-4 text-sm animate-fade-in-up">
           <div className="flex items-center justify-between">
-            <span className="text-emerald-600">
+            <span className="text-amber-600 dark:text-amber-400">
               <span className="mr-2">🎉</span>Welcome to Pro! Your account has been upgraded.
             </span>
             <button
@@ -99,7 +99,7 @@ export default function DashboardPage() {
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${
                 isPro
-                  ? "bg-gradient-to-r from-emerald-700 to-emerald-600 text-stone-900 dark:text-zinc-100 shadow-lg shadow-emerald-700/25 animate-glow-ring"
+                  ? "bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-950 shadow-lg shadow-amber-500/30 animate-glow-ring"
                   : "bg-stone-100 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 border border-stone-200 dark:border-zinc-700"
               }`}
             >
@@ -177,7 +177,7 @@ function NutritionCard({ data }: { data: NutritionBudgetResponse }) {
 
   return (
     <div className="glass rounded-2xl p-6 card-hover">
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">
         Nutrition Targets
       </p>
       <div className="mt-4 flex items-end gap-3">
@@ -235,7 +235,7 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
 
   return (
     <div className="glass rounded-2xl p-6 card-hover">
-      <p className="text-xs font-medium uppercase tracking-[0.15em] text-emerald-600">
+      <p className="text-xs font-medium uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">
         Budget
       </p>
       {hasBudget ? (
@@ -274,9 +274,9 @@ function BudgetCard({ data }: { data: NutritionBudgetResponse }) {
 
 function AchievementsSection() {
   const badges = [
-    { icon: "🔥", label: "7-Day Streak", desc: "Logged in for 7 days straight", glow: "from-emerald-600/20 to-amber-500/10" },
-    { icon: "📊", label: "First Entry", desc: "Logged your first progress entry", glow: "from-emerald-700/20 to-emerald-600/10" },
-    { icon: "🎯", label: "Goal Setter", desc: "Set your nutrition targets", glow: "from-emerald-500/20 to-teal-500/10" },
+    { icon: "🔥", label: "7-Day Streak", desc: "Logged in for 7 days straight", glow: "from-amber-500/20 to-orange-500/10" },
+    { icon: "📊", label: "First Entry", desc: "Logged your first progress entry", glow: "from-amber-600/20 to-amber-500/10" },
+    { icon: "🎯", label: "Goal Setter", desc: "Set your nutrition targets", glow: "from-amber-500/20 to-orange-600/10" },
   ];
 
   return (

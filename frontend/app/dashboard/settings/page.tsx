@@ -76,7 +76,7 @@ const budgetPeriods = [
 /* ── Shared styles ─────────────────────────────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30 text-sm";
+  "w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30 text-sm";
 
 const labelClass = "text-sm font-medium text-stone-500 dark:text-zinc-500";
 

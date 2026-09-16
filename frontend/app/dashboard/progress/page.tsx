@@ -444,7 +444,7 @@ function LogForm({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30"
+            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
             required
           />
         </div>
@@ -461,7 +461,7 @@ function LogForm({
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="e.g. 72.5"
-            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30"
+            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
             required
           />
         </div>
@@ -479,7 +479,7 @@ function LogForm({
               value={waist}
               onChange={(e) => setWaist(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30"
+              className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
             />
           </div>
           <div>
@@ -494,7 +494,7 @@ function LogForm({
               value={hip}
               onChange={(e) => setHip(e.target.value)}
               placeholder="Optional"
-              className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30"
+              className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
             />
           </div>
         </div>
@@ -512,7 +512,7 @@ function LogForm({
             value={bodyFat}
             onChange={(e) => setBodyFat(e.target.value)}
             placeholder="Optional"
-            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30"
+            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
           />
         </div>
 
@@ -526,7 +526,7 @@ function LogForm({
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional notes"
             rows={2}
-            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600/30"
+            className="mt-1 block w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
           />
         </div>
 

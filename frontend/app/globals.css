@@ -198,16 +198,16 @@
   }
 
   .btn-chrome-accent {
-    background: #059669;
-    color: #FFFFFF;
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    color: #1C1917;
     border: 1px solid transparent;
     font-weight: 600;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(5, 150, 105, 0.2);
+    box-shadow: 0 1px 3px rgba(251, 191, 36, 0.3);
   }
   .btn-chrome-accent:hover {
-    background: #047857;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    background: linear-gradient(135deg, #fcd34d, #fb923c);
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
     transform: translateY(-1px);
   }
   .btn-chrome-accent:active {
@@ -215,12 +215,12 @@
   }
 
   .dark .btn-chrome-accent {
-    background: #10B981;
-    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    box-shadow: 0 1px 3px rgba(251, 191, 36, 0.3);
   }
   .dark .btn-chrome-accent:hover {
-    background: #059669;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #fcd34d, #fb923c);
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
   }
 
   /* ── Gradient text ─────────────────────────────────────────────── */
@@ -337,12 +337,12 @@
 
 @keyframes glow-ring {
   0%, 100% { box-shadow: 0 0 15px rgba(5, 150, 105, 0.15); }
-  50% { box-shadow: 0 0 30px rgba(5, 150, 105, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.3); }
 }
 
 .dark @keyframes glow-ring {
-  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
-  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
+  0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
 }
 
 .animate-glow-ring {

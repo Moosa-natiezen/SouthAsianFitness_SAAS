@@ -33,12 +33,12 @@ type PlanState =
 const dayOptions = [1, 3, 7, 14, 30];
 const mealOptions = [2, 3, 4, 6];
 
-/* Shared chip styles — active state uses the emerald brand accent so the
+/* Shared chip styles — active state uses the amber brand accent so the
    selected chip is always visibly distinct from the rest. */
 const chipBase =
   "rounded-lg border px-3 py-1.5 text-sm font-medium transition-all duration-200";
 const chipActive =
-  "border-emerald-600/50 bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-600/10 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-400";
+  "border-amber-500/50 bg-amber-50 text-amber-700 shadow-sm shadow-amber-500/10 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-400";
 const chipInactive =
   "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60";
 
@@ -272,7 +272,7 @@ export default function MealPlansPage() {
               placeholder="Auto (from profile)"
               value={calorieTarget}
               onChange={(e) => setCalorieTarget(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2 text-sm text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-600 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30"
+              className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2 text-sm text-stone-900 dark:text-zinc-100 placeholder:text-stone-400 dark:placeholder:text-zinc-600 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30"
             />
             <p className="text-xs text-stone-400 dark:text-zinc-600">
               Leave empty to use your profile target (clamped to 1000–6000).

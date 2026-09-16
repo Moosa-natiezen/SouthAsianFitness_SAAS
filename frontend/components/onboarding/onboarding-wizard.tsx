@@ -379,7 +379,7 @@ export function OnboardingWizard() {
   /* ── Step content ───────────────────────────────────────────────────── */
 
   const selectClass =
-    "w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30";
+    "w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-3.5 py-2.5 text-stone-900 dark:text-zinc-100 placeholder:text-stone-500 dark:text-zinc-500 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30";
 
   const renderStep = () => {
     // ─── Step 0: Goal Selection ────────────────────────────────────────
@@ -394,12 +394,12 @@ export function OnboardingWizard() {
                 onClick={() => updateField("fitness_goal", g.value as GoalValue)}
                 className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-300 ${
                   form.fitness_goal === g.value
-                    ? "border-emerald-600/50 bg-emerald-50/80 shadow-[0_0_30px_rgba(5,150,105,0.15)] dark:border-emerald-500/40 dark:bg-emerald-500/10"
+                    ? "border-amber-500/50 bg-amber-50/80 shadow-[0_0_30px_rgba(251,191,36,0.15)] dark:border-amber-500/40 dark:bg-amber-500/10"
                     : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60"
                 }`}
               >
                 {form.fitness_goal === g.value && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent" />
                 )}
                 <div className="relative">
                   <div className="mb-3 text-3xl">{g.icon}</div>
@@ -433,7 +433,7 @@ export function OnboardingWizard() {
                   max={120}
                   value={form.age_years}
                   onChange={(e) => updateField("age_years", e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-3 text-center text-2xl font-bold text-stone-900 dark:text-zinc-100 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30"
+                  className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-3 text-center text-2xl font-bold text-stone-900 dark:text-zinc-100 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30"
                 />
               </div>
               <div className="space-y-2">
@@ -442,7 +442,7 @@ export function OnboardingWizard() {
                   type="number"
                   value={form.height_cm}
                   onChange={(e) => updateField("height_cm", e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-3 text-center text-2xl font-bold text-stone-900 dark:text-zinc-100 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30"
+                  className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-3 text-center text-2xl font-bold text-stone-900 dark:text-zinc-100 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30"
                 />
               </div>
               <div className="space-y-2">
@@ -451,7 +451,7 @@ export function OnboardingWizard() {
                   type="number"
                   value={form.weight_kg}
                   onChange={(e) => updateField("weight_kg", e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-3 text-center text-2xl font-bold text-stone-900 dark:text-zinc-100 outline-none transition-all focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30"
+                  className="w-full rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 px-4 py-3 text-center text-2xl font-bold text-stone-900 dark:text-zinc-100 outline-none transition-all focus:border-amber-600 focus:ring-1 focus:ring-amber-600/30"
                 />
               </div>
             </div>
@@ -465,7 +465,7 @@ export function OnboardingWizard() {
                     onClick={() => updateField("sex", s)}
                     className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
                       form.sex === s
-                        ? "border-emerald-600/50 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-400"
+                        ? "border-amber-500/50 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-400"
                         : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-stone-500 dark:text-zinc-500 hover:border-stone-300"
                     }`}
                   >
@@ -516,7 +516,7 @@ export function OnboardingWizard() {
                 onClick={() => updateField("activity_level", a.value as ActivityValue)}
                 className={`w-full rounded-xl border p-4 text-left transition-all duration-200 ${
                   form.activity_level === a.value
-                    ? "border-emerald-600/50 bg-emerald-50/80 dark:border-emerald-500/40 dark:bg-emerald-500/10"
+                    ? "border-amber-500/50 bg-amber-50/80 dark:border-amber-500/40 dark:bg-amber-500/10"
                     : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60"
                 }`}
               >
@@ -627,7 +627,7 @@ export function OnboardingWizard() {
                 onClick={() => updateField("diet_pattern", d.value as DietValue)}
                 className={`rounded-xl border p-4 text-left transition-all duration-200 ${
                   form.diet_pattern === d.value
-                    ? "border-emerald-600/50 bg-emerald-50/80 dark:border-emerald-500/40 dark:bg-emerald-500/10"
+                    ? "border-amber-500/50 bg-amber-50/80 dark:border-amber-500/40 dark:bg-amber-500/10"
                     : "border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 hover:border-stone-300 hover:bg-stone-100 dark:hover:bg-zinc-700/60"
                 }`}
               >
@@ -716,8 +716,8 @@ export function OnboardingWizard() {
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <FadeSlide className="text-center">
           <div className="relative mx-auto mb-8 h-24 w-24">
-            <div className="absolute inset-0 animate-spin rounded-full border-2 border-stone-300 border-t-emerald-600" />
-            <div className="absolute inset-2 animate-spin rounded-full border-2 border-zinc-700/20 border-b-emerald-500/70 [animation-direction:reverse] [animation-duration:1.5s]" />
+            <div className="absolute inset-0 animate-spin rounded-full border-2 border-stone-300 border-t-amber-500" />
+            <div className="absolute inset-2 animate-spin rounded-full border-2 border-zinc-700/20 border-b-amber-400/70 [animation-direction:reverse] [animation-duration:1.5s]" />
             <div className="absolute inset-0 flex items-center justify-center text-3xl">⚡</div>
           </div>
           <h2 className="font-serif text-3xl font-bold text-stone-900 dark:text-zinc-100">Calculating your plan</h2>
@@ -783,7 +783,7 @@ export function OnboardingWizard() {
             <div
               key={i}
               className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                i <= stepIndex ? "bg-emerald-600 dark:bg-emerald-500" : "bg-stone-100 dark:bg-zinc-800"
+                i <= stepIndex ? "bg-amber-500" : "bg-stone-100 dark:bg-zinc-800"
               }`}
             />
           ))}
@@ -822,7 +822,7 @@ export function OnboardingWizard() {
               type="button"
               onClick={handleNext}
               disabled={loading}
-              className="relative overflow-hidden rounded-xl bg-emerald-600 px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:bg-emerald-700 active:scale-[0.97] disabled:opacity-50"
+              className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-500/30 transition-all duration-200 hover:shadow-xl hover:shadow-amber-500/40 active:scale-[0.97] disabled:opacity-50"
             >
               {isLastStep ? "Calculate & Finish" : "Continue"}
             </button>
