@@ -421,14 +421,41 @@ export async function registerUser(payload: RegisterRequest): Promise<AuthSessio
   });
 }
 
+/**
+ * Single-flight cache for the current user session.
+ *
+ * Several components call getCurrentUser() on every dashboard navigation
+ * (AppShell, page effects, ProtectedRoute). Without this cache each mount
+ * re-fires GET /api/auth/me, so clicking through the sidebar costs 2-3
+ * identical requests per click. The cache keeps the in-flight promise so
+ * concurrent callers share one request, serves the resolved user instantly
+ * on re-mounts, and is invalidated by clearCurrentUserCache() after any
+ * mutation that changes the authenticated user's server-side state.
+ */
+type CurrentUserCache = {
+  user: AuthUser | null;
+  inFlight: Promise<AuthUser> | null;
+};
+
+const currentUserCache: CurrentUserCache = {
+  user: null,
+  inFlight: null,
+};
+
+export function clearCurrentUserCache(): void {
+  currentUserCache.user = null;
+  currentUserCache.inFlight = null;
+}
+
 export async function loginUser(payload: LoginRequest): Promise<AuthSession> {
   return apiFetch<AuthSession>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }).finally(clearCurrentUserCache);
 }
 
 export async function logoutUser(): Promise<void> {
+  clearCurrentUserCache();
   const csrfToken = await getCsrfToken();
   await apiFetch<unknown>("/api/auth/logout", {
     method: "POST",
@@ -437,7 +464,23 @@ export async function logoutUser(): Promise<void> {
 }
 
 export async function getCurrentUser(): Promise<AuthUser> {
-  return apiFetch<AuthUser>("/api/auth/me");
+  // Serve the cached user instantly; single-flight the network request so
+  // concurrent callers on one navigation share a single GET /api/auth/me.
+  // A failed attempt clears inFlight so the next call retries the network.
+  if (currentUserCache.user) return currentUserCache.user;
+  if (!currentUserCache.inFlight) {
+    currentUserCache.inFlight = apiFetch<AuthUser>("/api/auth/me")
+      .then((user) => {
+        currentUserCache.user = user;
+        currentUserCache.inFlight = null;
+        return user;
+      })
+      .catch((error: unknown) => {
+        currentUserCache.inFlight = null;
+        throw error;
+      });
+  }
+  return currentUserCache.inFlight;
 }
 
 export type OnboardingResponse = {
