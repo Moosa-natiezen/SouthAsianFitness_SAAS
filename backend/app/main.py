@@ -10,6 +10,7 @@ from fastmcp import FastMCP
 from sqlalchemy import func, select
 
 from app.api.router import api_router
+from app.api.routes.health import keepalive_router
 from app.core.config import settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import get_logger, setup_logging
@@ -212,6 +213,10 @@ def create_app() -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestSizeLimitMiddleware)
     app.include_router(api_router, prefix=settings.api_prefix)
+
+    # Root-level keep-alive endpoint (outside the /api prefix): zero-I/O
+    # target for external uptime pingers that keep free-tier instances warm.
+    app.include_router(keepalive_router)
     return app
 
 

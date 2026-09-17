@@ -10,6 +10,11 @@ logger = get_logger(__name__)
 
 router = APIRouter(tags=["health"])
 
+# Keep-alive pinger router: mounted at the application root (no /api prefix)
+# so uptime monitors can hit GET /health directly. Zero I/O — it exists purely
+# to keep the instance warm on hosting platforms that sleep idle services.
+keepalive_router = APIRouter(tags=["health"])
+
 
 class HealthResponse(BaseModel):
     status: str
@@ -18,6 +23,18 @@ class HealthResponse(BaseModel):
 
     # AI cost metrics: tokens saved via response cache + local math routing.
     ai_tokens_saved: dict[str, int] | None = None
+
+
+@keepalive_router.get("/health")
+def keepalive_check() -> dict[str, str]:
+    """Zero-I/O liveness probe for external uptime pingers.
+
+    Deliberately does NOT touch the database or return any diagnostics —
+    a keep-alive ping only needs to prove the Python process is serving
+    HTTP. Response is a static JSON body, so it stays fast and cheap even
+    at pinger frequency.
+    """
+    return {"status": "healthy"}
 
 
 @router.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
