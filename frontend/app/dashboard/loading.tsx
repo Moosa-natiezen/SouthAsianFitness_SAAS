@@ -10,9 +10,9 @@ export default function DashboardLoading() {
         <Skeleton className="h-4 w-72 rounded-md" />
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
+      {/* Core metric cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {[1, 2, 3].map((i) => (
           <div
             key={i}
             className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"

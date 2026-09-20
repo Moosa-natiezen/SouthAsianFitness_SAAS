@@ -106,7 +106,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isPro = user?.subscription_tier === "pro";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-dark text-foreground">
       {/* ── Top Bar ─────────────────────────────────────────────────── */}
       <header className="sticky top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-stone-200/50 dark:bg-zinc-900/80 dark:border-zinc-800/50 print:hidden">
         <div className="flex items-center justify-between px-5 py-3 md:px-6">

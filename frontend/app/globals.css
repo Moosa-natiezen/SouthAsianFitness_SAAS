@@ -90,6 +90,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  /* Dark surface system — theme-aware aliases over the semantic tokens so
+     `bg-dark` / `bg-dark-surface` / `border-dark-border` render the correct
+     surface in both light and dark mode (canvas / card / border). */
+  --color-dark: var(--background);
+  --color-dark-surface: var(--card);
+  --color-dark-border: var(--border);
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
@@ -175,10 +181,19 @@
   }
 
   /* ── Chrome buttons ────────────────────────────────────────────── */
+  /* ── Amber gradient text clip — hero numbers & highlighted metrics ── */
+  .amber-gradient {
+    background: linear-gradient(135deg, #F59E0B, #F97316);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
   .btn-chrome {
     background: rgba(28, 25, 23, 0.03);
     border: 1px solid rgba(28, 25, 23, 0.08);
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
   }
   .btn-chrome:hover {
     background: rgba(28, 25, 23, 0.06);
@@ -202,7 +217,7 @@
     color: #1C1917;
     border: 1px solid transparent;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     box-shadow: 0 1px 3px rgba(251, 191, 36, 0.3);
   }
   .btn-chrome-accent:hover {

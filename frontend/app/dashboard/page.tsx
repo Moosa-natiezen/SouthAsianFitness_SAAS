@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { MacroCard } from "@/components/dashboard/macro-card";
 import { TodayPlanCard } from "@/components/dashboard/today-plan-card";
 import {
   getCurrentUser,
@@ -131,9 +132,16 @@ export default function DashboardPage() {
 
       {/* Loading */}
       {state.status === "loading" && (
-        <div className="grid gap-5 md:grid-cols-2">
-          <Skeleton className="h-48 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
-          <Skeleton className="h-48 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
+        <div className="space-y-5">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Skeleton className="h-28 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
+            <Skeleton className="h-28 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
+            <Skeleton className="h-28 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <Skeleton className="h-48 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
+            <Skeleton className="h-48 rounded-2xl bg-stone-100 dark:bg-zinc-800" />
+          </div>
         </div>
       )}
 
@@ -147,6 +155,29 @@ export default function DashboardPage() {
       {/* Stats */}
       {state.status === "ready" && (
         <div className="space-y-5">
+          {/* Core metrics row */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <MacroCard
+              label="Total Calories"
+              value={Math.round(state.data.nutrition.calorie_target).toLocaleString()}
+              unit="kcal"
+              sublabel="Daily target"
+            />
+            <MacroCard
+              label="Protein Intake"
+              value={Math.round(state.data.nutrition.protein_g)}
+              unit="g"
+              sublabel="Daily target"
+            />
+            <MacroCard
+              label="Hidden Fats Adjusted"
+              value={Math.round(state.data.nutrition.fat_g)}
+              unit="g"
+              sublabel="Tarka & ghee calibrated"
+              accent
+            />
+          </div>
+
           <div className="grid gap-5 md:grid-cols-2">
             <NutritionCard data={state.data} />
             <BudgetCard data={state.data} />
