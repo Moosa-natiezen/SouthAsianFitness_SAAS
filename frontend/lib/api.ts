@@ -54,6 +54,7 @@ function dispatchFreeTrialLimit(): void {
 
 /** Default timeout for API requests (15 seconds). Prevents infinite hangs. */
 const API_TIMEOUT_MS = 15_000;
+const AUTH_TIMEOUT_MS = 20_000;
 
 /**
  * Base delay (ms) for exponential backoff on retryable errors.
@@ -61,16 +62,27 @@ const API_TIMEOUT_MS = 15_000;
  */
 const RETRY_BASE_DELAY_MS = 2_000;
 const MAX_RETRIES = 3;
+const LOGIN_MAX_RETRIES = 2;
 
 /** Sleep helper. */
 function _sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function apiFetch<T>(
+  path: string,
+  init: RequestInit = {},
+  onRetry?: () => void,
+): Promise<T> {
   const method = (init.method ?? "GET").toUpperCase();
-  // Only retry safe, idempotent GET requests — never POST/PUT/PATCH/DELETE
-  const maxAttempts = method === "GET" ? MAX_RETRIES + 1 : 1;
+  const isLoginRequest = path === "/api/auth/login" && method === "POST";
+  // Retry GETs and login only; other mutation requests remain single-attempt.
+  const maxAttempts = isLoginRequest
+    ? LOGIN_MAX_RETRIES + 1
+    : method === "GET"
+      ? MAX_RETRIES + 1
+      : 1;
+  const timeoutMs = path.startsWith("/api/auth/") ? AUTH_TIMEOUT_MS : API_TIMEOUT_MS;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const headers = new Headers(init.headers ?? {});
@@ -85,7 +97,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
 
     // Create an AbortController with a timeout so requests never hang forever
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const response = await fetch(`${apiBaseUrl}${path}`, {
@@ -143,14 +155,25 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
           );
         }
 
-        // Retry on 5xx (server cold-start / transient errors) — but not on 4xx
-        if (response.status >= 500 && attempt < maxAttempts - 1) {
+        // Retry safe GETs on server errors and login on gateway timeouts.
+        if (
+          attempt < maxAttempts - 1 &&
+          ((method === "GET" && response.status >= 500) ||
+            (isLoginRequest && response.status === 504))
+        ) {
           clearTimeout(timeoutId);
           console.warn(
             `[apiFetch] ${response.status} on ${path} — retrying (${attempt + 1}/${maxAttempts - 1})...`,
           );
+          onRetry?.();
           await _sleep(RETRY_BASE_DELAY_MS * 2 ** attempt);
           continue;
+        }
+
+        if (isLoginRequest && response.status === 504) {
+          throw new Error(
+            "The server is still waking up. Please try again in a moment.",
+          );
         }
 
         throw new Error(message);
@@ -175,6 +198,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
         console.warn(
           `[apiFetch] ${isTimeout ? "timeout" : "network error"} on ${path} — retrying (${attempt + 1}/${maxAttempts - 1})...`,
         );
+        onRetry?.();
         await _sleep(RETRY_BASE_DELAY_MS * 2 ** attempt);
         continue;
       }
@@ -182,7 +206,14 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
       // Convert AbortError to a clear timeout message on final failure
       if (isTimeout) {
         throw new Error(
-          "Request timed out. The server may be waking up — please try again in a moment.",
+          isLoginRequest
+            ? "The server is taking longer than expected. Please try again in a moment."
+            : "Request timed out. The server may be waking up — please try again in a moment.",
+        );
+      }
+      if (isLoginRequest && isNetworkError) {
+        throw new Error(
+          "Unable to reach the server right now. Please try again in a moment.",
         );
       }
       throw err;
@@ -447,11 +478,14 @@ export function clearCurrentUserCache(): void {
   currentUserCache.inFlight = null;
 }
 
-export async function loginUser(payload: LoginRequest): Promise<AuthSession> {
+export async function loginUser(
+  payload: LoginRequest,
+  onRetry?: () => void,
+): Promise<AuthSession> {
   return apiFetch<AuthSession>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
-  }).finally(clearCurrentUserCache);
+  }, onRetry).finally(clearCurrentUserCache);
 }
 
 export async function logoutUser(): Promise<void> {

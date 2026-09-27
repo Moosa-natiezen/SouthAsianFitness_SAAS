@@ -46,6 +46,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryingLogin, setRetryingLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // Refs to track timeouts so we can clean them up
@@ -104,6 +105,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
     setLoading(true);
     setError(null);
+    setRetryingLogin(false);
 
     try {
       const { loginUser, registerUser } = await import("@/lib/api");
@@ -123,17 +125,19 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         await loginUser({
           email: form.email.trim(),
           password: form.password,
-        });
+        }, () => setRetryingLogin(true));
       }
 
       router.push("/onboarding");
       router.refresh();
     } catch (caughtError) {
+      setRetryingLogin(false);
       const message =
         caughtError instanceof Error ? caughtError.message : "Authentication failed.";
       setError(message);
     } finally {
       setLoading(false);
+      setRetryingLogin(false);
     }
   };
 
@@ -171,7 +175,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             promptTimeoutRef.current = null;
           }
 
-          const GOOGLE_TOKEN_EXCHANGE_TIMEOUT_MS = 10_000;
+          const GOOGLE_TOKEN_EXCHANGE_TIMEOUT_MS = 20_000;
 
           try {
             const { apiBaseUrl } = await import("@/lib/api");
@@ -396,6 +400,15 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 </button>
               </div>
             </div>
+
+            {retryingLogin ? (
+              <div
+                role="status"
+                className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300"
+              >
+                Waking up server, retrying...
+              </div>
+            ) : null}
 
             {error ? (
               <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
