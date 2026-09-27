@@ -60,13 +60,47 @@ describe("auth UI flow", () => {
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(loginUser).toHaveBeenCalledWith({
-        email: "user@example.com",
-        password: "password123",
-      });
+      expect(loginUser).toHaveBeenCalledWith(
+        {
+          email: "user@example.com",
+          password: "password123",
+        },
+        expect.any(Function),
+      );
     });
 
     expect(mockPush).toHaveBeenCalledWith("/onboarding");
+  });
+
+  it("shows a server-waking status while login retries", async () => {
+    let resolveLogin: (value: { user: { id: string }; csrf_token: string }) => void =
+      () => {};
+    loginUser.mockImplementation(
+      (
+        _payload: unknown,
+        onRetry: () => void,
+      ) => {
+        onRetry();
+        return new Promise((resolve) => {
+          resolveLogin = resolve;
+        });
+      },
+    );
+
+    render(<AuthForm mode="login" />);
+
+    await userEvent.type(screen.getByLabelText("Email"), "user@example.com");
+    await userEvent.type(screen.getByLabelText("Password"), "password123");
+    await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
+
+    expect((await screen.findByRole("status")).textContent).toBe(
+      "Waking up server, retrying...",
+    );
+
+    resolveLogin({ user: { id: "1" }, csrf_token: "token" });
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/onboarding");
+    });
   });
 
   it("renders signup form and submits successfully", async () => {
