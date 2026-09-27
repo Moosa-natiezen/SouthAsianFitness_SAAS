@@ -1,7 +1,8 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { MacroCard } from "@/components/dashboard/macro-card";
@@ -19,19 +20,42 @@ type LoadState =
   | { status: "ready"; data: NutritionBudgetResponse }
   | { status: "error"; message: string };
 
+function UpgradeBanner() {
+  const searchParams = useSearchParams();
+  const [dismissed, setDismissed] = useState(false);
+
+  if (searchParams.get("upgraded") !== "true" || dismissed) return null;
+
+  return (
+    <div className="glass rounded-xl px-5 py-4 text-sm animate-fade-in-up">
+      <div className="flex items-center justify-between">
+        <span className="text-amber-600 dark:text-amber-400">
+          <span className="mr-2">🎉</span>Welcome to Pro! Your account has been upgraded.
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            setDismissed(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete("upgraded");
+            window.history.replaceState(
+              {},
+              "",
+              `${url.pathname}${url.search}${url.hash}`,
+            );
+          }}
+          className="ml-4 text-stone-400 dark:text-zinc-500 hover:text-stone-600 dark:text-zinc-400 transition-colors"
+        >
+          Dismiss
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
-  const [upgradeDismissed, setUpgradeDismissed] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("upgraded") === "true") {
-      setShowUpgradeBanner(true);
-      window.history.replaceState({}, "", "/dashboard");
-    }
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,22 +94,9 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Upgrade banner */}
-      {showUpgradeBanner && !upgradeDismissed && (
-        <div className="glass rounded-xl px-5 py-4 text-sm animate-fade-in-up">
-          <div className="flex items-center justify-between">
-            <span className="text-amber-600 dark:text-amber-400">
-              <span className="mr-2">🎉</span>Welcome to Pro! Your account has been upgraded.
-            </span>
-            <button
-              type="button"
-              onClick={() => setUpgradeDismissed(true)}
-              className="ml-4 text-stone-400 dark:text-zinc-500 hover:text-stone-600 dark:text-zinc-400 transition-colors"
-            >
-              Dismiss
-            </button>
-          </div>
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <UpgradeBanner />
+      </Suspense>
 
       {/* Hero */}
       <div className="glass rounded-2xl p-6">
