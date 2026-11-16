@@ -8,6 +8,21 @@ export const apiBaseUrl =
 /* ── Shared ────────────────────────────────────────────────────────────── */
 
 /**
+ * Thrown for any non-2xx API response, carrying the HTTP status alongside the
+ * backend's `detail` message so forms can map status codes to user-facing copy
+ * (e.g. 409 → "account already exists") instead of string-matching.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+/**
  * Thrown when the backend returns 403 with `detail.code === "PRO_REQUIRED"`.
  * Listeners can catch this to show an upgrade prompt.
  */
@@ -176,7 +191,7 @@ async function apiFetch<T>(
           );
         }
 
-        throw new Error(message);
+        throw new ApiError(message, response.status);
       }
 
       clearTimeout(timeoutId);
