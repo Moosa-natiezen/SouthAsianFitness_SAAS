@@ -4,7 +4,7 @@ import app.models  # noqa: F401
 from alembic import context
 from app.core.config import settings
 from app.db.base import Base
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import create_engine, pool
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.sqlalchemy_database_url.replace("%", "%%"))
@@ -29,23 +29,39 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}) or {},
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+def _run_migrations_on(connection) -> None:
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_type=True,
+        compare_server_default=True,
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            compare_type=True,
-            compare_server_default=True,
-        )
+    with context.begin_transaction():
+        context.run_migrations()
 
-        with context.begin_transaction():
-            context.run_migrations()
+
+def run_migrations_online() -> None:
+    # Migrations are DDL. Neon's ``-pooler`` endpoint is PgBouncer in transaction
+    # mode, which cannot carry multi-statement DDL or Alembic's advisory locks,
+    # so migrations always run on an unpooled AUTOCOMMIT connection. Callers
+    # such as ``app.db.init_db`` pass one in via ``config.attributes``.
+    shared_connection = config.attributes.get("connection")
+    if shared_connection is not None:
+        _run_migrations_on(shared_connection)
+        return
+
+    connectable = create_engine(
+        settings.sqlalchemy_database_url,
+        poolclass=pool.NullPool,
+        isolation_level="AUTOCOMMIT",
+    )
+
+    try:
+        with connectable.connect() as connection:
+            _run_migrations_on(connection)
+    finally:
+        connectable.dispose()
 
 
 if context.is_offline_mode():
