@@ -27,16 +27,25 @@ class Settings(BaseSettings):
 
     @property
     def sqlalchemy_database_url(self) -> str:
-        """Return the database URL with the correct psycopg v3 driver prefix.
+        """Return the database URL with a driver prefix SQLAlchemy can load.
 
-        Neon and many providers issue plain ``postgresql://`` URLs.  SQLAlchemy
-        interprets that as the psycopg2 dialect which this project does not
-        install.  Normalise to ``postgresql+psycopg://`` so the psycopg v3 driver
-        (specified in pyproject.toml) is always used.
+        Neon and Render hand out plain ``postgresql://`` URLs (Render also
+        still emits the deprecated ``postgres://`` scheme) and some tooling
+        writes ``postgresql+psycopg2://``.  SQLAlchemy maps the bare schemes to
+        psycopg2, which this project does not install, so normalise every
+        variant to the psycopg v3 driver declared in pyproject.toml.
+
+        The value is also stripped because environment variables pasted into a
+        hosting dashboard routinely carry a trailing newline, which otherwise
+        corrupts the host name and breaks DNS resolution.
         """
-        url = self.database_url
-        if url.startswith("postgresql://"):
-            url = "postgresql+psycopg://" + url[len("postgresql://") :]
+        url = (self.database_url or "").strip()
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url[len(prefix) :]
+        legacy_prefix = "postgresql+psycopg2://"
+        if url.startswith(legacy_prefix):
+            return "postgresql+psycopg://" + url[len(legacy_prefix) :]
         return url
     secret_key: str = Field(
         ...,

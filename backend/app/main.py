@@ -16,6 +16,7 @@ from app.core.errors import register_exception_handlers
 from app.core.logging import get_logger, setup_logging
 from app.core.request_limits import RequestSizeLimitMiddleware
 from app.core.security_headers import SecurityHeadersMiddleware
+from app.db.init_db import init_db
 from app.db.session import SessionLocal
 from app.models.enums import VerificationStatus
 from app.models.food import Food
@@ -44,6 +45,15 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting %s (%s)", settings.app_name, settings.environment)
+
+    # Build or migrate the schema first: a freshly provisioned database has no
+    # tables at all, and every seed below queries tables that must exist.
+    try:
+        init_db()
+    except Exception:
+        logger.exception(
+            "Database initialisation failed; application will continue starting"
+        )
 
     # Seed reference data (idempotent — safe on every startup)
     try:
