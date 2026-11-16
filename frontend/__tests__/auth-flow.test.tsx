@@ -29,6 +29,7 @@ jest.mock("next/navigation", () => ({
     replace: mockReplace,
     refresh: jest.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(window.location.search),
   usePathname: () => "/dashboard",
 }));
 
@@ -290,6 +291,34 @@ describe("dashboard nutrition display", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     getTodaysMealPlan.mockResolvedValue(null);
+  });
+
+  it("shows and dismisses the upgrade banner from the query string", async () => {
+    getCurrentUser.mockResolvedValue({
+      id: "1",
+      email: "user@example.com",
+      display_name: "Test User",
+      is_active: true,
+      is_onboarded: true,
+      subscription_tier: "free",
+    });
+    getNutritionAndBudget.mockReturnValue(new Promise(() => {}));
+    window.history.replaceState({}, "", "/dashboard?upgraded=true");
+
+    const { default: DashboardPage } = require("@/app/dashboard/page");
+    render(<DashboardPage />);
+
+    expect(
+      await screen.findByText(/Welcome to Pro! Your account has been upgraded/i),
+    ).toBeTruthy();
+
+    await userEvent.click(screen.getByRole("button", { name: "Dismiss" }));
+
+    expect(window.location.search).toBe("");
+    expect(
+      screen.queryByText(/Welcome to Pro! Your account has been upgraded/i),
+    ).toBeNull();
+    window.history.replaceState({}, "", "/dashboard");
   });
 
   it("renders nutrition targets from API response", async () => {
