@@ -4,6 +4,7 @@ from typing import Any
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 
@@ -61,6 +62,23 @@ def create_db_engine(url: str | None = None, **overrides: Any) -> Engine:
     """Create an engine for ``url`` (defaults to the configured database)."""
     target_url = url or database_url
     return create_engine(target_url, **build_engine_kwargs(target_url, **overrides))
+
+
+def create_probe_engine(connect_timeout: int = 3) -> Engine:
+    """Create an unpooled engine for health probes with a short connect timeout.
+
+    The application engine allows 10s to connect, which is right for user
+    requests but far too slow for a liveness probe: Render restarts an instance
+    whose health check does not answer in time, so a sleeping Neon compute must
+    fail fast instead of stalling the check.
+    """
+    target_url = database_url
+    kwargs = build_engine_kwargs(target_url, poolclass=NullPool)
+    if not target_url.startswith("sqlite"):
+        connect_args = dict(kwargs.get("connect_args") or {})
+        connect_args["connect_timeout"] = connect_timeout
+        kwargs["connect_args"] = connect_args
+    return create_engine(target_url, **kwargs)
 
 
 engine = create_db_engine()

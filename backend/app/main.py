@@ -1,4 +1,5 @@
 import os
+import threading
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -41,21 +42,11 @@ if sentry_dsn:
 setup_logging(debug=settings.debug)
 logger = get_logger(__name__)
 
+EXPECTED_FOOD_COUNT = 198  # Expected total foods in south_asian_foods.json
 
-@asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    logger.info("Starting %s (%s)", settings.app_name, settings.environment)
 
-    # Build or migrate the schema first: a freshly provisioned database has no
-    # tables at all, and every seed below queries tables that must exist.
-    try:
-        init_db()
-    except Exception:
-        logger.exception(
-            "Database initialisation failed; application will continue starting"
-        )
-
-    # Seed reference data (idempotent — safe on every startup)
+def _seed_reference_data() -> None:
+    """Seed currencies/countries/regions (idempotent)."""
     try:
         db = SessionLocal()
         try:
@@ -78,8 +69,9 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     except Exception:
         logger.exception("Reference data seed failed; application will continue starting")
 
-    # Seed food dataset (idempotent — skip if full dataset is present)
-    EXPECTED_FOOD_COUNT = 198  # Expected total foods in south_asian_foods.json
+
+def _seed_food_dataset() -> None:
+    """Seed the South Asian food dataset (idempotent; skips when complete)."""
     try:
         food_db = SessionLocal()
         try:
@@ -89,10 +81,12 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
             eligible_count = (
                 food_db.execute(
                     select(func.count(Food.id)).where(
-                        Food.verification_status.in_([
-                            VerificationStatus.VERIFIED,
-                            VerificationStatus.VERIFIED_WITH_NOTES,
-                        ]),
+                        Food.verification_status.in_(
+                            [
+                                VerificationStatus.VERIFIED,
+                                VerificationStatus.VERIFIED_WITH_NOTES,
+                            ]
+                        ),
                         Food.is_active.is_(True),
                     )
                 ).scalar()
@@ -106,7 +100,19 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
                     existing_count,
                     eligible_count,
                 )
-            elif existing_count > 0:
+                return
+
+            dataset_path = (
+                Path(__file__).resolve().parent.parent / "data" / "south_asian_foods.json"
+            )
+            if not dataset_path.exists():
+                logger.warning(
+                    "Food dataset not found at %s; meal plans will have no foods",
+                    dataset_path,
+                )
+                return
+
+            if existing_count > 0:
                 logger.warning(
                     "Food dataset incomplete: %d/%d foods present (%d eligible); "
                     "importing missing records",
@@ -114,75 +120,68 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
                     EXPECTED_FOOD_COUNT,
                     eligible_count,
                 )
-                from app.services.food_import_service import import_foods_from_file
 
-                dataset_path = (
-                    Path(__file__).resolve().parent.parent
-                    / "data"
-                    / "south_asian_foods.json"
-                )
-                if dataset_path.exists():
-                    result = import_foods_from_file(food_db, dataset_path)
-                    final_count = (
-                        food_db.execute(select(func.count(Food.id))).scalar() or 0
-                    )
-                    logger.info(
-                        "Food dataset seed completed: imported=%d skipped=%d "
-                        "failed=%d total_after=%d",
-                        result.imported,
-                        result.skipped,
-                        result.failed,
-                        final_count,
-                    )
-                    if final_count < EXPECTED_FOOD_COUNT:
-                        logger.warning(
-                            "Food dataset still incomplete after import: "
-                            "%d/%d foods",
-                            final_count,
-                            EXPECTED_FOOD_COUNT,
-                        )
-                else:
-                    logger.warning(
-                        "Food dataset not found at %s; meal plans will have no foods",
-                        dataset_path,
-                    )
-            else:
-                dataset_path = (
-                    Path(__file__).resolve().parent.parent
-                    / "data"
-                    / "south_asian_foods.json"
-                )
-                if dataset_path.exists():
-                    from app.services.food_import_service import import_foods_from_file
+            from app.services.food_import_service import import_foods_from_file
 
-                    result = import_foods_from_file(food_db, dataset_path)
-                    final_count = (
-                        food_db.execute(select(func.count(Food.id))).scalar() or 0
-                    )
-                    logger.info(
-                        "Food dataset imported from empty DB: imported=%d "
-                        "skipped=%d failed=%d total_after=%d",
-                        result.imported,
-                        result.skipped,
-                        result.failed,
-                        final_count,
-                    )
-                    if final_count < EXPECTED_FOOD_COUNT:
-                        logger.warning(
-                            "Food dataset incomplete after import: "
-                            "%d/%d foods",
-                            final_count,
-                            EXPECTED_FOOD_COUNT,
-                        )
-                else:
-                    logger.warning(
-                        "Food dataset not found at %s; meal plans will have no foods",
-                        dataset_path,
-                    )
+            result = import_foods_from_file(food_db, dataset_path)
+            final_count = (
+                food_db.execute(select(func.count(Food.id))).scalar() or 0
+            )
+            logger.info(
+                "Food dataset seed completed: imported=%d skipped=%d failed=%d "
+                "total_after=%d",
+                result.imported,
+                result.skipped,
+                result.failed,
+                final_count,
+            )
+            if final_count < EXPECTED_FOOD_COUNT:
+                logger.warning(
+                    "Food dataset incomplete after import: %d/%d foods",
+                    final_count,
+                    EXPECTED_FOOD_COUNT,
+                )
         finally:
             food_db.close()
     except Exception:
         logger.exception("Food dataset seed failed; application will continue starting")
+
+
+def _bootstrap_database() -> None:
+    """Create/migrate the schema and seed data. Blocking — run off the event loop.
+
+    On a fresh Neon database this takes seconds (35 tables plus a 198-food
+    import). Render's health check must be answered during that window, so this
+    runs in a daemon thread instead of blocking application startup.
+    """
+    try:
+        init_db()
+    except Exception:
+        logger.exception(
+            "Database initialisation failed; application will continue starting"
+        )
+
+    _seed_reference_data()
+    _seed_food_dataset()
+    logger.info("Database bootstrap finished")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    logger.info("Starting %s (%s)", settings.app_name, settings.environment)
+
+    # Never block startup on the database: the web worker must accept requests
+    # (and answer /health with 200) while Neon wakes up and the schema/seeds
+    # run. Every bootstrap step is individually guarded, so a failure here
+    # degrades data availability instead of killing the process.
+    bootstrap_thread = threading.Thread(
+        target=_bootstrap_database,
+        name="db-bootstrap",
+        daemon=True,
+    )
+    bootstrap_thread.start()
+    _app.state.db_bootstrap_thread = bootstrap_thread
+    logger.info("Database bootstrap running in the background; health probes are live")
 
     yield
     logger.info("Shutting down %s", settings.app_name)
@@ -198,14 +197,18 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json" if not settings.is_production else None,
     )
 
-    # CORS: allow_origins comes from the CORS_ORIGINS env var (which also
-    # carries sensible localhost + production defaults via the config).
-    # Vercel preview deployments live on ephemeral *.vercel.app hosts that
-    # cannot be enumerated statically, so allow_origin_regex (starlette
-    # full-matches it against the request Origin) keeps credential-carrying
-    # requests working for every preview — plus the production apex/www —
-    # even if CORS_ORIGINS is misconfigured on Render. Requests are still
-    # authenticated by the session cookie; CORS only governs browser reads.
+    # CORS is mounted before any router is included, so it applies to every
+    # route in the app (including the health probes Render and external
+    # monitors call).
+    #
+    # allow_origins comes from the CORS_ORIGINS env var (which also carries
+    # sensible localhost + production defaults via the config). Vercel preview
+    # deployments live on ephemeral *.vercel.app hosts that cannot be enumerated
+    # statically, so allow_origin_regex (starlette full-matches it against the
+    # request Origin) keeps credential-carrying requests working for every
+    # preview — plus the production apex/www — even if CORS_ORIGINS is
+    # misconfigured on Render. Requests are still authenticated by the session
+    # cookie; CORS only governs browser reads.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
@@ -222,10 +225,12 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestSizeLimitMiddleware)
+
+    # API routes live under /api → GET /api/health.
     app.include_router(api_router, prefix=settings.api_prefix)
 
-    # Root-level keep-alive endpoint (outside the /api prefix): zero-I/O
-    # target for external uptime pingers that keep free-tier instances warm.
+    # Root-level keep-alive endpoint (outside the /api prefix) → GET /health.
+    # Both probes always answer 200: Render must never recycle a healthy worker.
     app.include_router(keepalive_router)
     return app
 
