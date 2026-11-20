@@ -59,30 +59,36 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let cancelled = false;
-    getCurrentUser()
-      .then((u) => {
-        setUserState(u);
-        if (!cancelled) setUser(u);
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    getNutritionAndBudget()
-      .then((data) => {
-        if (!cancelled) setState({ status: "ready", data });
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
+    // The user identity and the nutrition/budget targets are independent, so
+    // fire them in one batch instead of chaining one behind the other. Settled
+    // (not all) so a failing call degrades its own card instead of blanking
+    // the whole dashboard.
+    void Promise.allSettled([getCurrentUser(), getNutritionAndBudget()]).then(
+      ([userResult, nutritionResult]) => {
+        if (cancelled) return;
+
+        if (userResult.status === "fulfilled") {
+          setUserState(userResult.value);
+          setUser(userResult.value);
+        }
+
+        if (nutritionResult.status === "fulfilled") {
+          setState({ status: "ready", data: nutritionResult.value });
+        } else {
+          const err: unknown = nutritionResult.reason;
           setState({
             status: "error",
-            message: err instanceof Error ? err.message : "Failed to load dashboard data.",
+            message:
+              err instanceof Error ? err.message : "Failed to load dashboard data.",
           });
         }
-      });
-    return () => { cancelled = true; };
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const greeting = user?.display_name

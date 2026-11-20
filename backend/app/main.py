@@ -7,6 +7,7 @@ from pathlib import Path
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastmcp import FastMCP
 from sqlalchemy import func, select
 
@@ -225,6 +226,12 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestSizeLimitMiddleware)
+
+    # Compress JSON responses (food library, meal plans, dashboard summaries)
+    # on the wire. They are the largest payloads the client downloads and
+    # compress by ~70-85%. Small bodies stay uncompressed to avoid the CPU and
+    # header cost of shrinking them.
+    app.add_middleware(GZipMiddleware, minimum_size=500)
 
     # API routes live under /api → GET /api/health.
     app.include_router(api_router, prefix=settings.api_prefix)

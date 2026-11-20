@@ -497,29 +497,75 @@ export async function registerUser(payload: RegisterRequest): Promise<AuthSessio
 }
 
 /**
- * Single-flight cache for the current user session.
+ * Short-lived cache for the current user session.
  *
- * Several components call getCurrentUser() on every dashboard navigation
- * (AppShell, page effects, ProtectedRoute). Without this cache each mount
- * re-fires GET /api/auth/me, so clicking through the sidebar costs 2-3
- * identical requests per click. The cache keeps the in-flight promise so
- * concurrent callers share one request, serves the resolved user instantly
- * on re-mounts, and is invalidated by clearCurrentUserCache() after any
- * mutation that changes the authenticated user's server-side state.
+ * Several components call getCurrentUser() on every navigation (AppShell,
+ * ProtectedRoute, page effects), and ProtectedRoute blocks the dashboard tree
+ * on it. Without a cache each navigation re-fires GET /api/auth/me, so every
+ * /login → /onboarding → /dashboard hop pays a full cross-region auth round-trip
+ * before the page's own data fetch can even start. This cache:
+ *
+ *  - single-flights the network request so concurrent callers share one call,
+ *  - serves the resolved user from memory (and sessionStorage, which survives
+ *    client-side navigation and reloads within the tab) for 45s,
+ *  - is invalidated by clearCurrentUserCache() after any mutation that changes
+ *    the authenticated user's server-side state.
  */
+const CURRENT_USER_TTL_MS = 45_000;
+const CURRENT_USER_STORAGE_KEY = "saf.current-user.v1";
+
 type CurrentUserCache = {
   user: AuthUser | null;
+  expiresAt: number;
   inFlight: Promise<AuthUser> | null;
 };
 
 const currentUserCache: CurrentUserCache = {
   user: null,
+  expiresAt: 0,
   inFlight: null,
 };
 
+function readStoredUser(): { user: AuthUser; expiresAt: number } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(CURRENT_USER_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { user?: AuthUser; expiresAt?: number };
+    if (!parsed.user || typeof parsed.expiresAt !== "number") return null;
+    if (Date.now() > parsed.expiresAt) {
+      window.sessionStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+      return null;
+    }
+    return { user: parsed.user, expiresAt: parsed.expiresAt };
+  } catch {
+    return null;
+  }
+}
+
+function storeUser(user: AuthUser, expiresAt: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(
+      CURRENT_USER_STORAGE_KEY,
+      JSON.stringify({ user, expiresAt }),
+    );
+  } catch {
+    // Private mode / quota: the in-memory cache still covers this tab.
+  }
+}
+
 export function clearCurrentUserCache(): void {
   currentUserCache.user = null;
+  currentUserCache.expiresAt = 0;
   currentUserCache.inFlight = null;
+  if (typeof window !== "undefined") {
+    try {
+      window.sessionStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+    } catch {
+      // Nothing to clean up if storage is unavailable.
+    }
+  }
 }
 
 export async function loginUser(
@@ -542,15 +588,30 @@ export async function logoutUser(): Promise<void> {
 }
 
 export async function getCurrentUser(): Promise<AuthUser> {
-  // Serve the cached user instantly; single-flight the network request so
-  // concurrent callers on one navigation share a single GET /api/auth/me.
-  // A failed attempt clears inFlight so the next call retries the network.
-  if (currentUserCache.user) return currentUserCache.user;
+  // Serve a fresh cached user instantly (memory, then sessionStorage);
+  // single-flight the network request so concurrent callers on one navigation
+  // share a single GET /api/auth/me. A failed attempt clears inFlight so the
+  // next call retries the network.
+  const now = Date.now();
+  if (currentUserCache.user && now < currentUserCache.expiresAt) {
+    return currentUserCache.user;
+  }
+
+  const stored = readStoredUser();
+  if (stored) {
+    currentUserCache.user = stored.user;
+    currentUserCache.expiresAt = stored.expiresAt;
+    return stored.user;
+  }
+
   if (!currentUserCache.inFlight) {
     currentUserCache.inFlight = apiFetch<AuthUser>("/api/auth/me")
       .then((user) => {
+        const expiresAt = Date.now() + CURRENT_USER_TTL_MS;
         currentUserCache.user = user;
+        currentUserCache.expiresAt = expiresAt;
         currentUserCache.inFlight = null;
+        storeUser(user, expiresAt);
         return user;
       })
       .catch((error: unknown) => {
@@ -570,6 +631,8 @@ export type OnboardingResponse = {
 
 export async function submitOnboarding(payload: OnboardingRequest): Promise<OnboardingResponse> {
   const csrfToken = await getCsrfToken();
+  // is_onboarded flips server-side, so the cached session is now stale.
+  clearCurrentUserCache();
   return apiFetch<OnboardingResponse>("/api/auth/onboarding", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
@@ -806,6 +869,8 @@ export async function updateProfile(
   payload: ProfileUpdatePayload,
 ): Promise<{ status: string }> {
   const csrfToken = await getCsrfToken();
+  // display_name/profile fields changed → drop the cached session user.
+  clearCurrentUserCache();
   return apiFetch<{ status: string }>("/api/auth/profile", {
     method: "PATCH",
     headers: { "X-CSRF-Token": csrfToken },
