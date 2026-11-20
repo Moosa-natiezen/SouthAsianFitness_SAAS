@@ -40,7 +40,7 @@
   "rewrites": [
     {
       "source": "/api/:path((?!meal-plans/enqueue).*)",
-      "destination": "https://south-asian-fitness-api.onrender.com/api/:path*"
+      "destination": "https://southasianfitness-saas.onrender.com/api/:path*"
     }
   ]
 }

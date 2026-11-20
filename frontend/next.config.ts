@@ -8,7 +8,7 @@ import { withSentryConfig } from "@sentry/nextjs";
  * fallback is the deployed API host already used by vercel.json.
  */
 const backendUrl = (
-  process.env.BACKEND_URL || "https://south-asian-fitness-api.onrender.com"
+  process.env.BACKEND_URL || "https://southasianfitness-saas.onrender.com"
 ).replace(/\/+$/, "");
 
 const nextConfig: NextConfig = {
