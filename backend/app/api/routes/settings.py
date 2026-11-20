@@ -22,6 +22,7 @@ from app.schemas.settings import (
 from app.services.settings_service import (
     get_user_profile,
     get_user_settings,
+    load_user_with_settings,
     update_user_preferences,
     update_user_profile,
 )
@@ -35,7 +36,9 @@ def get_settings(
     db: Annotated[Session, Depends(get_db)],
 ):
     """Return the authenticated user's current settings."""
-    data = get_user_settings(db, user)
+    # Eager-load profile/preferences and their tag collections: without this the
+    # response serializer issues a separate query per relationship.
+    data = get_user_settings(db, load_user_with_settings(db, user))
     return SettingsResponse(**data)
 
 
@@ -45,7 +48,7 @@ def get_profile(
     db: Annotated[Session, Depends(get_db)],
 ):
     """Return the user's full profile with calculated TDEE and macro targets."""
-    return get_user_profile(db, user)
+    return get_user_profile(db, load_user_with_settings(db, user))
 
 
 @router.patch("/profile")

@@ -11,7 +11,7 @@ import json
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.logging import get_logger
 from app.models.currency import Currency
@@ -23,6 +23,29 @@ from app.services.auth_service import ensure_dietary_tag
 from app.services.nutrition_service import calculate_nutrition_targets
 
 logger = get_logger(__name__)
+
+
+def load_user_with_settings(db: Session, user: User) -> User:
+    """Re-load a user with every relationship the settings endpoints serialize.
+
+    ``get_user_settings`` walks ``user.profile``, ``user.preferences``,
+    ``profile.dietary_tags``, ``preferences.dietary_tags``,
+    ``preferences.cuisine_tags`` and ``preferences.preferred_regions``. Left as
+    lazy loads that is six extra round-trips to the database on every Settings
+    page view; here they collapse into at most a handful of batched selects.
+    """
+    loaded = (
+        db.query(User)
+        .options(
+            selectinload(User.profile).selectinload(UserProfile.dietary_tags),
+            selectinload(User.preferences).selectinload(UserPreferences.dietary_tags),
+            selectinload(User.preferences).selectinload(UserPreferences.cuisine_tags),
+            selectinload(User.preferences).selectinload(UserPreferences.preferred_regions),
+        )
+        .filter(User.id == user.id)
+        .one_or_none()
+    )
+    return loaded or user
 
 
 def get_user_settings(db: Session, user: User) -> dict[str, Any]:

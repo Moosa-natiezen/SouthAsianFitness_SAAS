@@ -11,12 +11,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AiMealGenerator } from "@/components/ai/ai-meal-generator";
 import { MealPlanView } from "@/components/meal-plan/meal-plan-view";
 import {
+  cacheKeys,
   createCheckoutSession,
   deleteMealPlan,
   FreeTrialLimitError,
   generateMealPlan,
   getTodaysMealPlan,
   listMealPlans,
+  peekCache,
   type MealPlanFailure,
   type MealPlanListResponse,
   type MealPlanResponse,
@@ -50,8 +52,12 @@ export default function MealPlansPage() {
   const [state, setState] = useState<PlanState>({ status: "idle" });
 
   /* ── Plan history state ──────────────────────────────────────────── */
-  const [history, setHistory] = useState<MealPlanListResponse | null>(null);
-  const [historyLoading, setHistoryLoading] = useState(true);
+  const [history, setHistory] = useState<MealPlanListResponse | null>(
+    () => peekCache<MealPlanListResponse>(cacheKeys.mealPlans(20)) ?? null,
+  );
+  const [historyLoading, setHistoryLoading] = useState(
+    () => peekCache<MealPlanListResponse>(cacheKeys.mealPlans(20)) === undefined,
+  );
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -66,10 +72,14 @@ export default function MealPlansPage() {
 
   /* ── Load today's plan + history ─────────────────────────────────── */
 
-  const fetchHistory = () => {
-    setHistoryLoading(true);
-    listMealPlans({ limit: 20 })
-      .then(setHistory)
+  const fetchHistory = (force = false) => {
+    // Cached history paints instantly; `force` refetches after a mutation.
+    if (history === null) setHistoryLoading(true);
+    listMealPlans({ limit: 20 }, { force, onFresh: setHistory })
+      .then((data) => {
+        setHistory(data);
+        setHistoryError(null);
+      })
       .catch((err: unknown) => {
         setHistoryError(
           err instanceof Error ? err.message : "Failed to load plan history.",
@@ -79,19 +89,40 @@ export default function MealPlansPage() {
   };
 
   useEffect(() => {
-    setState({ status: "loading" });
-    getTodaysMealPlan()
-      .then((plan) => {
-        if (plan) {
-          setState({ status: "ready", plan });
-        } else {
-          setState({ status: "idle" });
-        }
-      })
-      .catch(() => {
+    // Seed from the SWR cache so a returning visit paints without a request.
+    const cachedPlan = peekCache<MealPlanResponse | null>(cacheKeys.todayMealPlan);
+    if (cachedPlan !== undefined) {
+      setState(cachedPlan ? { status: "ready", plan: cachedPlan } : { status: "idle" });
+    } else {
+      setState({ status: "loading" });
+    }
+
+    // Today's plan and the history list are independent — fetch them together.
+    void (async () => {
+      const [planRes, historyRes] = await Promise.allSettled([
+        getTodaysMealPlan(),
+        listMealPlans({ limit: 20 }),
+      ]);
+      if (planRes.status === "fulfilled") {
+        setState(
+          planRes.value ? { status: "ready", plan: planRes.value } : { status: "idle" },
+        );
+      } else if (cachedPlan === undefined) {
         setState({ status: "idle" });
-      });
-    fetchHistory();
+      }
+
+      if (historyRes.status === "fulfilled") {
+        setHistory(historyRes.value);
+        setHistoryError(null);
+      } else {
+        setHistoryError(
+          historyRes.reason instanceof Error
+            ? historyRes.reason.message
+            : "Failed to load plan history.",
+        );
+      }
+      setHistoryLoading(false);
+    })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Generate handler ────────────────────────────────────────────── */
@@ -108,7 +139,7 @@ export default function MealPlansPage() {
         setState({ status: "failure", data: result as MealPlanFailure });
       } else {
         setState({ status: "ready", plan: result as MealPlanResponse });
-        fetchHistory(); // refresh history after generating
+        fetchHistory(true); // refresh history after generating
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to generate meal plan.";
@@ -148,7 +179,7 @@ export default function MealPlansPage() {
     try {
       await deleteMealPlan(planId);
       setDeleteMsg({ type: "info", text: "Plan deleted." });
-      fetchHistory();
+      fetchHistory(true);
     } catch (err: unknown) {
       setDeleteMsg({
         type: "error",

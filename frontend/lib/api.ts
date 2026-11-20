@@ -268,6 +268,185 @@ async function apiFetch<T>(
   throw new Error("Max retries exceeded");
 }
 
+/* ── SWR cache for idempotent GETs ──────────────────────────────────────
+ *
+ * Every sidebar tab mounts fresh on navigation and used to re-fetch all of its
+ * data from Render, so each tab switch paid a skeleton flash plus a
+ * cross-region round-trip. cachedQuery() serves the last response immediately
+ * (memory first, then sessionStorage so it survives client-side navigation and
+ * reloads in the tab) and revalidates in the background once the entry is
+ * older than `ttlMs`. Concurrent callers share one in-flight request, and
+ * invalidateCache() drops the keys a successful mutation made stale.
+ */
+
+const SWR_DEFAULT_TTL_MS = 60_000;
+const SWR_STORAGE_PREFIX = "saf.swr.v1:";
+/** Skip sessionStorage for large payloads (food lists) to stay under quota. */
+const SWR_MAX_STORAGE_BYTES = 200_000;
+
+type SwrEntry = { value: unknown; storedAt: number };
+
+export type CacheOptions<T> = {
+  /** Freshness window in ms; older entries are still served, then revalidated. */
+  ttlMs?: number;
+  /** Receives the fresher value when a background revalidation resolves. */
+  onFresh?: (data: T) => void;
+  /** Bypass the cached read and always hit the network (explicit refresh). */
+  force?: boolean;
+};
+
+const swrMemory = new Map<string, SwrEntry>();
+const swrInFlight = new Map<string, Promise<unknown>>();
+
+/** Path builder shared by the GET helpers and the pages that peek at them. */
+function buildQuery(params: Record<string, string | number | undefined>): string {
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null || value === "") continue;
+    searchParams.set(key, String(value));
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+}
+
+function buildFoodQuery(params: FoodSearchParams): string {
+  return buildQuery({
+    q: params.q,
+    category_slug: params.category_slug,
+    dietary_tag_slug: params.dietary_tag_slug,
+    cuisine_tag_slug: params.cuisine_tag_slug,
+    verification_status: params.verification_status,
+    limit: params.limit,
+    offset: params.offset,
+  });
+}
+
+/** Cache keys shared by the API helpers and the pages that seed from cache. */
+export const cacheKeys = {
+  currentUser: "/api/auth/me",
+  settings: "/api/auth/settings",
+  profile: "/api/auth/profile",
+  locations: "/api/locations/",
+  whatsapp: "/api/users/me/whatsapp",
+  todayMealPlan: "/api/meal-plans/today",
+  mealPlans: (limit = 20) => `/api/meal-plans${buildQuery({ limit })}`,
+  savedMealPlans: (limit = 50) => `/api/ai/meal-plans/saved${buildQuery({ limit })}`,
+  savedWorkouts: (limit = 20) => `/api/ai/workouts/saved${buildQuery({ limit })}`,
+  progress: "/api/progress",
+  progressSummary: "/api/progress/summary",
+  foodCategories: "/api/foods/categories",
+  foods: (params: FoodSearchParams = {}) => `/api/foods${buildFoodQuery(params)}`,
+} as const;
+
+function readSwrEntry(key: string): SwrEntry | null {
+  const inMemory = swrMemory.get(key);
+  if (inMemory) return inMemory;
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(SWR_STORAGE_PREFIX + key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SwrEntry;
+    if (typeof parsed?.storedAt !== "number") return null;
+    swrMemory.set(key, parsed);
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function storeSwrEntry(key: string, value: unknown): void {
+  const entry: SwrEntry = { value, storedAt: Date.now() };
+  swrMemory.set(key, entry);
+  if (typeof window === "undefined") return;
+  try {
+    const serialized = JSON.stringify(entry);
+    if (serialized.length > SWR_MAX_STORAGE_BYTES) return;
+    window.sessionStorage.setItem(SWR_STORAGE_PREFIX + key, serialized);
+  } catch {
+    // Private mode / quota: the in-memory copy still covers this tab.
+  }
+}
+
+/**
+ * Synchronous cache read for first paint. Returns `undefined` on a miss, so a
+ * cached `null` payload (e.g. "no plan today") stays distinguishable from none.
+ */
+export function peekCache<T>(key: string): T | undefined {
+  const entry = readSwrEntry(key);
+  return entry ? (entry.value as T) : undefined;
+}
+
+/** Drop cached GETs whose key starts with `prefix` (no prefix = clear all). */
+export function invalidateCache(prefix?: string): void {
+  const matches = (key: string) => (prefix ? key.startsWith(prefix) : true);
+  for (const key of [...swrMemory.keys()]) {
+    if (matches(key)) swrMemory.delete(key);
+  }
+  if (typeof window === "undefined") return;
+  try {
+    const stale: string[] = [];
+    for (let i = 0; i < window.sessionStorage.length; i++) {
+      const key = window.sessionStorage.key(i);
+      if (key?.startsWith(SWR_STORAGE_PREFIX)) {
+        const logicalKey = key.slice(SWR_STORAGE_PREFIX.length);
+        if (matches(logicalKey)) stale.push(key);
+      }
+    }
+    for (const key of stale) window.sessionStorage.removeItem(key);
+  } catch {
+    // Storage unavailable — the in-memory cache is already cleared.
+  }
+}
+
+/**
+ * Stale-while-revalidate GET.
+ *
+ * - fresh cached entry  → returned immediately, no request
+ * - stale cached entry  → returned immediately, background revalidation
+ * - no entry            → single-flighted request shared by concurrent callers
+ */
+export async function cachedQuery<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  options: CacheOptions<T> = {},
+): Promise<T> {
+  const ttlMs = options.ttlMs ?? SWR_DEFAULT_TTL_MS;
+
+  if (!options.force) {
+    const entry = readSwrEntry(key);
+    if (entry) {
+      if (Date.now() - entry.storedAt < ttlMs) {
+        return entry.value as T;
+      }
+      if (!swrInFlight.has(key)) {
+        const revalidate = fetcher()
+          .then((fresh) => {
+            storeSwrEntry(key, fresh);
+            options.onFresh?.(fresh);
+            return fresh;
+          })
+          .catch(() => entry.value as T)
+          .finally(() => swrInFlight.delete(key));
+        swrInFlight.set(key, revalidate);
+      }
+      return entry.value as T;
+    }
+  }
+
+  const existing = swrInFlight.get(key);
+  if (existing) return existing as Promise<T>;
+
+  const request = fetcher()
+    .then((fresh) => {
+      storeSwrEntry(key, fresh);
+      options.onFresh?.(fresh);
+      return fresh;
+    })
+    .finally(() => swrInFlight.delete(key));
+  swrInFlight.set(key, request);
+  return request;
+}
+
 /* ── Auth types ────────────────────────────────────────────────────────── */
 
 export type HealthResponse = {
@@ -472,8 +651,14 @@ export type CountryData = {
   regions: RegionData[];
 };
 
-export async function fetchLocations(): Promise<CountryData[]> {
-  return apiFetch<CountryData[]>("/api/locations/");
+export async function fetchLocations(
+  options?: CacheOptions<CountryData[]>,
+): Promise<CountryData[]> {
+  return cachedQuery<CountryData[]>(
+    cacheKeys.locations,
+    () => apiFetch<CountryData[]>("/api/locations/"),
+    { ttlMs: 10 * 60_000, ...options },
+  );
 }
 
 /* ── Auth API ──────────────────────────────────────────────────────────── */
@@ -526,14 +711,14 @@ const currentUserCache: CurrentUserCache = {
   inFlight: null,
 };
 
-function readStoredUser(): { user: AuthUser; expiresAt: number } | null {
+function readStoredUser(allowStale = false): { user: AuthUser; expiresAt: number } | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.sessionStorage.getItem(CURRENT_USER_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { user?: AuthUser; expiresAt?: number };
     if (!parsed.user || typeof parsed.expiresAt !== "number") return null;
-    if (Date.now() > parsed.expiresAt) {
+    if (!allowStale && Date.now() > parsed.expiresAt) {
       window.sessionStorage.removeItem(CURRENT_USER_STORAGE_KEY);
       return null;
     }
@@ -604,6 +789,34 @@ export async function getCurrentUser(): Promise<AuthUser> {
     return stored.user;
   }
 
+  // Stale-while-revalidate: render with the last-known session and refresh in
+  // the background, so tab switches never block on GET /api/auth/me.
+  // ProtectedRoute revalidates explicitly and redirects if the session is gone.
+  const stale = currentUserCache.user ?? readStoredUser(true)?.user ?? null;
+  if (stale) {
+    currentUserCache.user = stale;
+    void refreshCurrentUser().catch(() => {});
+    return stale;
+  }
+
+  return refreshCurrentUser();
+}
+
+/**
+ * Synchronous read of the last-known user (fresh or stale) for first paint.
+ * Returns null when nothing has been cached in this tab yet.
+ */
+export function peekCurrentUser(): AuthUser | null {
+  if (currentUserCache.user) return currentUserCache.user;
+  const stored = readStoredUser(true);
+  if (!stored) return null;
+  currentUserCache.user = stored.user;
+  currentUserCache.expiresAt = stored.expiresAt;
+  return stored.user;
+}
+
+/** Always hits GET /api/auth/me (single-flighted), refreshing the cache. */
+export async function refreshCurrentUser(): Promise<AuthUser> {
   if (!currentUserCache.inFlight) {
     currentUserCache.inFlight = apiFetch<AuthUser>("/api/auth/me")
       .then((user) => {
@@ -616,6 +829,9 @@ export async function getCurrentUser(): Promise<AuthUser> {
       })
       .catch((error: unknown) => {
         currentUserCache.inFlight = null;
+        if (error instanceof ApiError && error.status === 401) {
+          clearCurrentUserCache();
+        }
         throw error;
       });
   }
@@ -631,8 +847,10 @@ export type OnboardingResponse = {
 
 export async function submitOnboarding(payload: OnboardingRequest): Promise<OnboardingResponse> {
   const csrfToken = await getCsrfToken();
-  // is_onboarded flips server-side, so the cached session is now stale.
+  // is_onboarded flips server-side, so the cached session and every derived
+  // GET payload (settings, nutrition targets, profile) are now stale.
   clearCurrentUserCache();
+  invalidateCache();
   return apiFetch<OnboardingResponse>("/api/auth/onboarding", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
@@ -673,6 +891,7 @@ export async function generateMealPlan(
   if (calorieTarget !== undefined) body.calorie_target = calorieTarget;
 
   const csrfToken = await getCsrfToken();
+  invalidateCache("/api/meal-plans");
   return apiFetch<MealPlanResponse | MealPlanFailure>("/api/meal-plans/generate", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
@@ -713,14 +932,21 @@ export type ProgressSummary = {
   height_cm: number | null;
 };
 
-export async function getProgress(): Promise<ProgressEntry[]> {
-  return apiFetch<ProgressEntry[]>("/api/progress");
+export async function getProgress(
+  options?: CacheOptions<ProgressEntry[]>,
+): Promise<ProgressEntry[]> {
+  return cachedQuery<ProgressEntry[]>(
+    cacheKeys.progress,
+    () => apiFetch<ProgressEntry[]>("/api/progress"),
+    options,
+  );
 }
 
 export async function createProgressEntry(
   payload: ProgressEntryCreate,
 ): Promise<ProgressEntry> {
   const csrfToken = await getCsrfToken();
+  invalidateCache(cacheKeys.progress);
   return apiFetch<ProgressEntry>("/api/progress", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
@@ -728,12 +954,19 @@ export async function createProgressEntry(
   });
 }
 
-export async function getProgressSummary(): Promise<ProgressSummary> {
-  return apiFetch<ProgressSummary>("/api/progress/summary");
+export async function getProgressSummary(
+  options?: CacheOptions<ProgressSummary>,
+): Promise<ProgressSummary> {
+  return cachedQuery<ProgressSummary>(
+    cacheKeys.progressSummary,
+    () => apiFetch<ProgressSummary>("/api/progress/summary"),
+    options,
+  );
 }
 
 export async function deleteProgressEntry(entryId: string): Promise<void> {
   const csrfToken = await getCsrfToken();
+  invalidateCache(cacheKeys.progress);
   await apiFetch<unknown>(`/api/progress/${entryId}`, {
     method: "DELETE",
     headers: { "X-CSRF-Token": csrfToken },
@@ -772,15 +1005,24 @@ export type UserProfileResponse = {
   targets: UserProfileTargets | null;
 };
 
-export async function getUserProfile(): Promise<UserProfileResponse> {
-  return apiFetch<UserProfileResponse>("/api/auth/profile");
+export async function getUserProfile(
+  options?: CacheOptions<UserProfileResponse>,
+): Promise<UserProfileResponse> {
+  return cachedQuery<UserProfileResponse>(
+    cacheKeys.profile,
+    () => apiFetch<UserProfileResponse>("/api/auth/profile"),
+    options,
+  );
 }
 
 /* ── Meal plan API ─────────────────────────────────────────────────────── */
 
 export async function getTodaysMealPlan(): Promise<MealPlanResponse | null> {
   try {
-    return await apiFetch<MealPlanResponse>("/api/meal-plans/today");
+    return await cachedQuery<MealPlanResponse>(
+      cacheKeys.todayMealPlan,
+      () => apiFetch<MealPlanResponse>("/api/meal-plans/today"),
+    );
   } catch (err) {
     const msg = err instanceof Error ? err.message : "";
     // Only treat "no plan found" as a normal 404 — re-throw all other errors
@@ -861,16 +1103,25 @@ export type ChangePasswordPayload = {
   new_password: string;
 };
 
-export async function getSettings(): Promise<SettingsResponse> {
-  return apiFetch<SettingsResponse>("/api/auth/settings");
+export async function getSettings(
+  options?: CacheOptions<SettingsResponse>,
+): Promise<SettingsResponse> {
+  return cachedQuery<SettingsResponse>(
+    cacheKeys.settings,
+    () => apiFetch<SettingsResponse>("/api/auth/settings"),
+    options,
+  );
 }
 
 export async function updateProfile(
   payload: ProfileUpdatePayload,
 ): Promise<{ status: string }> {
   const csrfToken = await getCsrfToken();
-  // display_name/profile fields changed → drop the cached session user.
+  // display_name/profile fields changed → drop the cached session user and the
+  // cached settings/profile payloads that still carry the old values.
   clearCurrentUserCache();
+  invalidateCache(cacheKeys.settings);
+  invalidateCache(cacheKeys.profile);
   return apiFetch<{ status: string }>("/api/auth/profile", {
     method: "PATCH",
     headers: { "X-CSRF-Token": csrfToken },
@@ -882,6 +1133,7 @@ export async function updatePreferences(
   payload: PreferencesUpdatePayload,
 ): Promise<{ status: string }> {
   const csrfToken = await getCsrfToken();
+  invalidateCache(cacheKeys.settings);
   return apiFetch<{ status: string }>("/api/auth/preferences", {
     method: "PATCH",
     headers: { "X-CSRF-Token": csrfToken },
@@ -908,20 +1160,26 @@ export type WhatsAppLinkResponse = {
   whatsapp_phone: string | null;
 };
 
-export async function getWhatsAppLink(): Promise<{
+export type WhatsAppLinkState = {
   linked: boolean;
   whatsapp_phone: string | null;
-}> {
-  return apiFetch<{
-    linked: boolean;
-    whatsapp_phone: string | null;
-  }>("/api/users/me/whatsapp");
+};
+
+export async function getWhatsAppLink(
+  options?: CacheOptions<WhatsAppLinkState>,
+): Promise<WhatsAppLinkState> {
+  return cachedQuery<WhatsAppLinkState>(
+    cacheKeys.whatsapp,
+    () => apiFetch<WhatsAppLinkState>("/api/users/me/whatsapp"),
+    options,
+  );
 }
 
 export async function updateWhatsAppPhone(
   whatsappPhone: string | null,
 ): Promise<WhatsAppLinkResponse> {
   const csrfToken = await getCsrfToken();
+  invalidateCache(cacheKeys.whatsapp);
   return apiFetch<WhatsAppLinkResponse>("/api/users/me/whatsapp", {
     method: "PATCH",
     headers: { "X-CSRF-Token": csrfToken },
@@ -981,25 +1239,26 @@ export type FoodSearchParams = {
   offset?: number;
 };
 
-export async function getFoodCategories(): Promise<FoodCategory[]> {
-  return apiFetch<FoodCategory[]>("/api/foods/categories");
+export async function getFoodCategories(
+  options?: CacheOptions<FoodCategory[]>,
+): Promise<FoodCategory[]> {
+  return cachedQuery<FoodCategory[]>(
+    cacheKeys.foodCategories,
+    () => apiFetch<FoodCategory[]>("/api/foods/categories"),
+    { ttlMs: 10 * 60_000, ...options },
+  );
 }
 
 export async function searchFoods(
   params: FoodSearchParams = {},
+  options?: CacheOptions<FoodListResponse>,
 ): Promise<FoodListResponse> {
-  const searchParams = new URLSearchParams();
-  if (params.q) searchParams.set("q", params.q);
-  if (params.category_slug) searchParams.set("category_slug", params.category_slug);
-  if (params.dietary_tag_slug) searchParams.set("dietary_tag_slug", params.dietary_tag_slug);
-  if (params.cuisine_tag_slug) searchParams.set("cuisine_tag_slug", params.cuisine_tag_slug);
-  if (params.verification_status) searchParams.set("verification_status", params.verification_status);
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  if (params.offset) searchParams.set("offset", String(params.offset));
-
-  const qs = searchParams.toString();
-  const path = `/api/foods${qs ? `?${qs}` : ""}`;
-  return apiFetch<FoodListResponse>(path);
+  const path = cacheKeys.foods(params);
+  return cachedQuery<FoodListResponse>(
+    path,
+    () => apiFetch<FoodListResponse>(path),
+    options,
+  );
 }
 
 /* ── Meal Plan Management API ───────────────────────────────────────── */
@@ -1024,17 +1283,22 @@ export type MealPlanListResponse = {
 
 export async function listMealPlans(
   params: { limit?: number; offset?: number } = {},
+  options?: CacheOptions<MealPlanListResponse>,
 ): Promise<MealPlanListResponse> {
-  const searchParams = new URLSearchParams();
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  if (params.offset) searchParams.set("offset", String(params.offset));
-  const qs = searchParams.toString();
-  const path = `/api/meal-plans${qs ? `?${qs}` : ""}`;
-  return apiFetch<MealPlanListResponse>(path);
+  const path = `/api/meal-plans${buildQuery({
+    limit: params.limit,
+    offset: params.offset,
+  })}`;
+  return cachedQuery<MealPlanListResponse>(
+    path,
+    () => apiFetch<MealPlanListResponse>(path),
+    options,
+  );
 }
 
 export async function deleteMealPlan(planId: string): Promise<void> {
   const csrfToken = await getCsrfToken();
+  invalidateCache("/api/meal-plans");
   await apiFetch<unknown>(`/api/meal-plans/${planId}`, {
     method: "DELETE",
     headers: { "X-CSRF-Token": csrfToken },
@@ -1070,6 +1334,7 @@ export async function saveAiMealPlan(
   payload: SaveMealPlanPayload,
 ): Promise<{ status: string; id: string }> {
   const csrfToken = await getCsrfToken();
+  invalidateCache("/api/ai/meal-plans/saved");
   return apiFetch<{ status: string; id: string }>("/api/ai/meal-plans/save", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
@@ -1079,17 +1344,22 @@ export async function saveAiMealPlan(
 
 export async function listSavedAiMealPlans(
   params: { limit?: number; offset?: number } = {},
+  options?: CacheOptions<SavedMealPlanListResponse>,
 ): Promise<SavedMealPlanListResponse> {
-  const searchParams = new URLSearchParams();
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  if (params.offset) searchParams.set("offset", String(params.offset));
-  const qs = searchParams.toString();
-  const path = `/api/ai/meal-plans/saved${qs ? `?${qs}` : ""}`;
-  return apiFetch<SavedMealPlanListResponse>(path);
+  const path = `/api/ai/meal-plans/saved${buildQuery({
+    limit: params.limit,
+    offset: params.offset,
+  })}`;
+  return cachedQuery<SavedMealPlanListResponse>(
+    path,
+    () => apiFetch<SavedMealPlanListResponse>(path),
+    options,
+  );
 }
 
 export async function deleteSavedAiMealPlan(planId: string): Promise<void> {
   const csrfToken = await getCsrfToken();
+  invalidateCache("/api/ai/meal-plans/saved");
   await apiFetch<unknown>(`/api/ai/meal-plans/saved/${planId}`, {
     method: "DELETE",
     headers: { "X-CSRF-Token": csrfToken },
@@ -1134,6 +1404,7 @@ export async function saveAiWorkout(
   payload: SaveWorkoutPlanPayload,
 ): Promise<{ status: string; id: string }> {
   const csrfToken = await getCsrfToken();
+  invalidateCache("/api/ai/workouts/saved");
   return apiFetch<{ status: string; id: string }>("/api/ai/workouts/saved", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
@@ -1143,17 +1414,22 @@ export async function saveAiWorkout(
 
 export async function listSavedAiWorkouts(
   params: { limit?: number; offset?: number } = {},
+  options?: CacheOptions<SavedWorkoutPlanListResponse>,
 ): Promise<SavedWorkoutPlanListResponse> {
-  const searchParams = new URLSearchParams();
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  if (params.offset) searchParams.set("offset", String(params.offset));
-  const qs = searchParams.toString();
-  const path = `/api/ai/workouts/saved${qs ? `?${qs}` : ""}`;
-  return apiFetch<SavedWorkoutPlanListResponse>(path);
+  const path = `/api/ai/workouts/saved${buildQuery({
+    limit: params.limit,
+    offset: params.offset,
+  })}`;
+  return cachedQuery<SavedWorkoutPlanListResponse>(
+    path,
+    () => apiFetch<SavedWorkoutPlanListResponse>(path),
+    options,
+  );
 }
 
 export async function deleteSavedAiWorkout(planId: string): Promise<void> {
   const csrfToken = await getCsrfToken();
+  invalidateCache("/api/ai/workouts/saved");
   await apiFetch<unknown>(`/api/ai/workouts/saved/${planId}`, {
     method: "DELETE",
     headers: { "X-CSRF-Token": csrfToken },

@@ -8,33 +8,49 @@ import { AlertBanner } from "@/components/ui/alert-banner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  cacheKeys,
   deleteSavedAiMealPlan,
   listSavedAiMealPlans,
+  peekCache,
   type SavedMealPlanItem,
   type SavedMealPlanListResponse,
 } from "@/lib/api";
 
+type SavedPlansState =
+  | { status: "loading" }
+  | { status: "ready"; data: SavedMealPlanListResponse }
+  | { status: "error"; message: string };
+
 export default function SavedPlansPage() {
-  const [state, setState] = useState<
-    | { status: "loading" }
-    | { status: "ready"; data: SavedMealPlanListResponse }
-    | { status: "error"; message: string }
-  >({ status: "loading" });
+  // Paint the cached archive on the first frame; revalidate in the background.
+  const [state, setState] = useState<SavedPlansState>(() => {
+    const cached = peekCache<SavedMealPlanListResponse>(
+      cacheKeys.savedMealPlans(50),
+    );
+    return cached ? { status: "ready", data: cached } : { status: "loading" };
+  });
 
   const [selectedPlan, setSelectedPlan] = useState<SavedMealPlanItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteMsg, setDeleteMsg] = useState<{ type: "info" | "error"; text: string } | null>(null);
 
-  const fetchPlans = () => {
-    setState({ status: "loading" });
-    listSavedAiMealPlans({ limit: 50 })
+  const fetchPlans = (force = false) => {
+    listSavedAiMealPlans(
+      { limit: 50 },
+      { force, onFresh: (data) => setState({ status: "ready", data }) },
+    )
       .then((data) => setState({ status: "ready", data }))
       .catch((err: unknown) =>
-        setState({
-          status: "error",
-          message: err instanceof Error ? err.message : "Failed to load saved plans.",
-        }),
+        setState((prev) =>
+          prev.status === "ready"
+            ? prev
+            : {
+                status: "error",
+                message:
+                  err instanceof Error ? err.message : "Failed to load saved plans.",
+              },
+        ),
       );
   };
 
@@ -48,7 +64,7 @@ export default function SavedPlansPage() {
     try {
       await deleteSavedAiMealPlan(planId);
       setDeleteMsg({ type: "info", text: "Plan deleted." });
-      fetchPlans();
+      fetchPlans(true);
     } catch (err: unknown) {
       setDeleteMsg({
         type: "error",

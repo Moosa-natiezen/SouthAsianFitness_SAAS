@@ -735,8 +735,19 @@ def list_user_meal_plans(
     limit: int = 20,
     offset: int = 0,
 ) -> tuple[list[MealPlan], int]:
-    """Return a paginated list of the user's meal plans, newest first."""
-    q = db.query(MealPlan).filter(MealPlan.user_id == user_id)
+    """Return a paginated list of the user's meal plans, newest first.
+
+    ``days`` is eager-loaded because the route falls back to ``len(plan.days)``
+    for the day count; loading it lazily inside that loop issued one extra query
+    per plan in the history list.
+    """
+    from sqlalchemy.orm import selectinload
+
+    q = (
+        db.query(MealPlan)
+        .options(selectinload(MealPlan.days))
+        .filter(MealPlan.user_id == user_id)
+    )
     total = q.count()
     items = (
         q.order_by(MealPlan.created_at.desc())

@@ -9,10 +9,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FoodThumbnail } from "@/components/food/food-thumbnail";
 import {
+  cacheKeys,
   getFoodCategories,
+  peekCache,
   searchFoods,
   type FoodCategory,
   type FoodItem,
+  type FoodListResponse,
 } from "@/lib/api";
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
@@ -149,17 +152,32 @@ function SkeletonGrid() {
 
 export default function FoodLibraryPage() {
   /* ── State ────────────────────────────────────────────────────────── */
-  const [foods, setFoods] = useState<FoodItem[]>([]);
-  const [total, setTotal] = useState(0);
+  // Seed the first page and the category rail from the SWR cache so a repeat
+  // visit renders the library immediately instead of a skeleton grid.
+  const [foods, setFoods] = useState<FoodItem[]>(
+    () =>
+      peekCache<FoodListResponse>(cacheKeys.foods({ limit: PAGE_SIZE, offset: 0 }))?.items ??
+      [],
+  );
+  const [total, setTotal] = useState(
+    () =>
+      peekCache<FoodListResponse>(cacheKeys.foods({ limit: PAGE_SIZE, offset: 0 }))?.total ??
+      0,
+  );
   const [categories, setCategories] = useState<FoodCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(
+    () => peekCache<FoodListResponse>(cacheKeys.foods({ limit: PAGE_SIZE, offset: 0 })) === undefined,
+  );
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isWakingUp, setIsWakingUp] = useState(false);
 
-  const offsetRef = useRef(0);
+  const offsetRef = useRef(
+    peekCache<FoodListResponse>(cacheKeys.foods({ limit: PAGE_SIZE, offset: 0 }))?.items
+      .length ?? 0,
+  );
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wakeUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -227,27 +245,37 @@ export default function FoodLibraryPage() {
 
   useEffect(() => {
     let cancelled = false;
+    const hasCachedPage =
+      peekCache<FoodListResponse>(cacheKeys.foods({ limit: PAGE_SIZE, offset: 0 })) !==
+      undefined;
+
     async function load() {
-      setLoading(true);
-      try {
-        const [cats] = await Promise.all([
-          getFoodCategories(),
-          fetchFoods("", null, true),
-        ]);
-        if (!cancelled) setCategories(cats);
-      } catch (err) {
+      if (!hasCachedPage) setLoading(true);
+      // Categories and the first food page are independent requests.
+      const [catsRes, foodsRes] = await Promise.allSettled([
+        getFoodCategories(),
+        fetchFoods("", null, true),
+      ]);
+      if (cancelled) return;
+
+      if (catsRes.status === "fulfilled") {
+        setCategories(catsRes.value);
+      } else {
+        console.error("[FoodLibrary] Category load failed:", catsRes.reason);
+      }
+
+      if (foodsRes.status === "rejected") {
         console.error(
           "[FoodLibrary] Initial load failed — check NEXT_PUBLIC_API_URL / backend availability:",
-          err,
+          foodsRes.reason,
         );
-        if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load foods.",
-          );
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+        setError(
+          foodsRes.reason instanceof Error
+            ? foodsRes.reason.message
+            : "Failed to load foods.",
+        );
       }
+      setLoading(false);
     }
     void load();
     return () => {

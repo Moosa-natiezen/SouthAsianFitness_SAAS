@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  cacheKeys,
   createCheckoutSession,
   createPortalSession,
   fetchLocations,
@@ -21,6 +22,8 @@ import {
   getSettings,
   getUserProfile,
   getWhatsAppLink,
+  peekCache,
+  peekCurrentUser,
   updateProfile,
   updatePreferences,
   updateWhatsAppPhone,
@@ -86,11 +89,17 @@ export default function SettingsPage() {
   /* ── Data state ──────────────────────────────────────────────────── */
   const [settings, setSettings] = useState<SettingsResponse | null>(null);
   const [countries, setCountries] = useState<CountryData[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Per-card loading flags: a slow locations list, macro recalculation or
+  // billing lookup must never keep the whole page in skeleton placeholders.
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [targetsLoading, setTargetsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   /* ── Profile form ────────────────────────────────────────────────── */
-  const [displayName, setDisplayName] = useState("");
+  const [displayName, setDisplayName] = useState(
+    () => peekCurrentUser()?.display_name ?? "",
+  );
   const [ageYears, setAgeYears] = useState("");
   const [sex, setSex] = useState("male");
   const [heightCm, setHeightCm] = useState("");
@@ -119,7 +128,7 @@ export default function SettingsPage() {
   const [targets, setTargets] = useState<UserProfileTargets | null>(null);
 
   /* ── Billing state ────────────────────────────────────────────────── */
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(() => peekCurrentUser());
   const [portalLoading, setPortalLoading] = useState(false);
   const [billingMsg, setBillingMsg] = useState<{
     type: "info" | "error";
@@ -169,69 +178,95 @@ export default function SettingsPage() {
 
   /* ── Load data ───────────────────────────────────────────────────── */
 
+  /** Populate the forms from a settings payload (initial load + revalidation). */
+  const applySettings = useCallback((data: SettingsResponse) => {
+    setSettings(data);
+    setDisplayName(data.display_name ?? "");
+    setCountryId(data.country_id ?? "");
+    setRegionId(data.region_id ?? "");
+    setCurrencyCode(data.preferred_currency_code ?? "PKR");
+    setUnitSystem(data.preferred_unit_system ?? "metric");
+    setPreferredLanguage(data.preferred_language ?? "en");
+
+    if (data.profile) {
+      const p = data.profile;
+      setAgeYears(p.age_years?.toString() ?? "");
+      setSex(p.sex ?? "male");
+      setHeightCm(p.height_cm?.toString() ?? "");
+      setWeightKg(p.weight_kg?.toString() ?? "");
+      setActivityLevel(p.activity_level ?? "moderately_active");
+      setFitnessGoal(p.fitness_goal ?? "weight_loss");
+      setDietPattern(p.diet_pattern ?? "omnivore");
+      setDietaryTags((p.dietary_tags ?? []).join(", "));
+    }
+
+    if (data.preferences) {
+      const pr = data.preferences;
+      setFoodDislikes((pr.food_dislikes ?? []).join(", "));
+      setPreferredFoods((pr.preferred_foods ?? []).join(", "));
+      setAllergenTags(
+        (pr.dietary_tags ?? []).filter((t) => !pr.food_dislikes?.includes(t)).join(", "),
+      );
+      setCuisineTags((pr.cuisine_tags ?? []).join(", "));
+      setWeeklyBudget(pr.weekly_budget_amount?.toString() ?? "");
+      setBudgetPeriod(pr.budget_period ?? "weekly");
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      try {
-        const [settingsData, locationsData, userData, profileData] = await Promise.all([
-          getSettings(),
-          fetchLocations(),
-          getCurrentUser(),
-          getUserProfile().catch(() => null),
-        ]);
-        if (cancelled) return;
 
-        setSettings(settingsData);
-        setCountries(locationsData);
-        setUser(userData);
-        setUserState(userData);
-        if (profileData?.targets) setTargets(profileData.targets);
+    // Frame 1: paint account details from the cached session, then from the
+    // cached settings payload — no network round-trip before the form shows.
+    const cachedUser = peekCurrentUser();
+    if (cachedUser) setUser(cachedUser);
+    const cachedSettings = peekCache<SettingsResponse>(cacheKeys.settings);
+    if (cachedSettings) applySettings(cachedSettings);
 
-        // Populate profile form
-        setDisplayName(settingsData.display_name ?? "");
-        setCountryId(settingsData.country_id ?? "");
-        setRegionId(settingsData.region_id ?? "");
-        setCurrencyCode(settingsData.preferred_currency_code ?? "PKR");
-        setUnitSystem(settingsData.preferred_unit_system ?? "metric");
-        setPreferredLanguage(settingsData.preferred_language ?? "en");
+    // Secondary data settles independently, so one slow or failing card can no
+    // longer trap the whole page in skeletons.
+    void (async () => {
+      const [settingsRes, locationsRes, profileRes, userRes] = await Promise.allSettled([
+        getSettings({ onFresh: (data) => { if (!cancelled) applySettings(data); } }),
+        fetchLocations(),
+        getUserProfile({
+          onFresh: (data) => {
+            if (!cancelled && data.targets) setTargets(data.targets);
+          },
+        }),
+        getCurrentUser(),
+      ]);
+      if (cancelled) return;
 
-        if (settingsData.profile) {
-          const p = settingsData.profile;
-          setAgeYears(p.age_years?.toString() ?? "");
-          setSex(p.sex ?? "male");
-          setHeightCm(p.height_cm?.toString() ?? "");
-          setWeightKg(p.weight_kg?.toString() ?? "");
-          setActivityLevel(p.activity_level ?? "moderately_active");
-          setFitnessGoal(p.fitness_goal ?? "weight_loss");
-          setDietPattern(p.diet_pattern ?? "omnivore");
-          setDietaryTags((p.dietary_tags ?? []).join(", "));
-        }
-
-        if (settingsData.preferences) {
-          const pr = settingsData.preferences;
-          setFoodDislikes((pr.food_dislikes ?? []).join(", "));
-          setPreferredFoods((pr.preferred_foods ?? []).join(", "));
-          setAllergenTags(
-            (pr.dietary_tags ?? []).filter((t) => !pr.food_dislikes?.includes(t)).join(", "),
-          );
-          setCuisineTags((pr.cuisine_tags ?? []).join(", "));
-          setWeeklyBudget(pr.weekly_budget_amount?.toString() ?? "");
-          setBudgetPeriod(pr.budget_period ?? "weekly");
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "Unable to load settings.",
-          );
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+      if (settingsRes.status === "fulfilled") {
+        applySettings(settingsRes.value);
+      } else {
+        setError(
+          settingsRes.reason instanceof Error
+            ? settingsRes.reason.message
+            : "Unable to load settings.",
+        );
       }
-    }
-    void load();
+      setSettingsLoading(false);
+
+      if (locationsRes.status === "fulfilled") setCountries(locationsRes.value);
+      setLocationsLoading(false);
+
+      if (profileRes.status === "fulfilled" && profileRes.value.targets) {
+        setTargets(profileRes.value.targets);
+      }
+      setTargetsLoading(false);
+
+      if (userRes.status === "fulfilled") {
+        setUser(userRes.value);
+        setUserState(userRes.value);
+      }
+    })();
+
     return () => {
       cancelled = true;
-    };  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    };
+  }, [applySettings]);
 
   /* ── Upgrade polling after returning from checkout ───────────────── */
 
@@ -499,33 +534,18 @@ export default function SettingsPage() {
 
   /* ── Loading state ───────────────────────────────────────────────── */
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-stone-900 dark:text-zinc-100">Settings</h2>
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-stone-900 dark:text-zinc-100">Settings</h2>
-        <AlertBanner variant="error" message={error} />
-      </div>
-    );
-  }
-
   /* ── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-stone-900 dark:text-zinc-100">Settings</h2>
 
+      {error && <AlertBanner variant="error" message={error} />}
+
       {/* ── Macro Targets Display ─────────────────────────────────────── */}
+      {targetsLoading && !targets && (
+        <Skeleton className="h-32 w-full rounded-2xl" />
+      )}
       {targets && (
         <div className="rounded-2xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 p-5 backdrop-blur-xl">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500 dark:text-zinc-500">
@@ -558,6 +578,21 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           {profileMsg && (
             <AlertBanner variant={profileMsg.type} message={profileMsg.text} />
+          )}
+
+          {/* Read-only account email from the cached session: renders on frame 1. */}
+          <div className="space-y-1">
+            <span className={labelClass}>Email</span>
+            <p className="text-sm text-stone-900 dark:text-zinc-100">
+              {settings?.email ?? user?.email ?? "—"}
+            </p>
+          </div>
+
+          {settingsLoading && (
+            <div className="space-y-2" aria-hidden>
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-9 w-full" />
+            </div>
           )}
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -705,6 +740,7 @@ export default function SettingsPage() {
                 value={countryId}
                 onChange={(e) => handleCountryChange(e.target.value)}
                 className={inputClass}
+                disabled={locationsLoading}
               >
                 <option value="">Select country</option>
                 {countries.map((c) => (
@@ -784,7 +820,10 @@ export default function SettingsPage() {
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button onClick={handleSaveProfile} disabled={profileSaving}>
+            <Button
+              onClick={handleSaveProfile}
+              disabled={profileSaving || settingsLoading}
+            >
               {profileSaving ? "Saving..." : "Save Profile"}
             </Button>
           </div>
@@ -890,7 +929,10 @@ export default function SettingsPage() {
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button onClick={handleSavePreferences} disabled={prefsSaving}>
+            <Button
+              onClick={handleSavePreferences}
+              disabled={prefsSaving || settingsLoading}
+            >
               {prefsSaving ? "Saving..." : "Save Preferences"}
             </Button>
           </div>
@@ -942,7 +984,10 @@ export default function SettingsPage() {
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button onClick={handleSavePreferences} disabled={prefsSaving}>
+            <Button
+              onClick={handleSavePreferences}
+              disabled={prefsSaving || settingsLoading}
+            >
               {prefsSaving ? "Saving..." : "Save Budget"}
             </Button>
           </div>

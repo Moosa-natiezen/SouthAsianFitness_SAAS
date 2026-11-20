@@ -10,8 +10,10 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AiWorkoutGenerator } from "@/components/ai/ai-workout-generator";
 import {
+  cacheKeys,
   deleteSavedAiWorkout,
   listSavedAiWorkouts,
+  peekCache,
   type SavedWorkoutPlanItem,
   type SavedWorkoutPlanListResponse,
 } from "@/lib/api";
@@ -33,17 +35,23 @@ const splitLabels: Record<string, string> = {
 
 export default function WorkoutsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("generator");
-  const [archive, setArchive] = useState<SavedWorkoutPlanListResponse | null>(null);
-  const [archiveLoading, setArchiveLoading] = useState(true);
+  const [archive, setArchive] = useState<SavedWorkoutPlanListResponse | null>(
+    () => peekCache<SavedWorkoutPlanListResponse>(cacheKeys.savedWorkouts(20)) ?? null,
+  );
+  const [archiveLoading, setArchiveLoading] = useState(
+    () => peekCache<SavedWorkoutPlanListResponse>(cacheKeys.savedWorkouts(20)) === undefined,
+  );
   const [archiveError, setArchiveError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [viewing, setViewing] = useState<SavedWorkoutPlanItem | null>(null);
 
-  const fetchArchive = () => {
-    setArchiveLoading(true);
-    listSavedAiWorkouts({ limit: 20 })
-      .then(setArchive)
+  const fetchArchive = (force = false) => {
+    listSavedAiWorkouts({ limit: 20 }, { force, onFresh: setArchive })
+      .then((data) => {
+        setArchive(data);
+        setArchiveError(null);
+      })
       .catch((err: unknown) => {
         setArchiveError(err instanceof Error ? err.message : "Failed to load archive.");
       })
@@ -58,7 +66,7 @@ export default function WorkoutsPage() {
     setDeleteId(id);
     try {
       await deleteSavedAiWorkout(id);
-      fetchArchive();
+      fetchArchive(true);
     } catch {
       // silently fail
     } finally {

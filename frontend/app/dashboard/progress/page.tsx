@@ -16,10 +16,12 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  cacheKeys,
   createProgressEntry,
   deleteProgressEntry,
   getProgress,
   getProgressSummary,
+  peekCache,
   type ProgressEntry,
   type ProgressEntryCreate,
   type ProgressSummary,
@@ -49,8 +51,14 @@ const goalLabels: Record<string, string> = {
 /* ── Page ───────────────────────────────────────────────────────────────── */
 
 export default function ProgressPage() {
-  const [summary, setSummary] = useState<SummaryState>({ status: "loading" });
-  const [history, setHistory] = useState<HistoryState>({ status: "loading" });
+  const [summary, setSummary] = useState<SummaryState>(() => {
+    const cached = peekCache<ProgressSummary>(cacheKeys.progressSummary);
+    return cached ? { status: "ready", data: cached } : { status: "loading" };
+  });
+  const [history, setHistory] = useState<HistoryState>(() => {
+    const cached = peekCache<ProgressEntry[]>(cacheKeys.progress);
+    return cached ? { status: "ready", entries: cached } : { status: "loading" };
+  });
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deleteMsg, setDeleteMsg] = useState<{
@@ -83,9 +91,46 @@ export default function ProgressPage() {
   };
 
   useEffect(() => {
-    loadSummary();
-    loadHistory();
-    // eslint-disable-line react-hooks/exhaustive-deps
+    // Both endpoints are independent — settle them together and let each card
+    // paint as soon as its own data (cached or fresh) is available.
+    void (async () => {
+      const [summaryRes, historyRes] = await Promise.allSettled([
+        getProgressSummary({ onFresh: (data) => setSummary({ status: "ready", data }) }),
+        getProgress({ onFresh: (entries) => setHistory({ status: "ready", entries }) }),
+      ]);
+
+      if (summaryRes.status === "fulfilled") {
+        setSummary({ status: "ready", data: summaryRes.value });
+      } else {
+        setSummary((prev) =>
+          prev.status === "ready"
+            ? prev
+            : {
+                status: "error",
+                message:
+                  summaryRes.reason instanceof Error
+                    ? summaryRes.reason.message
+                    : "Failed to load summary.",
+              },
+        );
+      }
+
+      if (historyRes.status === "fulfilled") {
+        setHistory({ status: "ready", entries: historyRes.value });
+      } else {
+        setHistory((prev) =>
+          prev.status === "ready"
+            ? prev
+            : {
+                status: "error",
+                message:
+                  historyRes.reason instanceof Error
+                    ? historyRes.reason.message
+                    : "Failed to load history.",
+              },
+        );
+      }
+    })();
   }, []);
 
   const handleEntryCreated = () => {
