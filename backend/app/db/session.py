@@ -64,7 +64,7 @@ def create_db_engine(url: str | None = None, **overrides: Any) -> Engine:
     return create_engine(target_url, **build_engine_kwargs(target_url, **overrides))
 
 
-def create_probe_engine(connect_timeout: int = 3) -> Engine:
+def create_probe_engine(connect_timeout: int = 4) -> Engine:
     """Create an unpooled engine for health probes with a short connect timeout.
 
     The application engine allows 10s to connect, which is right for user

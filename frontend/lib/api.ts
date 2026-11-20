@@ -5,6 +5,27 @@
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
 
+/**
+ * Fire-and-forget warm-up ping.
+ *
+ * Render's free web service sleeps after idle time and Neon suspends its
+ * compute after ~5 minutes without a query, so the first request of a session
+ * can pay a 30–50s wake-up. Calling this when the onboarding wizard or an auth
+ * page mounts spends that wait in the background instead of inside the user's
+ * first Save/Login submit. Never throws, never blocks, never retries.
+ */
+export function warmUpApi(): void {
+  if (typeof window === "undefined") return;
+  void fetch(`${apiBaseUrl}/api/health`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+    keepalive: true,
+  }).catch(() => {
+    // A warm-up is best-effort by definition: the real request will retry.
+  });
+}
+
 /* ── Shared ────────────────────────────────────────────────────────────── */
 
 /**
@@ -67,9 +88,17 @@ function dispatchFreeTrialLimit(): void {
   }
 }
 
-/** Default timeout for API requests (15 seconds). Prevents infinite hangs. */
-const API_TIMEOUT_MS = 15_000;
-const AUTH_TIMEOUT_MS = 20_000;
+/**
+ * Default timeout for API requests.
+ *
+ * 65s covers a full Render + Neon cold start: Render's free tier takes
+ * 30–50s to boot a sleeping service, and Neon's compute resume is queued
+ * behind that. The previous 15s (20s for auth) aborted onboarding saves and
+ * profile updates mid-warmup with "Request timed out. The server may be
+ * waking up" even though the request would have succeeded.
+ */
+const API_TIMEOUT_MS = 65_000;
+const AUTH_TIMEOUT_MS = 65_000;
 
 /**
  * Base delay (ms) for exponential backoff on retryable errors.

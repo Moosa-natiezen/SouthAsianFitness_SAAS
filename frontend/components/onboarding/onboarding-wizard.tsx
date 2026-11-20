@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   fetchLocations,
   submitOnboarding,
+  warmUpApi,
   type CountryData,
 } from "@/lib/api";
 
@@ -234,6 +235,12 @@ export function OnboardingWizard() {
   const [countries, setCountries] = useState<CountryData[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
+
+  // Start waking Render (and its Neon compute) as soon as the wizard mounts,
+  // so the Step 4+ saves are not the requests that pay the cold start.
+  useEffect(() => {
+    warmUpApi();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

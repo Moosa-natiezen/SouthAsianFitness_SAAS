@@ -311,6 +311,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     };
   }, [handleGoogleCredential]);
 
+  // Warm Render + Neon while the user types, so the sign-in POST is not the
+  // request that absorbs a cold start. Imported lazily to keep the auth bundle
+  // free of the whole API client until a request is actually made.
+  useEffect(() => {
+    void import("@/lib/api").then(({ warmUpApi }) => warmUpApi());
+  }, []);
+
   useEffect(() => {
     // Missing client ID is already reflected in the initial state above; the
     // button reports the misconfiguration when clicked instead of spinning.
